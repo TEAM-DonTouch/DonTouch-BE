@@ -1,13 +1,13 @@
-name: workflow-name # 워크플로 이름
+name: dontouch-cicd.yml # 워크플로 이름
 
 on:
   push:
     branches: # 워크플로 대상 브랜치
-#      - main
+      - main
 #      - test
 
 env:
-  PROJECT_NAME: my-project # 프로젝트 명
+  PROJECT_NAME: dontouch # 프로젝트 명
   DOCKERHUB_REPO: ${{ secrets.DOCKERHUB_USERNAME }}
   APP_IMAGE_SUFFIX: "-back"
   MAIN_PORT: "8080"

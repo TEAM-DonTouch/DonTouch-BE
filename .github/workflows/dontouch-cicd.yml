@@ -4,7 +4,7 @@ on:
   push:
     branches: # 워크플로 대상 브랜치
       - main
-#      - test
+      - test
 
 env:
   PROJECT_NAME: dontouch # 프로젝트 명

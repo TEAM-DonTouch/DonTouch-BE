@@ -21,6 +21,8 @@ spring:
 
 springdoc:
   servers:
+    - url: http://api.dontouch.shop
+      description: main-server
     - url: http://localhost:8080
       description: local-server
 

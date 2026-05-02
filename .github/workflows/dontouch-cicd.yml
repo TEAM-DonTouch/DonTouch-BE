@@ -13,7 +13,7 @@ env:
   MAIN_PORT: "8080"
   TEST_PORT: "8081"
   APP_EXPOSE_PORT: "8080"
-  MOUNT_DIR: "/volume/project/..."
+  MOUNT_DIR: "/home/ubuntu/dontouch/server"
   SPRING_PROFILE_MAIN: "prod"
   SPRING_PROFILE_TEST: "prod"
 

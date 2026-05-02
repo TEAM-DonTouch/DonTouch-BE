@@ -10,8 +10,8 @@ env:
   PROJECT_NAME: dontouch # 프로젝트 명
   DOCKERHUB_REPO: ${{ secrets.DOCKERHUB_USERNAME }}
   APP_IMAGE_SUFFIX: "-backend"
-  MAIN_PORT: "8080"
-  TEST_PORT: "8081"
+  MAIN_PORT: "8087"
+  TEST_PORT: "8088"
   APP_EXPOSE_PORT: "8080"
   MOUNT_DIR: "/home/ubuntu/dontouch/server"
   SPRING_PROFILE_MAIN: "prod"

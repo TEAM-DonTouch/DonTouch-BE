@@ -15,7 +15,7 @@ spring:
     time-zone: Asia/Seoul
   mvc:
     format:
-      date-time: "yyyy-MM-dd'T'HH:mm:ss"
+      date-time: "yyyy-MM-dd HH:mm:ss"
     pathmatch:
       matching-strategy: ant_path_matcher
 

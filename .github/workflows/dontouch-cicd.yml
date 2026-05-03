@@ -39,9 +39,11 @@ jobs:
       # application-prod.yml 파일을 빌드 전에 생성
       - name: Create application-prod.yml from secret
         run: |
-          cat << 'EOF' > ./src/main/resources/application-prod.yml
-          ${{ secrets.APPLICATION_PROD_YML }}
-          EOF
+          if [ "${GITHUB_REF_NAME}" = "test" ]; then
+              echo "${{ secrets.APPLICATION_TEST_YML }}" > ./src/main/resources/application-prod.yml
+          else
+              echo "${{ secrets.APPLICATION_PROD_YML }}" > ./src/main/resources/application-prod.yml
+          fi
 
       # 브랜치 별 active profile 설정
       - name: Decide active profile

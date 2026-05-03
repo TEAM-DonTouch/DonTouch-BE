@@ -12,12 +12,7 @@ spring:
         format_sql: true
         use_sql_comments: true
   jackson:
-    time-zone: Asia/Seoul
-  mvc:
-    format:
-      date-time: "yyyy-MM-dd HH:mm:ss"
-    pathmatch:
-      matching-strategy: ant_path_matcher
+    time-zone: Asia/Seoul서
 
 springdoc:
   servers:

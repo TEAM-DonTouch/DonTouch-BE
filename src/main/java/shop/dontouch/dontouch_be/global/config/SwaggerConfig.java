@@ -19,7 +19,7 @@ import org.springframework.context.annotation.Configuration;
     info = @Info(
         title = "🍱 DonTouch 🍱",
         description = """
-            ### 🌐 CampusTable 웹사이트 🌐 : https://www.dontouch.shop
+            ### 🌐 DonTouch 웹사이트 🌐 : https://www.dontouch.shop
             [**웹사이트 바로가기**](https://www.dontouch.shop)
             
             ### 💻 **GitHub 저장소**

@@ -1,6 +1,6 @@
-package com.dontouch.dontouch_be.global.config;
+package shop.dontouch.dontouch_be.global.config;
 
-import com.dontouch.dontouch_be.global.properties.SpringDocProperties;
+import shop.dontouch.dontouch_be.global.properties.SpringDocProperties;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.info.Info;
 import io.swagger.v3.oas.models.Components;

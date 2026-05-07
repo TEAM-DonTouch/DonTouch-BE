@@ -1,4 +1,4 @@
-package com.dontouch.dontouch_be;
+package shop.dontouch.dontouch_be;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

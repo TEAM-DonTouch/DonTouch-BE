@@ -2,6 +2,8 @@ package shop.dontouch.dontouch_be.domain.finance.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -17,6 +19,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import shop.dontouch.dontouch_be.domain.ai.entity.AiImage;
+import shop.dontouch.dontouch_be.domain.finance.constant.TransactionType;
+import shop.dontouch.dontouch_be.domain.user.constant.MemberRole;
 import shop.dontouch.dontouch_be.domain.user.entity.User;
 import shop.dontouch.dontouch_be.global.common.BaseEntity;
 
@@ -44,9 +48,10 @@ public class Transaction extends BaseEntity {
   @JoinColumn(name = "category_id", nullable = false, unique = true)
   private Category category;
 
+  @Enumerated(EnumType.STRING)
   @Column(nullable = false)
-  private boolean type;
-  //0이 지출, 1이 수입
+  @Builder.Default
+  private TransactionType type = TransactionType.INCOME;
 
   @Column(nullable = false)
   private int amount;

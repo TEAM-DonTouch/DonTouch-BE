@@ -25,7 +25,7 @@ public class Achievement extends BaseEntity {
   private UUID id;
 
   @Column(nullable = false, unique = true, length = 30)
-  private String achievementName;
+  private String name;
 
   @Column(nullable = false, unique = true, length = 100)
   private String description;

@@ -34,5 +34,5 @@ public class Category extends BaseEntity {
   private User user;
 
   @Column(nullable = false, unique = true, length = 10)
-  private String categoryName;
+  private String name;
 }

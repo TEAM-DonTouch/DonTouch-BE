@@ -34,7 +34,7 @@ public class EmploymentInfo extends BaseEntity {
   private User user;
 
   @Column(nullable = false)
-  private LocalDate hire_date;
+  private LocalDate hireDate;
 
   @Column(nullable = false)
   private int salary;

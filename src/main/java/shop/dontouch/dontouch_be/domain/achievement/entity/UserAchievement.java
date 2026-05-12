@@ -30,10 +30,10 @@ public class UserAchievement extends BaseEntity {
   private UUID id;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "user_id", nullable = false, unique = true)
+  @JoinColumn(name = "user_id", nullable = false)
   private User user;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "achievement_id", nullable = false, unique = true)
+  @JoinColumn(name = "achievement_id", nullable = false)
   private Achievement achievement;
 }

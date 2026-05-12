@@ -30,13 +30,13 @@ public class Post extends BaseEntity {
   private UUID id;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "user_id", nullable = false, unique = true)
+  @JoinColumn(name = "user_id", nullable = false)
   private User user;
 
-  @Column(nullable = false, unique = true, length = 30)
+  @Column(nullable = false, length = 30)
   private String title;
 
-  @Column(nullable = false, unique = true, length = 255)
+  @Column(nullable = false, length = 255)
   private String content;
 
   @Column(nullable = false)

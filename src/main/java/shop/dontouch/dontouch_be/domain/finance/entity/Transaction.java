@@ -37,15 +37,15 @@ public class Transaction extends BaseEntity {
   private UUID id;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "user_id", nullable = false, unique = true)
+  @JoinColumn(name = "user_id", nullable = false)
   private User user;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "ai_image_id", nullable = false, unique = true)
+  @JoinColumn(name = "ai_image_id", nullable = false)
   private AiImage aiImage;
 
-  @OneToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "category_id", nullable = false, unique = true)
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "category_id", nullable = false)
   private Category category;
 
   @Enumerated(EnumType.STRING)
@@ -56,7 +56,7 @@ public class Transaction extends BaseEntity {
   @Column(nullable = false)
   private int amount;
 
-  @Column(nullable = false, unique = true, length = 30)
+  @Column(nullable = false, length = 30)
   private String memo;
 
   @Column(updatable = false)

@@ -30,9 +30,9 @@ public class Category extends BaseEntity {
   private UUID id;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "user_id", nullable = false, unique = true)
+  @JoinColumn(name = "user_id", nullable = false)
   private User user;
 
-  @Column(nullable = false, unique = true, length = 10)
+  @Column(nullable = false, length = 10)
   private String name;
 }

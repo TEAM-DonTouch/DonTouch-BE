@@ -1,0 +1,41 @@
+package shop.dontouch.dontouch_be.domain.notice.entity;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import java.util.UUID;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import shop.dontouch.dontouch_be.domain.user.constant.MemberStatus;
+import shop.dontouch.dontouch_be.global.common.BaseEntity;
+
+@Entity
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@Builder
+public class Notice extends BaseEntity {
+  @Id
+  @GeneratedValue(strategy = GenerationType.UUID)
+  @Column(updatable = false, nullable = false)
+  private UUID id;
+
+  @Column(nullable = false, unique = true, length = 30)
+  private String title;
+
+  @Column(nullable = false, unique = true, length = 255)
+  private String content;
+
+  @Column(nullable = false)
+  private int viewCount;
+
+  @Column(nullable = false)
+  private boolean noticeStatus;
+}

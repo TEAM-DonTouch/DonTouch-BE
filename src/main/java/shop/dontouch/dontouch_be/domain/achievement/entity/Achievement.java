@@ -27,6 +27,6 @@ public class Achievement extends BaseEntity {
   @Column(nullable = false, unique = true, length = 30)
   private String name;
 
-  @Column(nullable = false, unique = true, length = 100)
+  @Column(nullable = false, length = 100)
   private String description;
 }

@@ -37,7 +37,7 @@ public class Comment extends BaseEntity {
   @JoinColumn(name = "post_id", nullable = false)
   private Post post;
 
-  @Column(nullable = false, unique = true, length = 100)
+  @Column(nullable = false, length = 100)
   private String content;
 
   @Column(nullable = false)

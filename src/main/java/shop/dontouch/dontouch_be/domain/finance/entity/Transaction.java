@@ -20,6 +20,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import shop.dontouch.dontouch_be.domain.ai.entity.AiImage;
 import shop.dontouch.dontouch_be.domain.finance.constant.TransactionType;
+import shop.dontouch.dontouch_be.domain.finance.dto.TransactionUpdateRequest;
 import shop.dontouch.dontouch_be.domain.user.constant.MemberRole;
 import shop.dontouch.dontouch_be.domain.user.entity.User;
 import shop.dontouch.dontouch_be.global.common.BaseEntity;
@@ -40,13 +41,13 @@ public class Transaction extends BaseEntity {
   @JoinColumn(name = "user_id", nullable = false)
   private User user;
 
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "ai_image_id", nullable = false)
-  private AiImage aiImage;
-
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "category_id", nullable = false)
-  private Category category;
+//  @ManyToOne(fetch = FetchType.LAZY)
+//  @JoinColumn(name = "ai_image_id", nullable = false)
+//  private AiImage aiImage;
+//
+//  @ManyToOne(fetch = FetchType.LAZY)
+//  @JoinColumn(name = "category_id", nullable = false)
+//  private Category category;
 
   @Enumerated(EnumType.STRING)
   @Column(nullable = false)
@@ -59,9 +60,13 @@ public class Transaction extends BaseEntity {
   @Column(nullable = false, length = 30)
   private String memo;
 
-  @Column(updatable = false)
+  @Column(nullable = false)
   private LocalDateTime transactionDate;
 
-  @Column(nullable = false)
-  private boolean transactionStatus;
+  public void update(TransactionUpdateRequest request) {
+    this.amount = request.getAmount();
+    this.memo = request.getMemo();
+    this.type = request.getType();
+    this.transactionDate = request.getTransactionDate();
+  }
 }

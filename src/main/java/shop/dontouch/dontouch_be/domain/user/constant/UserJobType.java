@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public enum MemberJobType {
+public enum UserJobType {
   EMPLOYEE,
   FREELANCER,
   SOLE_PROPRIETOR,

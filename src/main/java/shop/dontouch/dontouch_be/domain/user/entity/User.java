@@ -13,13 +13,13 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
-import shop.dontouch.dontouch_be.domain.user.constant.MemberGender;
-import shop.dontouch.dontouch_be.domain.user.constant.MemberJobType;
-import shop.dontouch.dontouch_be.domain.user.constant.MemberRegion;
-import shop.dontouch.dontouch_be.domain.user.constant.MemberRole;
-import shop.dontouch.dontouch_be.domain.user.constant.MemberStatus;
+import shop.dontouch.dontouch_be.domain.user.constant.UserGender;
+import shop.dontouch.dontouch_be.domain.user.constant.UserJobType;
+import shop.dontouch.dontouch_be.domain.user.constant.UserRegion;
+import shop.dontouch.dontouch_be.domain.user.constant.UserRole;
+import shop.dontouch.dontouch_be.domain.user.constant.UserStatus;
+import shop.dontouch.dontouch_be.domain.user.dto.UserDto;
 import shop.dontouch.dontouch_be.global.common.BaseEntity;
 
 @Entity
@@ -36,7 +36,7 @@ public class User extends BaseEntity {
   @Column(nullable = false, unique = true, length = 255)
   private String email;
 
-  @Column(nullable = false, unique = true, length = 10)
+  @Column(nullable = false, unique = true, length = 30)
   private String nickname;
 
   @Column(length = 500)
@@ -45,7 +45,7 @@ public class User extends BaseEntity {
   @Enumerated(EnumType.STRING)
   @Column(nullable = false)
   @Builder.Default
-  private MemberRole memberRole = MemberRole.GENERAL_USER;
+  private UserRole userRole = UserRole.GENERAL_USER;
 
   @Column(nullable = false)
   private int age;
@@ -53,20 +53,54 @@ public class User extends BaseEntity {
   @Enumerated(EnumType.STRING)
   @Column(length = 15)
   @Builder.Default
-  private MemberGender gender = MemberGender.NOT_SELECTED;
+  private UserGender gender = UserGender.NOT_SELECTED;
 
   @Enumerated(EnumType.STRING)
   @Column(nullable = false)
   @Builder.Default
-  private MemberJobType memberJobType = MemberJobType.OTHER;
+  private UserJobType userJobType = UserJobType.OTHER;
 
   @Enumerated(EnumType.STRING)
   @Column(nullable = false)
   @Builder.Default
-  private MemberRegion memberRegion = MemberRegion.SEOUL;
+  private UserRegion userRegion = UserRegion.SEOUL;
 
   @Enumerated(EnumType.STRING)
   @Column(nullable = false)
   @Builder.Default
-  private MemberStatus memberStatus = MemberStatus.ACTIVE;
+  private UserStatus userStatus = UserStatus.ACTIVE;
+
+  public void updateUser(UserDto dto) {
+    if (dto.getNickname() != null) {
+      this.nickname = dto.getNickname();
+    }
+
+    if (dto.getProfileImageUrl() != null) {
+      this.profileImageUrl = dto.getProfileImageUrl();
+    }
+
+    if (dto.getAge() != null) {
+      this.age = dto.getAge();
+    }
+
+    if (dto.getGender() != null) {
+      this.gender = dto.getGender();
+    }
+
+    if (dto.getUserJobType() != null) {
+      this.userJobType = dto.getUserJobType();
+    }
+
+    if (dto.getUserRegion() != null) {
+      this.userRegion = dto.getUserRegion();
+    }
+  }
+
+  public void updateStatus(UserStatus userStatus) {
+    this.userStatus = userStatus;
+  }
+
+  public void withdraw() {
+    this.userStatus = UserStatus.WITHDRAWN;
+  }
 }

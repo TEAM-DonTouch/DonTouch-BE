@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public enum MemberGender {
+public enum UserGender {
   MALE,
   FEMALE,
   NOT_SELECTED

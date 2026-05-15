@@ -30,7 +30,7 @@ public class UserDto {
   private String email;
 
   @NotBlank(message = "닉네임은 필수입니다.")
-  @Size(min = 2, max = 50, message = "닉네임은 2자 이상 30자 이하여야 합니다.")
+  @Size(min = 2, max = 30, message = "닉네임은 2자 이상 30자 이하여야 합니다.")
   @Schema(description = "닉네임", example = "돈더치")
   private String nickname;
 
@@ -57,6 +57,7 @@ public class UserDto {
         .id(entity.getId())
         .email(entity.getEmail())
         .nickname(entity.getNickname())
+        .profileImageUrl(entity.getProfileImageUrl())
         .age(entity.getAge())
         .gender(entity.getGender())
         .userJobType(entity.getUserJobType())

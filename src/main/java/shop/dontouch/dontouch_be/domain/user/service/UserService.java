@@ -22,6 +22,9 @@ public class UserService {
 
   @Transactional
   public UserDto createUser(UserDto userDto) {
+    if (userDto == null || userDto.getEmail() == null || userDto.getEmail().isBlank()) {
+      throw new CustomException(ErrorCode.INVALID_INPUT_VALUE);
+    }
     // 이메일 중복 체크
     if (userRepository.existsByEmail(userDto.getEmail())) {
       throw new CustomException(ErrorCode.USER_EMAIL_DUPLICATE);
@@ -68,6 +71,10 @@ public class UserService {
 
   @Transactional
   public UserDto updateUserStatus(UUID userId, UserDto userDto) {
+    if (userDto == null || userDto.getUserStatus() == null) {
+      throw new CustomException(ErrorCode.INVALID_INPUT_VALUE);
+    }
+
     User user = userRepository.findById(userId)
         .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 

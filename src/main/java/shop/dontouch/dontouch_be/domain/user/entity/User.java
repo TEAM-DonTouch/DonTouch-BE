@@ -47,8 +47,8 @@ public class User extends BaseEntity {
   @Builder.Default
   private UserRole userRole = UserRole.GENERAL_USER;
 
-  @Column(nullable = false)
-  private int age;
+  @Column()
+  private Integer age;
 
   @Enumerated(EnumType.STRING)
   @Column(length = 15)
@@ -98,6 +98,10 @@ public class User extends BaseEntity {
 
   public void updateStatus(UserStatus userStatus) {
     this.userStatus = userStatus;
+  }
+
+  public void updateRole(UserRole userRole) {
+    this.userRole = userRole;
   }
 
   public void withdraw() {

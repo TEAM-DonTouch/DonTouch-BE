@@ -39,6 +39,11 @@ public class UserService {
     User entity = User.builder()
         .email(userDto.getEmail())
         .nickname(userDto.getNickname())
+        .profileImageUrl(userDto.getProfileImageUrl())
+        .age(userDto.getAge())
+        .gender(userDto.getGender())
+        .userJobType(userDto.getUserJobType())
+        .userRegion(userDto.getUserRegion())
         .build();
 
     User savedEntity = userRepository.save(entity);
@@ -79,6 +84,20 @@ public class UserService {
         .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
     user.updateStatus(userDto.getUserStatus());
+
+    return UserDto.entityToDto(user);
+  }
+
+  @Transactional
+  public UserDto updateUserRole(UUID userId, UserDto userDto) {
+    if (userDto == null || userDto.getUserRole() == null) {
+      throw new CustomException(ErrorCode.INVALID_INPUT_VALUE);
+    }
+
+    User user = userRepository.findById(userId)
+        .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+
+    user.updateRole(userDto.getUserRole());
 
     return UserDto.entityToDto(user);
   }

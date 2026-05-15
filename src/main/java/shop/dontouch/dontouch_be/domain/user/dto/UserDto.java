@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 import shop.dontouch.dontouch_be.domain.user.constant.UserGender;
 import shop.dontouch.dontouch_be.domain.user.constant.UserJobType;
 import shop.dontouch.dontouch_be.domain.user.constant.UserRegion;
+import shop.dontouch.dontouch_be.domain.user.constant.UserRole;
 import shop.dontouch.dontouch_be.domain.user.constant.UserStatus;
 import shop.dontouch.dontouch_be.domain.user.entity.User;
 
@@ -36,6 +37,9 @@ public class UserDto {
 
   @Schema(description = "프로필 이미지")
   private String profileImageUrl;
+
+  @Schema(description = "Role", example = "GENERAL_USER")
+  private UserRole userRole;
 
   @Schema(description = "나이", example = "20")
   private Integer age;

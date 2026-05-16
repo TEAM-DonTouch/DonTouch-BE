@@ -66,9 +66,17 @@ public class Transaction extends BaseEntity {
   private LocalDateTime transactionDate;
 
   public void update(TransactionUpdateRequest request) {
-    this.amount = request.getAmount();
-    this.memo = request.getMemo();
-    this.type = request.getType();
-    this.transactionDate = request.getTransactionDate();
+    if (request.getAmount() >= 0) {
+      this.amount = request.getAmount();
+    }
+    if (request.getMemo() != null) {
+      this.memo = request.getMemo();
+    }
+    if (request.getType() != null) {
+      this.type = request.getType();
+    }
+    if (request.getTransactionDate() != null) {
+      this.transactionDate = request.getTransactionDate();
+    }
   }
 }

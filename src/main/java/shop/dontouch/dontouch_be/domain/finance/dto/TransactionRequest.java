@@ -1,6 +1,10 @@
 package shop.dontouch.dontouch_be.domain.finance.dto;
 
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.Size;
 import java.time.LocalDateTime;
 import java.util.UUID;
 import lombok.Getter;
@@ -16,11 +20,14 @@ public class TransactionRequest {
   @NotNull
   private UUID userId;
 
+  @Min(value = 1, message = "금액은 1 이상이어야 합니다.")
   private int amount;
 
   @NotNull
   private TransactionType type; // INCOME,EXPENSE
-  
+
+  @NotBlank
+  @Size(max = 30)
   private String memo;
 
   @NotNull

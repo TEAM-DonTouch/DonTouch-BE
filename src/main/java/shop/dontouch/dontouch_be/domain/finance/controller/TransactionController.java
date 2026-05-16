@@ -32,6 +32,7 @@ public class TransactionController {
     return ResponseEntity.status(HttpStatus.CREATED).body(response);
   }
 
+  // TODO 추후 ADMIN 권한 접근으로 변경 예정
   @GetMapping
   public ResponseEntity<List<TransactionResponse>> getAllTransactions() {
     List<TransactionResponse> responses = transactionService.getAllTransactions();
@@ -66,7 +67,7 @@ public class TransactionController {
   @DeleteMapping("/{transaction-id}")
   public ResponseEntity<Void> deleteTransaction(
       @PathVariable(name = "transaction-id") UUID transactionId
-  ){
+  ) {
     transactionService.deleteTransaction(transactionId);
     return ResponseEntity.noContent().build();
   }

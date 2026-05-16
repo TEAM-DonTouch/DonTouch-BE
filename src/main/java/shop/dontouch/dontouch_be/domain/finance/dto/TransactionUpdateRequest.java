@@ -13,6 +13,5 @@ public class TransactionUpdateRequest {
   private String memo;
   private TransactionType type;
   private LocalDateTime transactionDate;
-  private boolean transactionStatus;
 
 }

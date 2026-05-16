@@ -18,6 +18,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLRestriction;
 import shop.dontouch.dontouch_be.domain.ai.entity.AiImage;
 import shop.dontouch.dontouch_be.domain.finance.constant.TransactionType;
 import shop.dontouch.dontouch_be.domain.finance.dto.TransactionUpdateRequest;
@@ -30,6 +31,7 @@ import shop.dontouch.dontouch_be.global.common.BaseEntity;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Builder
+@SQLRestriction("deleted_at IS NULL")
 public class Transaction extends BaseEntity {
 
   @Id

@@ -57,7 +57,7 @@ public class Transaction extends BaseEntity {
   private TransactionType type = TransactionType.INCOME;
 
   @Column(nullable = false)
-  private int amount;
+  private Long amount;
 
   @Column(nullable = false, length = 30)
   private String memo;
@@ -66,7 +66,7 @@ public class Transaction extends BaseEntity {
   private LocalDateTime transactionDate;
 
   public void update(TransactionUpdateRequest request) {
-    if (request.getAmount() >= 0) {
+    if (request.getAmount()!= null) {
       this.amount = request.getAmount();
     }
     if (request.getMemo() != null) {

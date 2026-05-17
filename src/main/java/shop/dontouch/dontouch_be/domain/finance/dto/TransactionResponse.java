@@ -17,12 +17,11 @@ public class TransactionResponse {
   private UUID transactionId;
   private UUID userId;
   private TransactionType type;
-  private int amount;
+  private Long amount;
   private String memo;
   private LocalDateTime transactionDate;
   private LocalDateTime createdAt;
   private LocalDateTime updatedAt;
-  private LocalDateTime deletedAt;
 
   public static TransactionResponse from(Transaction transaction) {
     return new TransactionResponse(
@@ -33,8 +32,7 @@ public class TransactionResponse {
         transaction.getMemo(),
         transaction.getTransactionDate(),
         transaction.getCreatedAt(),
-        transaction.getUpdatedAt(),
-        transaction.getDeletedAt()
+        transaction.getUpdatedAt()
     );
   }
 

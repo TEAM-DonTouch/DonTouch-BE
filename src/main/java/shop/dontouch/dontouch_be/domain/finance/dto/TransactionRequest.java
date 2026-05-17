@@ -20,8 +20,9 @@ public class TransactionRequest {
   @NotNull
   private UUID userId;
 
+  @NotNull
   @Min(value = 1, message = "금액은 1 이상이어야 합니다.")
-  private int amount;
+  private Long amount;
 
   @NotNull
   private TransactionType type; // INCOME,EXPENSE

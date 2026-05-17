@@ -9,7 +9,7 @@ import shop.dontouch.dontouch_be.domain.finance.constant.TransactionType;
 @NoArgsConstructor
 public class TransactionUpdateRequest {
 
-  private int amount;
+  private Long amount;
   private String memo;
   private TransactionType type;
   private LocalDateTime transactionDate;

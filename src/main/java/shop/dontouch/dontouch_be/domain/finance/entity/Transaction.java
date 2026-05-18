@@ -10,7 +10,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
 import java.time.LocalDateTime;
 import java.util.UUID;
 import lombok.AccessLevel;
@@ -21,8 +20,6 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.SQLRestriction;
 import shop.dontouch.dontouch_be.domain.ai.entity.AiImage;
 import shop.dontouch.dontouch_be.domain.finance.constant.TransactionType;
-import shop.dontouch.dontouch_be.domain.finance.dto.TransactionUpdateRequest;
-import shop.dontouch.dontouch_be.domain.user.constant.MemberRole;
 import shop.dontouch.dontouch_be.domain.user.entity.User;
 import shop.dontouch.dontouch_be.global.common.BaseEntity;
 
@@ -65,18 +62,18 @@ public class Transaction extends BaseEntity {
   @Column(nullable = false)
   private LocalDateTime transactionDate;
 
-  public void update(TransactionUpdateRequest request) {
-    if (request.getAmount()!= null) {
-      this.amount = request.getAmount();
+  public void update(Long amount, String memo, TransactionType type, LocalDateTime transactionDate) {
+    if (amount != null) {
+      this.amount = amount;
     }
-    if (request.getMemo() != null) {
-      this.memo = request.getMemo();
+    if (memo != null) {
+      this.memo = memo;
     }
-    if (request.getType() != null) {
-      this.type = request.getType();
+    if (type != null) {
+      this.type = type;
     }
-    if (request.getTransactionDate() != null) {
-      this.transactionDate = request.getTransactionDate();
+    if (transactionDate != null) {
+      this.transactionDate = transactionDate;
     }
   }
 }

@@ -32,7 +32,14 @@ public class TransactionService {
           return new CustomException(ErrorCode.USER_NOT_FOUND);
         });
     Transaction transaction = transactionRepository.save(
-        request.toEntity(user));
+        Transaction.builder()
+            .user(user)
+            .amount(request.getAmount())
+            .type(request.getType())
+            .memo(request.getMemo())
+            .transactionDate(request.getTransactionDate())
+            .build()
+    );
 
     return TransactionResponse.from(transaction);
   }
@@ -75,7 +82,7 @@ public class TransactionService {
           log.warn("updateTransaction: 유효하지 않은 transactionId {}", transactionId);
           return new CustomException(ErrorCode.TRANSACTION_NOT_FOUND);
         });
-    transaction.update(request);
+    transaction.update(request.getAmount(), request.getMemo(), request.getType(), request.getTransactionDate());
     return TransactionResponse.from(transaction);
   }
 

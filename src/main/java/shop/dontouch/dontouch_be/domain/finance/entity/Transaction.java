@@ -25,7 +25,7 @@ import shop.dontouch.dontouch_be.domain.user.entity.User;
 import shop.dontouch.dontouch_be.global.common.BaseEntity;
 
 @Entity
-@Table(name = "transactoins")
+@Table(name = "transactions")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)

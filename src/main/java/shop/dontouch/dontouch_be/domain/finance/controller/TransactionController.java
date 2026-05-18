@@ -22,7 +22,7 @@ import shop.dontouch.dontouch_be.domain.finance.service.TransactionService;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/transactions")
-public class TransactionController {
+public class TransactionController implements TransactionControllerDocs {
 
   private final TransactionService transactionService;
 

@@ -22,7 +22,7 @@ import shop.dontouch.dontouch_be.domain.finance.service.TransactionService;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/transactions")
-public class TransactionController {
+public class TransactionController implements TransactionControllerDocs {
 
   private final TransactionService transactionService;
 
@@ -40,7 +40,7 @@ public class TransactionController {
   }
 
   @GetMapping("/users/{user-id}")
-  public ResponseEntity<List<TransactionResponse>> getAllTransactionByUserId(
+  public ResponseEntity<List<TransactionResponse>> getAllTransactionsByUserId(
       @PathVariable(name = "user-id") UUID userId
   ) {
     List<TransactionResponse> responses = transactionService.getAllTransactionsByUserId(userId);

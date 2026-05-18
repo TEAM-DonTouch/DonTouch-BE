@@ -19,14 +19,14 @@ public class TransactionRequest {
   @NotNull
   private UUID userId;
 
+  @Schema(description = "거래 유형 (INCOME / EXPENSE)", example = "INCOME")
+  @NotNull
+  private TransactionType type; // INCOME,EXPENSE
+
   @Schema(description = "거래 금액", example = "50000")
   @NotNull
   @Min(value = 1, message = "금액은 1 이상이어야 합니다.")
   private Long amount;
-
-  @Schema(description = "거래 유형 (INCOME / EXPENSE)", example = "INCOME")
-  @NotNull
-  private TransactionType type; // INCOME,EXPENSE
 
   @Schema(description = "메모")
   @NotBlank

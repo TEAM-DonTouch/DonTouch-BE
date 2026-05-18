@@ -4,12 +4,14 @@ package shop.dontouch.dontouch_be.domain.finance.dto;
 import java.time.LocalDateTime;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import shop.dontouch.dontouch_be.domain.finance.constant.TransactionType;
 import shop.dontouch.dontouch_be.domain.finance.entity.Transaction;
 
 @Getter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class TransactionResponse {
@@ -24,16 +26,15 @@ public class TransactionResponse {
   private LocalDateTime updatedAt;
 
   public static TransactionResponse from(Transaction transaction) {
-    return new TransactionResponse(
-        transaction.getId(),
-        transaction.getUser().getId(),
-        transaction.getType(),
-        transaction.getAmount(),
-        transaction.getMemo(),
-        transaction.getTransactionDate(),
-        transaction.getCreatedAt(),
-        transaction.getUpdatedAt()
-    );
+    return TransactionResponse.builder()
+        .transactionId(transaction.getId())
+        .userId(transaction.getUser().getId())
+        .type(transaction.getType())
+        .amount(transaction.getAmount())
+        .memo(transaction.getMemo())
+        .transactionDate(transaction.getTransactionDate())
+        .createdAt(transaction.getCreatedAt())
+        .updatedAt(transaction.getUpdatedAt())
+        .build();
   }
-
 }

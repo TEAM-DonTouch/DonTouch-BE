@@ -68,7 +68,7 @@ public class Transaction extends BaseEntity {
     if (amount != null) {
       this.amount = amount;
     }
-    if (memo != null) {
+    if (memo != null && !memo.isBlank()) {
       this.memo = memo;
     }
     if (type != null) {

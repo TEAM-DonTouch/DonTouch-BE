@@ -31,6 +31,7 @@ public class TransactionService {
           log.warn("createTransaction: 유효하지 않은 userId {}", request.getUserId());
           return new CustomException(ErrorCode.USER_NOT_FOUND);
         });
+
     Transaction transaction = transactionRepository.save(
         Transaction.builder()
             .user(user)
@@ -40,7 +41,6 @@ public class TransactionService {
             .transactionDate(request.getTransactionDate())
             .build()
     );
-
     return TransactionResponse.from(transaction);
   }
 
@@ -53,11 +53,11 @@ public class TransactionService {
 
   @Transactional(readOnly = true)
   public List<TransactionResponse> getAllTransactionsByUserId(UUID userId) {
-    User user = userRepository.findById(userId)
-        .orElseThrow(() -> {
-          log.warn("getAllTransactionsByUserId: 유효하지 않은 userId {}", userId);
-          return new CustomException(ErrorCode.USER_NOT_FOUND);
-        });
+    if(!userRepository.existsById(userId)) {
+      log.warn("getAllTransactionsByUserId: 유효하지 않은 userId {}", userId);
+      throw new CustomException(ErrorCode.USER_NOT_FOUND);
+    }
+
     List<Transaction> transactions = transactionRepository.findAllByUserId(userId);
 
     return transactions.stream()

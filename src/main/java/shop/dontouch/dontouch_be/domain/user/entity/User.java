@@ -16,11 +16,11 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import shop.dontouch.dontouch_be.domain.user.constant.UserGender;
-import shop.dontouch.dontouch_be.domain.user.constant.UserJobType;
-import shop.dontouch.dontouch_be.domain.user.constant.UserRegion;
-import shop.dontouch.dontouch_be.domain.user.constant.UserRole;
-import shop.dontouch.dontouch_be.domain.user.constant.UserStatus;
+import shop.dontouch.dontouch_be.domain.user.constant.Gender;
+import shop.dontouch.dontouch_be.domain.user.constant.JobType;
+import shop.dontouch.dontouch_be.domain.user.constant.Region;
+import shop.dontouch.dontouch_be.domain.user.constant.Role;
+import shop.dontouch.dontouch_be.domain.user.constant.Status;
 import shop.dontouch.dontouch_be.domain.user.dto.UserDto;
 import shop.dontouch.dontouch_be.global.common.BaseEntity;
 
@@ -48,7 +48,7 @@ public class User extends BaseEntity {
   @Enumerated(EnumType.STRING)
   @Column(nullable = false)
   @Builder.Default
-  private UserRole userRole = UserRole.GENERAL_USER;
+  private Role userRole = Role.GENERAL_USER;
 
   @Column()
   private Integer age;
@@ -56,22 +56,22 @@ public class User extends BaseEntity {
   @Enumerated(EnumType.STRING)
   @Column(length = 15)
   @Builder.Default
-  private UserGender gender = UserGender.NOT_SELECTED;
+  private Gender gender = Gender.NOT_SELECTED;
 
   @Enumerated(EnumType.STRING)
   @Column(nullable = false)
   @Builder.Default
-  private UserJobType userJobType = UserJobType.OTHER;
+  private JobType userJobType = JobType.OTHER;
 
   @Enumerated(EnumType.STRING)
   @Column(nullable = false)
   @Builder.Default
-  private UserRegion userRegion = UserRegion.SEOUL;
+  private Region userRegion = Region.SEOUL;
 
   @Enumerated(EnumType.STRING)
   @Column(nullable = false)
   @Builder.Default
-  private UserStatus userStatus = UserStatus.ACTIVE;
+  private Status userStatus = Status.ACTIVE;
 
   public void updateUser(UserDto dto) {
     if (dto.getNickname() != null) {
@@ -99,15 +99,15 @@ public class User extends BaseEntity {
     }
   }
 
-  public void updateStatus(UserStatus userStatus) {
+  public void updateStatus(Status userStatus) {
     this.userStatus = Objects.requireNonNull(userStatus, "userStatus must not be null");
   }
 
-  public void updateRole(UserRole userRole) {
+  public void updateRole(Role userRole) {
     this.userRole = Objects.requireNonNull(userRole, "userRole must not be null");
   }
 
   public void withdraw() {
-    this.userStatus = UserStatus.WITHDRAWN;
+    this.userStatus = Status.WITHDRAWN;
   }
 }

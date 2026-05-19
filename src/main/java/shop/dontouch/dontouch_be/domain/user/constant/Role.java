@@ -1,6 +1,6 @@
 package shop.dontouch.dontouch_be.domain.user.constant;
 
-public enum UserRole {
+public enum Role {
   GENERAL_USER,
   ADMIN
 }

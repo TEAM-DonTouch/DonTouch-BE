@@ -5,9 +5,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import shop.dontouch.dontouch_be.domain.user.constant.UserJobType;
-import shop.dontouch.dontouch_be.domain.user.constant.UserRegion;
-import shop.dontouch.dontouch_be.domain.user.constant.UserStatus;
+import shop.dontouch.dontouch_be.domain.user.constant.JobType;
+import shop.dontouch.dontouch_be.domain.user.constant.Region;
+import shop.dontouch.dontouch_be.domain.user.constant.Status;
 import shop.dontouch.dontouch_be.domain.user.dto.UserDto;
 import shop.dontouch.dontouch_be.domain.user.entity.User;
 import shop.dontouch.dontouch_be.domain.user.repository.UserRepository;
@@ -47,8 +47,8 @@ public class UserService {
         .profileImageUrl(userDto.getProfileImageUrl())
         .age(userDto.getAge())
         .gender(userDto.getGender())
-        .userJobType(userDto.getUserJobType() != null ? userDto.getUserJobType() : UserJobType.OTHER)
-        .userRegion(userDto.getUserRegion() != null ? userDto.getUserRegion() : UserRegion.SEOUL)
+        .userJobType(userDto.getUserJobType() != null ? userDto.getUserJobType() : JobType.OTHER)
+        .userRegion(userDto.getUserRegion() != null ? userDto.getUserRegion() : Region.SEOUL)
         .build();
 
     User savedEntity = userRepository.save(entity);
@@ -116,7 +116,7 @@ public class UserService {
     User user = userRepository.findById(userId)
         .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
-    if (user.getUserStatus() == UserStatus.WITHDRAWN) {
+    if (user.getUserStatus() == Status.WITHDRAWN) {
       throw new CustomException(ErrorCode.USER_ALREADY_WITHDRAWN);
     }
 

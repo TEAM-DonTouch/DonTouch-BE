@@ -9,11 +9,11 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import shop.dontouch.dontouch_be.domain.user.constant.UserGender;
-import shop.dontouch.dontouch_be.domain.user.constant.UserJobType;
-import shop.dontouch.dontouch_be.domain.user.constant.UserRegion;
-import shop.dontouch.dontouch_be.domain.user.constant.UserRole;
-import shop.dontouch.dontouch_be.domain.user.constant.UserStatus;
+import shop.dontouch.dontouch_be.domain.user.constant.Gender;
+import shop.dontouch.dontouch_be.domain.user.constant.JobType;
+import shop.dontouch.dontouch_be.domain.user.constant.Region;
+import shop.dontouch.dontouch_be.domain.user.constant.Role;
+import shop.dontouch.dontouch_be.domain.user.constant.Status;
 import shop.dontouch.dontouch_be.domain.user.entity.User;
 
 @Data
@@ -39,22 +39,22 @@ public class UserDto {
   private String profileImageUrl;
 
   @Schema(description = "Role", example = "GENERAL_USER")
-  private UserRole userRole;
+  private Role userRole;
 
   @Schema(description = "나이", example = "20")
   private Integer age;
 
   @Schema(description = "성별", example = "MALE")
-  private UserGender gender;
+  private Gender gender;
 
   @Schema(description = "직업", example = "OTHER")
-  private UserJobType userJobType;
+  private JobType userJobType;
 
   @Schema(description = "지역", example = "SEOUL")
-  private UserRegion userRegion;
+  private Region userRegion;
 
   @Schema(description = "계정 상태", example = "ACTIVE")
-  private UserStatus userStatus;
+  private Status userStatus;
 
   public static UserDto entityToDto(User entity) {
     return UserDto.builder()

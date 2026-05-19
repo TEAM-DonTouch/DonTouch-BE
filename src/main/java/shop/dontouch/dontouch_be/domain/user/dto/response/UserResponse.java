@@ -3,11 +3,11 @@ package shop.dontouch.dontouch_be.domain.user.dto.response;
 import java.util.UUID;
 import lombok.Builder;
 import lombok.Getter;
-import shop.dontouch.dontouch_be.domain.user.constant.UserGender;
-import shop.dontouch.dontouch_be.domain.user.constant.UserJobType;
-import shop.dontouch.dontouch_be.domain.user.constant.UserRegion;
-import shop.dontouch.dontouch_be.domain.user.constant.UserRole;
-import shop.dontouch.dontouch_be.domain.user.constant.UserStatus;
+import shop.dontouch.dontouch_be.domain.user.constant.Gender;
+import shop.dontouch.dontouch_be.domain.user.constant.JobType;
+import shop.dontouch.dontouch_be.domain.user.constant.Region;
+import shop.dontouch.dontouch_be.domain.user.constant.Role;
+import shop.dontouch.dontouch_be.domain.user.constant.Status;
 import shop.dontouch.dontouch_be.domain.user.dto.UserDto;
 
 @Getter
@@ -18,12 +18,12 @@ public class UserResponse {
   private String email;
   private String nickname;
   private String profileImageUrl;
-  private UserRole userRole;
+  private Role userRole;
   private Integer age;
-  private UserGender gender;
-  private UserJobType userJobType;
-  private UserRegion userRegion;
-  private UserStatus userStatus;
+  private Gender gender;
+  private JobType userJobType;
+  private Region userRegion;
+  private Status userStatus;
 
   public static UserResponse from(UserDto userDto) {
     return UserResponse.builder()

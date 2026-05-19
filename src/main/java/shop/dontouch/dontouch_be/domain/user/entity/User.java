@@ -7,6 +7,8 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import java.util.Objects;
 import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -23,6 +25,7 @@ import shop.dontouch.dontouch_be.domain.user.dto.UserDto;
 import shop.dontouch.dontouch_be.global.common.BaseEntity;
 
 @Entity
+@Table(name = "users")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
@@ -97,11 +100,11 @@ public class User extends BaseEntity {
   }
 
   public void updateStatus(UserStatus userStatus) {
-    this.userStatus = userStatus;
+    this.userStatus = Objects.requireNonNull(userStatus, "userStatus must not be null");
   }
 
   public void updateRole(UserRole userRole) {
-    this.userRole = userRole;
+    this.userRole = Objects.requireNonNull(userRole, "userRole must not be null");
   }
 
   public void withdraw() {

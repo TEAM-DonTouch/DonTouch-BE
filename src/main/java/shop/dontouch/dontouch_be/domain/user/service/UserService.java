@@ -5,6 +5,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import shop.dontouch.dontouch_be.domain.user.constant.UserJobType;
+import shop.dontouch.dontouch_be.domain.user.constant.UserRegion;
 import shop.dontouch.dontouch_be.domain.user.constant.UserStatus;
 import shop.dontouch.dontouch_be.domain.user.dto.UserDto;
 import shop.dontouch.dontouch_be.domain.user.entity.User;
@@ -25,13 +27,16 @@ public class UserService {
     if (userDto == null || userDto.getEmail() == null || userDto.getEmail().isBlank()) {
       throw new CustomException(ErrorCode.INVALID_INPUT_VALUE);
     }
+    if (userDto.getNickname() == null || userDto.getNickname().isBlank()) {
+      throw new CustomException(ErrorCode.INVALID_INPUT_VALUE);
+    }
+
     // 이메일 중복 체크
     if (userRepository.existsByEmail(userDto.getEmail())) {
       throw new CustomException(ErrorCode.USER_EMAIL_DUPLICATE);
     }
     //nickName 중복 체크
-    if (userDto.getNickname() != null &&
-        userRepository.existsByNickname(userDto.getNickname())) {
+    if (userRepository.existsByNickname(userDto.getNickname())) {
       throw new CustomException(ErrorCode.USER_NICKNAME_DUPLICATE);
     }
 
@@ -42,8 +47,8 @@ public class UserService {
         .profileImageUrl(userDto.getProfileImageUrl())
         .age(userDto.getAge())
         .gender(userDto.getGender())
-        .userJobType(userDto.getUserJobType())
-        .userRegion(userDto.getUserRegion())
+        .userJobType(userDto.getUserJobType() != null ? userDto.getUserJobType() : UserJobType.OTHER)
+        .userRegion(userDto.getUserRegion() != null ? userDto.getUserRegion() : UserRegion.SEOUL)
         .build();
 
     User savedEntity = userRepository.save(entity);
@@ -60,6 +65,10 @@ public class UserService {
 
   @Transactional
   public UserDto updateUser(UUID userId, UserDto userDto) {
+    if (userDto == null) {
+      throw new CustomException(ErrorCode.INVALID_INPUT_VALUE);
+    }
+
     User user = userRepository.findById(userId)
         .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 

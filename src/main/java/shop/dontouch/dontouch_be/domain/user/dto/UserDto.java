@@ -62,6 +62,7 @@ public class UserDto {
         .email(entity.getEmail())
         .nickname(entity.getNickname())
         .profileImageUrl(entity.getProfileImageUrl())
+        .userRole(entity.getUserRole())
         .age(entity.getAge())
         .gender(entity.getGender())
         .userJobType(entity.getUserJobType())

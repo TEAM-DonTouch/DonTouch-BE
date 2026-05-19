@@ -24,10 +24,10 @@ public class Notice extends BaseEntity {
   @Column(updatable = false, nullable = false)
   private UUID id;
 
-  @Column(nullable = false, unique = true, length = 30)
+  @Column(nullable = false, length = 30)
   private String title;
 
-  @Column(nullable = false, unique = true, length = 255)
+  @Column(nullable = false, length = 255)
   private String content;
 
   @Column(nullable = false)

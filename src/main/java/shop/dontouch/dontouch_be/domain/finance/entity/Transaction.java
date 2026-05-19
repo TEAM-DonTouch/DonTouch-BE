@@ -19,7 +19,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.SQLRestriction;
-import shop.dontouch.dontouch_be.domain.ai.entity.AiImage;
 import shop.dontouch.dontouch_be.domain.finance.constant.TransactionType;
 import shop.dontouch.dontouch_be.domain.user.entity.User;
 import shop.dontouch.dontouch_be.global.common.BaseEntity;

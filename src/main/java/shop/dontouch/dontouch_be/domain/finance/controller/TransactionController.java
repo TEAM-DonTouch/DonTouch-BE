@@ -40,7 +40,7 @@ public class TransactionController implements TransactionControllerDocs {
   }
 
   @GetMapping("/users/{user-id}")
-  public ResponseEntity<List<TransactionResponse>> getAllTransactionByUserId(
+  public ResponseEntity<List<TransactionResponse>> getAllTransactionsByUserId(
       @PathVariable(name = "user-id") UUID userId
   ) {
     List<TransactionResponse> responses = transactionService.getAllTransactionsByUserId(userId);

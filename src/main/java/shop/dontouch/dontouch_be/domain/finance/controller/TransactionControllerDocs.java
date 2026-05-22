@@ -145,7 +145,7 @@ public interface TransactionControllerDocs {
           - `USER_NOT_FOUND` (404 NOT_FOUND): 유저를 찾을 수 없습니다.
           """
   )
-  ResponseEntity<List<TransactionResponse>> getAllTransactionByUserId(
+  ResponseEntity<List<TransactionResponse>> getAllTransactionsByUserId(
       @PathVariable(name = "user-id") UUID userId
   );
 

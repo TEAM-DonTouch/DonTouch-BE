@@ -53,7 +53,6 @@ public class UserService {
     return UserResponse.from(savedEntity);
   }
 
-  @Transactional
   public UserResponse getUser(UUID userId) {
     User user = userRepository.findById(userId)
         .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));

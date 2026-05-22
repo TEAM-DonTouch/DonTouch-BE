@@ -8,19 +8,19 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import java.util.Objects;
 import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
-import shop.dontouch.dontouch_be.domain.user.constant.MemberGender;
-import shop.dontouch.dontouch_be.domain.user.constant.MemberJobType;
-import shop.dontouch.dontouch_be.domain.user.constant.MemberRegion;
-import shop.dontouch.dontouch_be.domain.user.constant.MemberRole;
-import shop.dontouch.dontouch_be.domain.user.constant.MemberStatus;
+import shop.dontouch.dontouch_be.domain.user.constant.UserGender;
+import shop.dontouch.dontouch_be.domain.user.constant.UserJobType;
+import shop.dontouch.dontouch_be.domain.user.constant.UserRegion;
+import shop.dontouch.dontouch_be.domain.user.constant.UserRole;
+import shop.dontouch.dontouch_be.domain.user.constant.UserStatus;
 import shop.dontouch.dontouch_be.global.common.BaseEntity;
 
 @Entity
@@ -38,7 +38,7 @@ public class User extends BaseEntity {
   @Column(nullable = false, unique = true, length = 255)
   private String email;
 
-  @Column(nullable = false, unique = true, length = 10)
+  @Column(nullable = false, unique = true, length = 30)
   private String nickname;
 
   @Column(length = 500)
@@ -47,28 +47,73 @@ public class User extends BaseEntity {
   @Enumerated(EnumType.STRING)
   @Column(nullable = false)
   @Builder.Default
-  private MemberRole memberRole = MemberRole.GENERAL_USER;
+  private UserRole role = UserRole.GENERAL_USER;
 
-  @Column(nullable = false)
-  private int age;
+  @Column()
+  private Integer age;
 
   @Enumerated(EnumType.STRING)
   @Column(length = 15)
   @Builder.Default
-  private MemberGender gender = MemberGender.NOT_SELECTED;
+  private UserGender gender = UserGender.NOT_SELECTED;
 
   @Enumerated(EnumType.STRING)
   @Column(nullable = false)
   @Builder.Default
-  private MemberJobType memberJobType = MemberJobType.OTHER;
+  private UserJobType jobType = UserJobType.OTHER;
 
   @Enumerated(EnumType.STRING)
   @Column(nullable = false)
   @Builder.Default
-  private MemberRegion memberRegion = MemberRegion.SEOUL;
+  private UserRegion region = UserRegion.SEOUL;
 
   @Enumerated(EnumType.STRING)
   @Column(nullable = false)
   @Builder.Default
-  private MemberStatus memberStatus = MemberStatus.ACTIVE;
+  private UserStatus status = UserStatus.ACTIVE;
+
+  public void updateUser(
+      String nickname,
+      String profileImageUrl,
+      Integer age,
+      UserGender gender,
+      UserJobType jobType,
+      UserRegion region
+  ) {
+    if (nickname != null) {
+      this.nickname = nickname;
+    }
+
+    if (profileImageUrl != null) {
+      this.profileImageUrl = profileImageUrl;
+    }
+
+    if (age != null) {
+      this.age = age;
+    }
+
+    if (gender != null) {
+      this.gender = gender;
+    }
+
+    if (jobType != null) {
+      this.jobType = jobType;
+    }
+
+    if (region != null) {
+      this.region = region;
+    }
+  }
+
+  public void updateStatus(UserStatus userStatus) {
+    this.status = Objects.requireNonNull(userStatus, "userStatus must not be null");
+  }
+
+  public void updateRole(UserRole userRole) {
+    this.role = Objects.requireNonNull(userRole, "userRole must not be null");
+  }
+
+  public void withdraw() {
+    this.status = UserStatus.WITHDRAWN;
+  }
 }

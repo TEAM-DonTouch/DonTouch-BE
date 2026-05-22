@@ -29,14 +29,6 @@ public class UserService {
 
   @Transactional
   public UserResponse createUser(UserCreateRequest request) {
-    if (request == null
-        || request.getEmail() == null
-        || request.getEmail().isBlank()
-        || request.getNickname() == null
-        || request.getNickname().isBlank()) {
-      throw new CustomException(ErrorCode.INVALID_INPUT_VALUE);
-    }
-
     // 이메일 중복 체크
     if (userRepository.existsByEmail(request.getEmail())) {
       throw new CustomException(ErrorCode.USER_EMAIL_DUPLICATE);
@@ -61,7 +53,7 @@ public class UserService {
     return UserResponse.from(savedEntity);
   }
 
-  @Transactional(readOnly = true)
+  @Transactional
   public UserResponse getUser(UUID userId) {
     User user = userRepository.findById(userId)
         .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));

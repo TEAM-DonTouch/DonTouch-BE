@@ -3,6 +3,7 @@ package shop.dontouch.dontouch_be.domain.user.controller;
 import jakarta.validation.Valid;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -30,7 +31,8 @@ public class UserController {
   public ResponseEntity<UserResponse> createUser(
       @Valid @RequestBody UserCreateRequest request
   ) {
-    return ResponseEntity.ok(userService.createUser(request));
+    return ResponseEntity.status(HttpStatus.CREATED)
+        .body(userService.createUser(request));
   }
 
   @GetMapping("/{userId}")

@@ -1,6 +1,6 @@
 package shop.dontouch.dontouch_be.domain.user.constant;
 
-public enum Region {
+public enum UserRegion {
   SEOUL,
   BUSAN,
   DAEGU,

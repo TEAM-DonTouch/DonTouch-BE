@@ -1,6 +1,6 @@
 package shop.dontouch.dontouch_be.domain.user.constant;
 
-public enum JobType {
+public enum UserJobType {
   EMPLOYEE,
   FREELANCER,
   SOLE_PROPRIETOR,

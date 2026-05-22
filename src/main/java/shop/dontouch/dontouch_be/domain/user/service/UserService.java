@@ -1,5 +1,6 @@
 package shop.dontouch.dontouch_be.domain.user.service;
 
+import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -58,6 +59,13 @@ public class UserService {
         .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
     return UserResponse.from(user);
+  }
+
+  public List<UserResponse> getAllUsers() {
+    return userRepository.findAll()
+        .stream()
+        .map(UserResponse::from)
+        .toList();
   }
 
   @Transactional

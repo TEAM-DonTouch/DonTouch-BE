@@ -1,6 +1,7 @@
 package shop.dontouch.dontouch_be.domain.user.controller;
 
 import jakarta.validation.Valid;
+import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -38,6 +39,11 @@ public class UserController {
   @GetMapping("/{userId}")
   public ResponseEntity<UserResponse> getUser(@PathVariable UUID userId) {
     return ResponseEntity.ok(userService.getUser(userId));
+  }
+
+  @GetMapping
+  public ResponseEntity<List<UserResponse>> getAllUsers() {
+    return ResponseEntity.ok(userService.getAllUsers());
   }
 
   @PatchMapping("/{userId}")

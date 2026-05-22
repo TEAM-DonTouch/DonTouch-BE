@@ -5,10 +5,15 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import shop.dontouch.dontouch_be.domain.user.constant.JobType;
-import shop.dontouch.dontouch_be.domain.user.constant.Region;
-import shop.dontouch.dontouch_be.domain.user.constant.Status;
-import shop.dontouch.dontouch_be.domain.user.dto.UserDto;
+import shop.dontouch.dontouch_be.domain.user.constant.UserGender;
+import shop.dontouch.dontouch_be.domain.user.constant.UserJobType;
+import shop.dontouch.dontouch_be.domain.user.constant.UserRegion;
+import shop.dontouch.dontouch_be.domain.user.constant.UserStatus;
+import shop.dontouch.dontouch_be.domain.user.dto.request.UserCreateRequest;
+import shop.dontouch.dontouch_be.domain.user.dto.request.UserRoleUpdateRequest;
+import shop.dontouch.dontouch_be.domain.user.dto.request.UserStatusUpdateRequest;
+import shop.dontouch.dontouch_be.domain.user.dto.request.UserUpdateRequest;
+import shop.dontouch.dontouch_be.domain.user.dto.response.UserResponse;
 import shop.dontouch.dontouch_be.domain.user.entity.User;
 import shop.dontouch.dontouch_be.domain.user.repository.UserRepository;
 import shop.dontouch.dontouch_be.global.exception.CustomException;
@@ -23,105 +28,112 @@ public class UserService {
   private final UserRepository userRepository;
 
   @Transactional
-  public UserDto createUser(UserDto userDto) {
-    if (userDto == null || userDto.getEmail() == null || userDto.getEmail().isBlank()) {
-      throw new CustomException(ErrorCode.INVALID_INPUT_VALUE);
-    }
-    if (userDto.getNickname() == null || userDto.getNickname().isBlank()) {
+  public UserResponse createUser(UserCreateRequest request) {
+    if (request == null
+        || request.getEmail() == null
+        || request.getEmail().isBlank()
+        || request.getNickname() == null
+        || request.getNickname().isBlank()) {
       throw new CustomException(ErrorCode.INVALID_INPUT_VALUE);
     }
 
     // 이메일 중복 체크
-    if (userRepository.existsByEmail(userDto.getEmail())) {
+    if (userRepository.existsByEmail(request.getEmail())) {
       throw new CustomException(ErrorCode.USER_EMAIL_DUPLICATE);
     }
     //nickName 중복 체크
-    if (userRepository.existsByNickname(userDto.getNickname())) {
+    if (userRepository.existsByNickname(request.getNickname())) {
       throw new CustomException(ErrorCode.USER_NICKNAME_DUPLICATE);
     }
 
-    // Entity 변환 및 저장
+    // Entity 저장
     User entity = User.builder()
-        .email(userDto.getEmail())
-        .nickname(userDto.getNickname())
-        .profileImageUrl(userDto.getProfileImageUrl())
-        .age(userDto.getAge())
-        .gender(userDto.getGender())
-        .userJobType(userDto.getUserJobType() != null ? userDto.getUserJobType() : JobType.OTHER)
-        .userRegion(userDto.getUserRegion() != null ? userDto.getUserRegion() : Region.SEOUL)
+        .email(request.getEmail())
+        .nickname(request.getNickname())
+        .profileImageUrl(request.getProfileImageUrl())
+        .age(request.getAge())
+        .gender(request.getGender() != null ? request.getGender() : UserGender.NOT_SELECTED)
+        .jobType(request.getUserJobType() != null ? request.getUserJobType() : UserJobType.OTHER)
+        .region(request.getUserRegion() != null ? request.getUserRegion() : UserRegion.SEOUL)
         .build();
 
     User savedEntity = userRepository.save(entity);
-    return UserDto.entityToDto(savedEntity);
+    return UserResponse.from(savedEntity);
   }
 
   @Transactional(readOnly = true)
-  public UserDto getUser(UUID userId) {
+  public UserResponse getUser(UUID userId) {
     User user = userRepository.findById(userId)
         .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
-    return UserDto.entityToDto(user);
+    return UserResponse.from(user);
   }
 
   @Transactional
-  public UserDto updateUser(UUID userId, UserDto userDto) {
-    if (userDto == null) {
+  public UserResponse updateUser(UUID userId, UserUpdateRequest request) {
+    if (request == null) {
       throw new CustomException(ErrorCode.INVALID_INPUT_VALUE);
     }
 
     User user = userRepository.findById(userId)
         .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
-    //nickName 중복 체크
-    if (userDto.getNickname() != null &&
-        userRepository.existsByNicknameAndIdNot(userDto.getNickname(), userId)) {
+    if (request.getNickname() != null
+        && userRepository.existsByNicknameAndIdNot(request.getNickname(), userId)) {
       throw new CustomException(ErrorCode.USER_NICKNAME_DUPLICATE);
     }
 
-    user.updateUser(userDto);
+    user.updateUser(
+        request.getNickname(),
+        request.getProfileImageUrl(),
+        request.getAge(),
+        request.getGender(),
+        request.getUserJobType(),
+        request.getUserRegion()
+    );
 
-    return UserDto.entityToDto(user);
+    return UserResponse.from(user);
   }
 
   @Transactional
-  public UserDto updateUserStatus(UUID userId, UserDto userDto) {
-    if (userDto == null || userDto.getUserStatus() == null) {
+  public UserResponse updateUserStatus(UUID userId, UserStatusUpdateRequest request) {
+    if (request == null || request.getUserStatus() == null) {
       throw new CustomException(ErrorCode.INVALID_INPUT_VALUE);
     }
 
     User user = userRepository.findById(userId)
         .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
-    user.updateStatus(userDto.getUserStatus());
+    user.updateStatus(request.getUserStatus());
 
-    return UserDto.entityToDto(user);
+    return UserResponse.from(user);
   }
 
   @Transactional
-  public UserDto updateUserRole(UUID userId, UserDto userDto) {
-    if (userDto == null || userDto.getUserRole() == null) {
+  public UserResponse updateUserRole(UUID userId, UserRoleUpdateRequest request) {
+    if (request == null || request.getUserRole() == null) {
       throw new CustomException(ErrorCode.INVALID_INPUT_VALUE);
     }
 
     User user = userRepository.findById(userId)
         .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
-    user.updateRole(userDto.getUserRole());
+    user.updateRole(request.getUserRole());
 
-    return UserDto.entityToDto(user);
+    return UserResponse.from(user);
   }
 
   @Transactional
-  public UserDto deleteUser(UUID userId) {
+  public UserResponse deleteUser(UUID userId) {
     User user = userRepository.findById(userId)
         .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
-    if (user.getUserStatus() == Status.WITHDRAWN) {
+    if (user.getStatus() == UserStatus.WITHDRAWN) {
       throw new CustomException(ErrorCode.USER_ALREADY_WITHDRAWN);
     }
 
     user.withdraw();
 
-    return UserDto.entityToDto(user);
+    return UserResponse.from(user);
   }
 }

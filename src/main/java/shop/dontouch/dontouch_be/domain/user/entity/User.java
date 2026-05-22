@@ -16,12 +16,11 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import shop.dontouch.dontouch_be.domain.user.constant.Gender;
-import shop.dontouch.dontouch_be.domain.user.constant.JobType;
-import shop.dontouch.dontouch_be.domain.user.constant.Region;
-import shop.dontouch.dontouch_be.domain.user.constant.Role;
-import shop.dontouch.dontouch_be.domain.user.constant.Status;
-import shop.dontouch.dontouch_be.domain.user.dto.UserDto;
+import shop.dontouch.dontouch_be.domain.user.constant.UserGender;
+import shop.dontouch.dontouch_be.domain.user.constant.UserJobType;
+import shop.dontouch.dontouch_be.domain.user.constant.UserRegion;
+import shop.dontouch.dontouch_be.domain.user.constant.UserRole;
+import shop.dontouch.dontouch_be.domain.user.constant.UserStatus;
 import shop.dontouch.dontouch_be.global.common.BaseEntity;
 
 @Entity
@@ -48,7 +47,7 @@ public class User extends BaseEntity {
   @Enumerated(EnumType.STRING)
   @Column(nullable = false)
   @Builder.Default
-  private Role userRole = Role.GENERAL_USER;
+  private UserRole role = UserRole.GENERAL_USER;
 
   @Column()
   private Integer age;
@@ -56,58 +55,65 @@ public class User extends BaseEntity {
   @Enumerated(EnumType.STRING)
   @Column(length = 15)
   @Builder.Default
-  private Gender gender = Gender.NOT_SELECTED;
+  private UserGender gender = UserGender.NOT_SELECTED;
 
   @Enumerated(EnumType.STRING)
   @Column(nullable = false)
   @Builder.Default
-  private JobType userJobType = JobType.OTHER;
+  private UserJobType jobType = UserJobType.OTHER;
 
   @Enumerated(EnumType.STRING)
   @Column(nullable = false)
   @Builder.Default
-  private Region userRegion = Region.SEOUL;
+  private UserRegion region = UserRegion.SEOUL;
 
   @Enumerated(EnumType.STRING)
   @Column(nullable = false)
   @Builder.Default
-  private Status userStatus = Status.ACTIVE;
+  private UserStatus status = UserStatus.ACTIVE;
 
-  public void updateUser(UserDto dto) {
-    if (dto.getNickname() != null) {
-      this.nickname = dto.getNickname();
+  public void updateUser(
+      String nickname,
+      String profileImageUrl,
+      Integer age,
+      UserGender gender,
+      UserJobType jobType,
+      UserRegion region
+  ) {
+    if (nickname != null) {
+      this.nickname = nickname;
     }
 
-    if (dto.getProfileImageUrl() != null) {
-      this.profileImageUrl = dto.getProfileImageUrl();
+    if (profileImageUrl != null) {
+      this.profileImageUrl = profileImageUrl;
     }
 
-    if (dto.getAge() != null) {
-      this.age = dto.getAge();
+    if (age != null) {
+      this.age = age;
     }
 
-    if (dto.getGender() != null) {
-      this.gender = dto.getGender();
+    if (gender != null) {
+      this.gender = gender;
     }
 
-    if (dto.getUserJobType() != null) {
-      this.userJobType = dto.getUserJobType();
+    if (jobType != null) {
+      this.jobType = jobType;
     }
 
-    if (dto.getUserRegion() != null) {
-      this.userRegion = dto.getUserRegion();
+    if (region != null) {
+      this.region = region;
     }
   }
 
-  public void updateStatus(Status userStatus) {
-    this.userStatus = Objects.requireNonNull(userStatus, "userStatus must not be null");
+  public void updateStatus(UserStatus userStatus) {
+    this.status = Objects.requireNonNull(userStatus, "userStatus must not be null");
   }
 
-  public void updateRole(Role userRole) {
-    this.userRole = Objects.requireNonNull(userRole, "userRole must not be null");
+  public void updateRole(UserRole userRole) {
+    this.role = Objects.requireNonNull(userRole, "userRole must not be null");
   }
 
   public void withdraw() {
-    this.userStatus = Status.WITHDRAWN;
+    this.status = UserStatus.WITHDRAWN;
   }
 }

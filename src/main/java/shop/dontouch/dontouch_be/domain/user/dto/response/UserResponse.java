@@ -3,12 +3,12 @@ package shop.dontouch.dontouch_be.domain.user.dto.response;
 import java.util.UUID;
 import lombok.Builder;
 import lombok.Getter;
-import shop.dontouch.dontouch_be.domain.user.constant.Gender;
-import shop.dontouch.dontouch_be.domain.user.constant.JobType;
-import shop.dontouch.dontouch_be.domain.user.constant.Region;
-import shop.dontouch.dontouch_be.domain.user.constant.Role;
-import shop.dontouch.dontouch_be.domain.user.constant.Status;
-import shop.dontouch.dontouch_be.domain.user.dto.UserDto;
+import shop.dontouch.dontouch_be.domain.user.constant.UserGender;
+import shop.dontouch.dontouch_be.domain.user.constant.UserJobType;
+import shop.dontouch.dontouch_be.domain.user.constant.UserRegion;
+import shop.dontouch.dontouch_be.domain.user.constant.UserRole;
+import shop.dontouch.dontouch_be.domain.user.constant.UserStatus;
+import shop.dontouch.dontouch_be.domain.user.entity.User;
 
 @Getter
 @Builder
@@ -18,25 +18,25 @@ public class UserResponse {
   private String email;
   private String nickname;
   private String profileImageUrl;
-  private Role userRole;
+  private UserRole userRole;
   private Integer age;
-  private Gender gender;
-  private JobType userJobType;
-  private Region userRegion;
-  private Status userStatus;
+  private UserGender gender;
+  private UserJobType userJobType;
+  private UserRegion userRegion;
+  private UserStatus userStatus;
 
-  public static UserResponse from(UserDto userDto) {
+  public static UserResponse from(User user) {
     return UserResponse.builder()
-        .id(userDto.getId())
-        .email(userDto.getEmail())
-        .nickname(userDto.getNickname())
-        .profileImageUrl(userDto.getProfileImageUrl())
-        .userRole(userDto.getUserRole())
-        .age(userDto.getAge())
-        .gender(userDto.getGender())
-        .userJobType(userDto.getUserJobType())
-        .userRegion(userDto.getUserRegion())
-        .userStatus(userDto.getUserStatus())
+        .id(user.getId())
+        .email(user.getEmail())
+        .nickname(user.getNickname())
+        .profileImageUrl(user.getProfileImageUrl())
+        .userRole(user.getRole())
+        .age(user.getAge())
+        .gender(user.getGender())
+        .userJobType(user.getJobType())
+        .userRegion(user.getRegion())
+        .userStatus(user.getStatus())
         .build();
   }
 }

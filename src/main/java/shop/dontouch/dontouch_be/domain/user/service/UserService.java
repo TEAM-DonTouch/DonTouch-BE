@@ -1,5 +1,7 @@
 package shop.dontouch.dontouch_be.domain.user.service;
 
+import org.hibernate.exception.ConstraintViolationException;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -55,8 +57,28 @@ public class UserService {
       User savedEntity = userRepository.saveAndFlush(entity);
       return UserResponse.from(savedEntity);
     } catch (DataIntegrityViolationException e) {
-      throw new CustomException(ErrorCode.USER_DUPLICATE);
+      if (isUniqueConstraintViolation(e)) {
+        throw new CustomException(ErrorCode.USER_DUPLICATE);
+      }
+
+      throw e;
     }
+  }
+
+  private boolean isUniqueConstraintViolation(DataIntegrityViolationException e) {
+    Throwable cause = e.getCause();
+
+    while (cause != null) {
+      if (cause instanceof ConstraintViolationException constraintViolationException) {
+        SQLException sqlException = constraintViolationException.getSQLException();
+
+        return sqlException != null && "23505".equals(sqlException.getSQLState());
+      }
+
+      cause = cause.getCause();
+    }
+
+    return false;
   }
 
   public UserResponse getUser(UUID userId) {

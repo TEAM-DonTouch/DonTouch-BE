@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import shop.dontouch.dontouch_be.domain.user.constant.UserGender;
@@ -50,8 +51,12 @@ public class UserService {
         .region(request.getUserRegion() != null ? request.getUserRegion() : UserRegion.SEOUL)
         .build();
 
-    User savedEntity = userRepository.save(entity);
-    return UserResponse.from(savedEntity);
+    try {
+      User savedEntity = userRepository.saveAndFlush(entity);
+      return UserResponse.from(savedEntity);
+    } catch (DataIntegrityViolationException e) {
+      throw new CustomException(ErrorCode.USER_DUPLICATE);
+    }
   }
 
   public UserResponse getUser(UUID userId) {

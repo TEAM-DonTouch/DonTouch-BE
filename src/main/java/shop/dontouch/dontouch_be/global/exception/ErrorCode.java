@@ -14,6 +14,9 @@ public enum ErrorCode {
   INVALID_REQUEST(HttpStatus.BAD_REQUEST, "유효하지 않은 요청입니다."),
   ACCESS_DENIED(HttpStatus.FORBIDDEN, "접근이 거부되었습니다."),
 
+  // Transaction
+  TRANSACTION_NOT_FOUND(HttpStatus.NOT_FOUND, "거래를 찾을 수 없습니다."),
+
   //User
   USER_EMAIL_DUPLICATE(HttpStatus.CONFLICT, "이미 사용 중인 이메일입니다."),
   USER_NICKNAME_DUPLICATE(HttpStatus.CONFLICT, "이미 사용 중인 닉네임입니다."),

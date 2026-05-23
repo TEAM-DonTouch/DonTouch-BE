@@ -1,5 +1,6 @@
 package shop.dontouch.dontouch_be.domain.user.dto.request;
 
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
@@ -16,8 +17,10 @@ public class UserUpdateRequest {
   @Pattern(regexp = "^(?!\\s*$).*$", message = "닉네임은 공백만 입력할 수 없습니다.")
   private String nickname;
 
+  @Size(max = 500, message = "프로필 이미지 URL은 500자를 초과할 수 없습니다.")
   private String profileImageUrl;
 
+  @Min(value = 1, message = "나이는 1 이상이어야 합니다.")
   private Integer age;
 
   private UserGender gender;

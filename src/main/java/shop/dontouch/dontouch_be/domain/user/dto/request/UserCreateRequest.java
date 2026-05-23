@@ -1,6 +1,7 @@
 package shop.dontouch.dontouch_be.domain.user.dto.request;
 
 import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
@@ -25,6 +26,7 @@ public class UserCreateRequest {
   @Size(max = 500, message = "프로필 이미지 URL은 500자를 초과할 수 없습니다.")
   private String profileImageUrl;
 
+  @Min(value = 1,message = "나이는 1 이상이어야 합니다.")
   private Integer age;
 
   private UserGender gender;

@@ -19,6 +19,7 @@ public enum ErrorCode {
 
   // Category
   CATEGORY_NAME_DUPLICATE(HttpStatus.CONFLICT, "이미 존재하는 이름입니다."),
+  CATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND, "카테고리를 찾을 수 없습니다."),
 
   // User
   USER_EMAIL_DUPLICATE(HttpStatus.CONFLICT, "이미 사용 중인 이메일입니다."),

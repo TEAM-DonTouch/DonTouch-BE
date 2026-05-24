@@ -1,5 +1,7 @@
 package shop.dontouch.dontouch_be.domain.finance.service;
 
+import java.util.List;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -31,6 +33,49 @@ public class CategoryService {
             .build()
     );
     return CategoryResponse.from(category);
+  }
+
+  public CategoryResponse getCategoryByCategoryId(UUID categoryId) {
+    Category category = categoryRepository.findById(categoryId)
+        .orElseThrow(() -> {
+          log.warn("getCategory: 유효하지 않은 category id");
+          return new CustomException(ErrorCode.CATEGORY_NOT_FOUND);
+        });
+    return CategoryResponse.from(category);
+  }
+
+  public List<CategoryResponse> getAllCategories() {
+    return categoryRepository.findAll().stream()
+        .map(CategoryResponse::from)
+        .toList();
+  }
+
+  @Transactional
+  public CategoryResponse updateCategory(UUID categoryId, CategoryRequest request) {
+    Category category = categoryRepository.findById(categoryId)
+        .orElseThrow(() -> {
+          log.warn("updateCategory: 유효하지 않은 category id");
+          return new CustomException(ErrorCode.CATEGORY_NOT_FOUND);
+        });
+
+    if (categoryRepository.existsByName(request.getCategoryName())) {
+      log.warn("updateCategory: 이미 존재하는 이름입니다. {}", request.getCategoryName());
+      throw new CustomException(ErrorCode.CATEGORY_NAME_DUPLICATE);
+    }
+
+    category.updateName(request.getCategoryName());
+
+    return CategoryResponse.from(category);
+  }
+
+  @Transactional
+  public void deleteCategory(UUID categoryId) {
+    Category category = categoryRepository.findById(categoryId)
+        .orElseThrow(() -> {
+          log.warn("deleteCategory: 유효하지 않은 category id");
+          return new CustomException(ErrorCode.CATEGORY_NOT_FOUND);
+        });
+    category.delete();
   }
 
 }

@@ -12,6 +12,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLRestriction;
 import shop.dontouch.dontouch_be.domain.user.entity.User;
 import shop.dontouch.dontouch_be.global.common.BaseEntity;
 
@@ -20,6 +21,7 @@ import shop.dontouch.dontouch_be.global.common.BaseEntity;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Builder
+@SQLRestriction("deleted_at IS NULL")
 public class Category extends BaseEntity {
 
   @Id
@@ -33,4 +35,8 @@ public class Category extends BaseEntity {
 
   @Column(nullable = false, unique = true, length = 10)
   private String name;
+
+  public void updateName(String name) {
+    this.name = name;
+  }
 }

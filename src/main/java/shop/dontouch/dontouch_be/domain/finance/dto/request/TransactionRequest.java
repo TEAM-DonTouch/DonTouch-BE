@@ -19,6 +19,10 @@ public class TransactionRequest {
   @NotNull
   private UUID userId;
 
+  @Schema(description = "카테고리 ID", example = "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa")
+  @NotNull
+  private UUID categoryId;
+
   @Schema(description = "거래 유형 (INCOME / EXPENSE)", example = "INCOME")
   @NotNull
   private TransactionType type; // INCOME,EXPENSE

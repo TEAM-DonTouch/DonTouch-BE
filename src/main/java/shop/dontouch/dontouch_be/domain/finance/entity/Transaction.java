@@ -42,13 +42,13 @@ public class Transaction extends BaseEntity {
   @JoinColumn(name = "user_id", nullable = false)
   private User user;
 
-//  @ManyToOne(fetch = FetchType.LAZY)
+  //  @ManyToOne(fetch = FetchType.LAZY)
 //  @JoinColumn(name = "ai_image_id", nullable = false)
 //  private AiImage aiImage;
 //
-//  @ManyToOne(fetch = FetchType.LAZY)
-//  @JoinColumn(name = "category_id", nullable = false)
-//  private Category category;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "category_id", nullable = false)
+  private Category category;
 
   @Enumerated(EnumType.STRING)
   @Column(nullable = false)
@@ -64,15 +64,18 @@ public class Transaction extends BaseEntity {
   @Column(nullable = false)
   private LocalDateTime transactionDate;
 
-  public void update(Long amount, String memo, TransactionType type, LocalDateTime transactionDate) {
+  public void update(Category category, Long amount, String memo, TransactionType type, LocalDateTime transactionDate) {
+    if (category != null) {
+      this.category = category;
+    }
+    if (type != null) {
+      this.type = type;
+    }
     if (amount != null) {
       this.amount = amount;
     }
     if (memo != null && !memo.isBlank()) {
       this.memo = memo;
-    }
-    if (type != null) {
-      this.type = type;
     }
     if (transactionDate != null) {
       this.transactionDate = transactionDate;

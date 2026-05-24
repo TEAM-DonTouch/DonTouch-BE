@@ -18,6 +18,7 @@ public class TransactionResponse {
 
   private UUID transactionId;
   private UUID userId;
+  private UUID categoryId;
   private TransactionType type;
   private Long amount;
   private String memo;
@@ -29,6 +30,7 @@ public class TransactionResponse {
     return TransactionResponse.builder()
         .transactionId(transaction.getId())
         .userId(transaction.getUser().getId())
+        .categoryId(transaction.getCategory().getId())
         .type(transaction.getType())
         .amount(transaction.getAmount())
         .memo(transaction.getMemo())

@@ -8,4 +8,6 @@ import shop.dontouch.dontouch_be.domain.finance.entity.Transaction;
 public interface TransactionRepository extends JpaRepository<Transaction, UUID> {
 
   List<Transaction> findAllByUserId(UUID userId);
+
+  List<Transaction> findAllByCategoryId(UUID categoryId);
 }

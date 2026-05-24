@@ -39,6 +39,14 @@ public class TransactionController implements TransactionControllerDocs {
     return ResponseEntity.ok(responses);
   }
 
+  @GetMapping("/{transaction-id}")
+  public ResponseEntity<TransactionResponse> getTransactionByTransactionId(
+      @PathVariable(name = "transaction-id") UUID transactionId
+  ) {
+    TransactionResponse response = transactionService.getTransactionByTransactionId(transactionId);
+    return ResponseEntity.ok(response);
+  }
+
   @GetMapping("/users/{user-id}")
   public ResponseEntity<List<TransactionResponse>> getAllTransactionsByUserId(
       @PathVariable(name = "user-id") UUID userId
@@ -47,12 +55,12 @@ public class TransactionController implements TransactionControllerDocs {
     return ResponseEntity.ok(responses);
   }
 
-  @GetMapping("/{transaction-id}")
-  public ResponseEntity<TransactionResponse> getTransactionByTransactionId(
-      @PathVariable(name = "transaction-id") UUID transactionId
+  @GetMapping("/categories/{category-id}")
+  public ResponseEntity<List<TransactionResponse>> getAllTransactionsByCategoryId(
+      @PathVariable(name = "category-id") UUID categoryId
   ) {
-    TransactionResponse response = transactionService.getTransactionByTransactionId(transactionId);
-    return ResponseEntity.ok(response);
+    List<TransactionResponse> responses = transactionService.getAllTransactionsByCategoryId(categoryId);
+    return ResponseEntity.ok(responses);
   }
 
   @PatchMapping("/{transaction-id}")

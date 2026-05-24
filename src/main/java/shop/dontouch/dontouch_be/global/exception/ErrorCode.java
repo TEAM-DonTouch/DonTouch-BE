@@ -17,7 +17,10 @@ public enum ErrorCode {
   // Transaction
   TRANSACTION_NOT_FOUND(HttpStatus.NOT_FOUND, "거래를 찾을 수 없습니다."),
 
-  //User
+  // Category
+  CATEGORY_NAME_DUPLICATE(HttpStatus.CONFLICT, "이미 존재하는 이름입니다."),
+
+  // User
   USER_EMAIL_DUPLICATE(HttpStatus.CONFLICT, "이미 사용 중인 이메일입니다."),
   USER_NICKNAME_DUPLICATE(HttpStatus.CONFLICT, "이미 사용 중인 닉네임입니다."),
   USER_NOT_FOUND(HttpStatus.NOT_FOUND, "사용자를 찾을 수 없습니다."),

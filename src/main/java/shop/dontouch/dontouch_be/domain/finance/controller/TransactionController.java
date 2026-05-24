@@ -14,9 +14,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import shop.dontouch.dontouch_be.domain.finance.dto.TransactionRequest;
-import shop.dontouch.dontouch_be.domain.finance.dto.TransactionResponse;
-import shop.dontouch.dontouch_be.domain.finance.dto.TransactionUpdateRequest;
+import shop.dontouch.dontouch_be.domain.finance.dto.request.TransactionRequest;
+import shop.dontouch.dontouch_be.domain.finance.dto.response.TransactionResponse;
+import shop.dontouch.dontouch_be.domain.finance.dto.request.TransactionUpdateRequest;
 import shop.dontouch.dontouch_be.domain.finance.service.TransactionService;
 
 @RestController

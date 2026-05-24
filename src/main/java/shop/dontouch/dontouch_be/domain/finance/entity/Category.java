@@ -6,9 +6,6 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
 import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -24,15 +21,16 @@ import shop.dontouch.dontouch_be.global.common.BaseEntity;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Builder
 public class Category extends BaseEntity {
+
   @Id
   @GeneratedValue(strategy = GenerationType.UUID)
   @Column(updatable = false, nullable = false)
   private UUID id;
 
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "user_id", nullable = false)
-  private User user;
+//  @ManyToOne(fetch = FetchType.LAZY)
+//  @JoinColumn(name = "user_id", nullable = false)
+//  private User user;
 
-  @Column(nullable = false, length = 10)
+  @Column(nullable = false, unique = true, length = 10)
   private String name;
 }

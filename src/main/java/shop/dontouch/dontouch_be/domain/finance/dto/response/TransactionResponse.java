@@ -1,4 +1,4 @@
-package shop.dontouch.dontouch_be.domain.finance.dto;
+package shop.dontouch.dontouch_be.domain.finance.dto.response;
 
 
 import java.time.LocalDateTime;

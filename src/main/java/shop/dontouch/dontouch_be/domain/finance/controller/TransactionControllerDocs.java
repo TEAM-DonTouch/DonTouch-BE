@@ -7,9 +7,9 @@ import java.util.UUID;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
-import shop.dontouch.dontouch_be.domain.finance.dto.TransactionRequest;
-import shop.dontouch.dontouch_be.domain.finance.dto.TransactionResponse;
-import shop.dontouch.dontouch_be.domain.finance.dto.TransactionUpdateRequest;
+import shop.dontouch.dontouch_be.domain.finance.dto.request.TransactionRequest;
+import shop.dontouch.dontouch_be.domain.finance.dto.response.TransactionResponse;
+import shop.dontouch.dontouch_be.domain.finance.dto.request.TransactionUpdateRequest;
 
 public interface TransactionControllerDocs {
 

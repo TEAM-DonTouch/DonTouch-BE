@@ -150,7 +150,7 @@ public class UserService {
   }
 
   @Transactional
-  public UserResponse deleteUser(UUID userId) {
+  public void deleteUser(UUID userId) {
     User user = userRepository.findById(userId)
         .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
@@ -159,7 +159,5 @@ public class UserService {
     }
 
     user.withdraw();
-
-    return UserResponse.from(user);
   }
 }

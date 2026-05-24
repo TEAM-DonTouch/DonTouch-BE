@@ -36,8 +36,9 @@ public class UserController {
         .body(userService.createUser(request));
   }
 
-  @GetMapping("/{userId}")
-  public ResponseEntity<UserResponse> getUser(@PathVariable UUID userId) {
+  @GetMapping("/{user-id}")
+  public ResponseEntity<UserResponse> getUser(
+      @PathVariable(name = "user-id") UUID userId) {
     return ResponseEntity.ok(userService.getUser(userId));
   }
 
@@ -46,32 +47,33 @@ public class UserController {
     return ResponseEntity.ok(userService.getAllUsers());
   }
 
-  @PatchMapping("/{userId}")
+  @PatchMapping("/{user-id}")
   public ResponseEntity<UserResponse> updateUser(
-      @PathVariable UUID userId,
+      @PathVariable(name = "user-id") UUID userId,
       @Valid @RequestBody UserUpdateRequest request
   ) {
     return ResponseEntity.ok(userService.updateUser(userId, request));
   }
 
-  @PatchMapping("/{userId}/status")
+  @PatchMapping("/{user-id}/status")
   public ResponseEntity<UserResponse> updateUserStatus(
-      @PathVariable UUID userId,
+      @PathVariable(name = "user-id") UUID userId,
       @Valid @RequestBody UserStatusUpdateRequest request
   ) {
     return ResponseEntity.ok(userService.updateUserStatus(userId, request));
   }
 
-  @PatchMapping("/{userId}/role")
+  @PatchMapping("/{user-id}/role")
   public ResponseEntity<UserResponse> updateUserRole(
-      @PathVariable UUID userId,
+      @PathVariable(name = "user-id") UUID userId,
       @Valid @RequestBody UserRoleUpdateRequest request
   ) {
     return ResponseEntity.ok(userService.updateUserRole(userId, request));
   }
 
-  @DeleteMapping("/{userId}")
-  public ResponseEntity<Void> deleteUser(@PathVariable UUID userId) {
+  @DeleteMapping("/{user-id}")
+  public ResponseEntity<Void> deleteUser(
+      @PathVariable(name = "user-id") UUID userId) {
     userService.deleteUser(userId);
     return ResponseEntity.noContent().build();
   }

@@ -2,8 +2,6 @@ package shop.dontouch.dontouch_be.domain.notice.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -13,7 +11,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import shop.dontouch.dontouch_be.domain.user.constant.MemberStatus;
 import shop.dontouch.dontouch_be.global.common.BaseEntity;
 
 @Entity
@@ -27,10 +24,10 @@ public class Notice extends BaseEntity {
   @Column(updatable = false, nullable = false)
   private UUID id;
 
-  @Column(nullable = false, unique = true, length = 30)
+  @Column(nullable = false, length = 30)
   private String title;
 
-  @Column(nullable = false, unique = true, length = 255)
+  @Column(nullable = false, length = 255)
   private String content;
 
   @Column(nullable = false)

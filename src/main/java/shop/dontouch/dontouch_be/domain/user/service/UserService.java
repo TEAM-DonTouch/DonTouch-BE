@@ -7,6 +7,7 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import shop.dontouch.dontouch_be.domain.user.constant.UserGender;
@@ -30,9 +31,16 @@ import shop.dontouch.dontouch_be.global.exception.ErrorCode;
 public class UserService {
 
   private final UserRepository userRepository;
+  private final PasswordEncoder passwordEncoder;
 
   @Transactional
   public UserResponse createUser(UserCreateRequest request) {
+    if (request == null) {
+      throw new CustomException(ErrorCode.INVALID_INPUT_VALUE);
+    }
+    if (userRepository.existsByLoginId(request.getLoginId())) {
+      throw new CustomException(ErrorCode.USER_LOGIN_ID_DUPLICATE);
+    }
     // 이메일 중복 체크
     if (userRepository.existsByEmail(request.getEmail())) {
       throw new CustomException(ErrorCode.USER_EMAIL_DUPLICATE);
@@ -44,6 +52,8 @@ public class UserService {
 
     // Entity 저장
     User entity = User.builder()
+        .loginId(request.getLoginId())
+        .password(passwordEncoder.encode(request.getPassword()))
         .email(request.getEmail())
         .nickname(request.getNickname())
         .profileImageUrl(request.getProfileImageUrl())

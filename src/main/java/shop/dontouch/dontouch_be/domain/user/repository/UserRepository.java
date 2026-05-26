@@ -9,6 +9,9 @@ import shop.dontouch.dontouch_be.domain.user.entity.User;
 public interface UserRepository extends JpaRepository<User, UUID> {
   Optional<User> findByEmail(String email);
 
+  Optional<User> findByLoginId(String loginId);
+
+  boolean existsByLoginId(String loginId);
 
   boolean existsByNickname(String nickname);
   boolean existsByNicknameAndIdNot(String nickname, UUID id);

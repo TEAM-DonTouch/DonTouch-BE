@@ -19,7 +19,7 @@ import shop.dontouch.dontouch_be.domain.finance.service.BudgetService;
 @RestController
 @RequestMapping("/api/budgets")
 @RequiredArgsConstructor
-public class BudgetController {
+public class BudgetController implements BudgetControllerDocs {
 
   private final BudgetService budgetService;
 

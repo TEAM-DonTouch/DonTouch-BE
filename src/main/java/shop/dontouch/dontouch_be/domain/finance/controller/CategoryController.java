@@ -21,7 +21,7 @@ import shop.dontouch.dontouch_be.domain.finance.service.CategoryService;
 @RestController
 @RequestMapping("/api/categories")
 @RequiredArgsConstructor
-public class CategoryController {
+public class CategoryController implements CategoryControllerDocs {
 
   private final CategoryService categoryService;
 

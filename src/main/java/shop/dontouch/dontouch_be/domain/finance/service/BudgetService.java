@@ -89,7 +89,7 @@ public class BudgetService {
           log.warn("deleteBudget: 유효하지 않은 budgetId {}", budgetId);
           return new CustomException(ErrorCode.BUDGET_NOT_FOUND);
         });
-    budget.delete();
+    budgetRepository.delete(budget);
   }
 
 }

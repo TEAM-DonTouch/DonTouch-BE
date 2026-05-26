@@ -17,7 +17,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.SQLRestriction;
 import shop.dontouch.dontouch_be.domain.finance.constant.BudgetPeriod;
 import shop.dontouch.dontouch_be.domain.user.entity.User;
 import shop.dontouch.dontouch_be.global.common.BaseEntity;
@@ -27,7 +26,6 @@ import shop.dontouch.dontouch_be.global.common.BaseEntity;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Builder
-@SQLRestriction("deleted_at IS NULL")
 public class Budget extends BaseEntity {
 
   @Id

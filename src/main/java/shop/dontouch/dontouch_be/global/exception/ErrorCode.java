@@ -22,7 +22,11 @@ public enum ErrorCode {
   USER_NICKNAME_DUPLICATE(HttpStatus.CONFLICT, "이미 사용 중인 닉네임입니다."),
   USER_NOT_FOUND(HttpStatus.NOT_FOUND, "사용자를 찾을 수 없습니다."),
   USER_ALREADY_WITHDRAWN(HttpStatus.CONFLICT, "이미 탈퇴한 사용자입니다."),
-  USER_DUPLICATE(HttpStatus.CONFLICT, "이미 사용 중인 이메일 또는 닉네임입니다.");
+  USER_DUPLICATE(HttpStatus.CONFLICT, "이미 사용 중인 이메일 또는 닉네임입니다."),
+
+  //Auth
+  USER_LOGIN_ID_DUPLICATE(HttpStatus.CONFLICT, "이미 사용 중인 아이디입니다."),
+  LOGIN_FAILED(HttpStatus.UNAUTHORIZED, "로그인에 실패했습니다. 아이디 또는 비밀번호를 확인해주세요.");
 
   private final HttpStatus httpStatus;
   private final String message;

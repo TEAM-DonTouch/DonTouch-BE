@@ -43,7 +43,7 @@ public interface CategoryControllerDocs {
           - 이미 존재하는 카테고리 이름으로 생성 시 예외가 발생합니다.
 
           ### 예외 처리
-          - `CATEGORY_ALREADY_EXISTS` (409 CONFLICT): 이미 존재하는 카테고리입니다.
+          - `CATEGORY_NAME_DUPLICATE` (409 CONFLICT): 이미 존재하는 카테고리입니다.
           - `INVALID_INPUT_VALUE` (400 BAD_REQUEST): 유효하지 않은 입력값입니다.
           """
   )
@@ -153,7 +153,7 @@ public interface CategoryControllerDocs {
 
           ### 예외 처리
           - `CATEGORY_NOT_FOUND` (404 NOT_FOUND): 카테고리를 찾을 수 없습니다.
-          - `CATEGORY_ALREADY_EXISTS` (409 CONFLICT): 이미 존재하는 카테고리입니다.
+          - `CATEGORY_NAME_DUPLICATE` (409 CONFLICT): 이미 존재하는 카테고리입니다.
           - `INVALID_INPUT_VALUE` (400 BAD_REQUEST): 유효하지 않은 입력값입니다.
           """
   )

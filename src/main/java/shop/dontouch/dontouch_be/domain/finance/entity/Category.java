@@ -33,7 +33,7 @@ public class Category extends BaseEntity {
 //  @JoinColumn(name = "user_id", nullable = false)
 //  private User user;
 
-  @Column(nullable = false, unique = true, length = 10)
+  @Column(nullable = false, length = 10)
   private String name;
 
   public void updateName(String name) {

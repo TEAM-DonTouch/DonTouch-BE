@@ -37,6 +37,9 @@ public class BudgetService {
       if (request.getStartDate() == null || request.getEndDate() == null) {
         throw new CustomException(ErrorCode.INVALID_INPUT_VALUE);
       }
+      if(request.getStartDate().isAfter(request.getEndDate())) {
+        throw new CustomException(ErrorCode.INVALID_INPUT_VALUE);
+      }
     }
 
     Budget budget = budgetRepository.findByUser(user)

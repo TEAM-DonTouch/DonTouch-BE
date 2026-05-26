@@ -58,7 +58,7 @@ public class CategoryService {
           return new CustomException(ErrorCode.CATEGORY_NOT_FOUND);
         });
 
-    if (categoryRepository.existsByName(request.getCategoryName())) {
+    if (categoryRepository.existsByNameAndIdNot(request.getCategoryName(), categoryId)) {
       log.warn("updateCategory: 이미 존재하는 이름입니다. {}", request.getCategoryName());
       throw new CustomException(ErrorCode.CATEGORY_NAME_DUPLICATE);
     }

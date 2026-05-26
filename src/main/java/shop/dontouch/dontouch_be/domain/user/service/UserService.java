@@ -72,6 +72,7 @@ public class UserService {
       if (cause instanceof ConstraintViolationException constraintViolationException) {
         SQLException sqlException = constraintViolationException.getSQLException();
 
+        //23505는 많은 SQL 데이터베이스에서 '유니크 제약조건 위반(Unique Violation, 중복 데이터 입력 에러)'을 뜻하는 SQLState 코드입니다.
         return sqlException != null && "23505".equals(sqlException.getSQLState());
       }
 

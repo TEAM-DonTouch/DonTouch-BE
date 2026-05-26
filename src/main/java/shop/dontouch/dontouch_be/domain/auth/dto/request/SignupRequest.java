@@ -18,7 +18,7 @@ public class SignupRequest {
   private String email;
 
   @NotBlank(message = "아이디는 필수입니다.")
-  @Size(min = 4, max = 30, message = "아이디는 4자 이상 20자 이하이어야 합니다.")
+  @Size(min = 4, max = 30, message = "아이디는 4자 이상 30자 이하이어야 합니다.")
   private String loginId;
 
   @NotBlank(message = "비밀번호는 필수입니다.")

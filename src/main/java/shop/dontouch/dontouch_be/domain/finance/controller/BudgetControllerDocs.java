@@ -102,10 +102,6 @@ public interface BudgetControllerDocs {
           1. 별도의 요청값 없이 호출합니다.
           2. 저장된 전체 예산 목록을 반환합니다.
 
-          ### 유의 사항
-          - 삭제된 예산은 조회되지 않습니다.
-          - `deleted_at IS NULL` 조건이 적용된 데이터만 조회됩니다.
-
           ### 예외 처리
           - `INTERNAL_SERVER_ERROR` (500 INTERNAL_SERVER_ERROR): 서버에 문제가 발생했습니다.
           """
@@ -142,7 +138,6 @@ public interface BudgetControllerDocs {
           ### 유의 사항
           - 존재하지 않는 유저 ID로 요청 시 예외가 발생합니다.
           - 해당 유저의 예산이 없을 경우 예외가 발생합니다.
-          - 삭제된 예산은 조회되지 않습니다.
 
           ### 예외 처리
           - `USER_NOT_FOUND` (404 NOT_FOUND): 유저를 찾을 수 없습니다.
@@ -174,9 +169,7 @@ public interface BudgetControllerDocs {
           2. 요청 성공 시 응답 본문 없이 204 상태 코드가 반환됩니다.
 
           ### 유의 사항
-          - 실제 DB Row 삭제가 아닌 Soft Delete 방식입니다.
-          - 삭제 시 `deletedAt` 값이 저장됩니다.
-          - `@SQLRestriction("deleted_at IS NULL")` 조건으로 인해 삭제된 데이터는 이후 조회되지 않습니다.
+          - 예산 데이터가 DB에서 완전히 삭제됩니다 (Hard Delete).
           - 존재하지 않는 예산 ID로 요청 시 예외가 발생합니다.
 
           ### 예외 처리

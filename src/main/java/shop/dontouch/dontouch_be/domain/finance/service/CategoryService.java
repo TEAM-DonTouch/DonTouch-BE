@@ -38,7 +38,7 @@ public class CategoryService {
   public CategoryResponse getCategoryByCategoryId(UUID categoryId) {
     Category category = categoryRepository.findById(categoryId)
         .orElseThrow(() -> {
-          log.warn("getCategory: 유효하지 않은 category id");
+          log.warn("getCategory: 유효하지 않은 category id {}", categoryId);
           return new CustomException(ErrorCode.CATEGORY_NOT_FOUND);
         });
     return CategoryResponse.from(category);
@@ -54,7 +54,7 @@ public class CategoryService {
   public CategoryResponse updateCategory(UUID categoryId, CategoryRequest request) {
     Category category = categoryRepository.findById(categoryId)
         .orElseThrow(() -> {
-          log.warn("updateCategory: 유효하지 않은 category id");
+          log.warn("updateCategory: 유효하지 않은 category id {}", categoryId);
           return new CustomException(ErrorCode.CATEGORY_NOT_FOUND);
         });
 
@@ -72,7 +72,7 @@ public class CategoryService {
   public void deleteCategory(UUID categoryId) {
     Category category = categoryRepository.findById(categoryId)
         .orElseThrow(() -> {
-          log.warn("deleteCategory: 유효하지 않은 category id");
+          log.warn("deleteCategory: 유효하지 않은 category id  {}", categoryId);
           return new CustomException(ErrorCode.CATEGORY_NOT_FOUND);
         });
     category.delete();

@@ -49,12 +49,8 @@ public class Budget extends BaseEntity {
   private LocalDate endDate;
 
   public void update(BudgetPeriod period, Long amount, LocalDate startDate, LocalDate endDate) {
-    if (period != null) {
-      this.period = period;
-    }
-    if (amount != null) {
-      this.amount = amount;
-    }
+    this.period = period;
+    this.amount = amount;
     if (period == BudgetPeriod.CUSTOM) {
       this.startDate = startDate;
       this.endDate = endDate;

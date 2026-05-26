@@ -1,6 +1,7 @@
 package shop.dontouch.dontouch_be.domain.auth.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -50,7 +51,12 @@ public class AuthService {
         .region(request.getRegion() != null ? request.getRegion() : UserRegion.SEOUL)
         .build();
 
-    User savedUser = userRepository.save(user);
+    User savedUser;
+    try {
+      savedUser = userRepository.saveAndFlush(user);
+    } catch (DataIntegrityViolationException e) {
+        throw new CustomException(ErrorCode.USER_DUPLICATE);
+    }
 
     String accessToken = jwtProvider.createAccessToken(savedUser);
 

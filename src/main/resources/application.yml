@@ -14,6 +14,10 @@ spring:
   jackson:
     time-zone: Asia/Seoul
 
+jwt:
+  secret: "dontouch-secret-key-dontouch-secret-key-dontouch-secret-key"
+  access-token-expiration: 3600000
+
 springdoc:
   servers:
     - url: http://api.dontouch.shop
@@ -22,10 +26,10 @@ springdoc:
       description: test-server
     - url: http://localhost:8080
       description: local-server
-
   default-consumes-media-type: application/json;charset=UTF-8
   default-produces-media-type: application/json;charset=UTF-8
   swagger-ui:
     path: /docs/swagger
+
 server:
   forward-headers-strategy: framework

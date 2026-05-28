@@ -71,11 +71,11 @@ public class AuthService {
     User user = userRepository.findByLoginId(request.getLoginId())
         .orElseThrow(() -> new CustomException(ErrorCode.LOGIN_FAILED));
 
-    if(user.getStatus() == UserStatus.WITHDRAWN) {
-      throw new CustomException(ErrorCode.USER_ALREADY_WITHDRAWN);
-    }
     if(!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
       throw new CustomException(ErrorCode.LOGIN_FAILED);
+    }
+    if(user.getStatus() == UserStatus.WITHDRAWN) {
+      throw new CustomException(ErrorCode.USER_ALREADY_WITHDRAWN);
     }
 
     String accessToken = jwtProvider.createAccessToken(user);

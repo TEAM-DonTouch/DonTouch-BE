@@ -24,7 +24,7 @@ import shop.dontouch.dontouch_be.domain.user.service.UserService;
 @RestController
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
-public class UserController {
+public class UserController implements UserControllerDocs {
 
   private final UserService userService;
 

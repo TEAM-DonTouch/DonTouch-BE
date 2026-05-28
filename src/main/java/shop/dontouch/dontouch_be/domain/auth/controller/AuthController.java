@@ -16,7 +16,7 @@ import shop.dontouch.dontouch_be.domain.auth.service.AuthService;
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
-public class AuthController {
+public class AuthController implements AuthControllerDocs {
 
   private final AuthService authService;
 

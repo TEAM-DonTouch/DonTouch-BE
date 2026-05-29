@@ -1,4 +1,4 @@
-package shop.dontouch.dontouch_be.domain.finance.dto;
+package shop.dontouch.dontouch_be.domain.finance.dto.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Min;
@@ -18,6 +18,10 @@ public class TransactionRequest {
   @Schema(description = "유저 ID", example = "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa")
   @NotNull
   private UUID userId;
+
+  @Schema(description = "카테고리 ID", example = "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa")
+  @NotNull
+  private UUID categoryId;
 
   @Schema(description = "거래 유형 (INCOME / EXPENSE)", example = "INCOME")
   @NotNull

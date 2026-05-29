@@ -1,9 +1,10 @@
-package shop.dontouch.dontouch_be.domain.finance.dto;
+package shop.dontouch.dontouch_be.domain.finance.dto.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Size;
 import java.time.LocalDateTime;
+import java.util.UUID;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import shop.dontouch.dontouch_be.domain.finance.constant.TransactionType;
@@ -11,6 +12,9 @@ import shop.dontouch.dontouch_be.domain.finance.constant.TransactionType;
 @Getter
 @NoArgsConstructor
 public class TransactionUpdateRequest {
+
+  @Schema(description = "카테고리 ID",example = "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa")
+  private UUID categoryId;
 
   @Schema(description = "거래 유형 (INCOME / EXPENSE)")
   private TransactionType type;

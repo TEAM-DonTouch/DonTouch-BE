@@ -29,3 +29,6 @@ springdoc:
     path: /docs/swagger
 server:
   forward-headers-strategy: framework
+
+dontouch-ai:
+  base-url: http://localhost:8081

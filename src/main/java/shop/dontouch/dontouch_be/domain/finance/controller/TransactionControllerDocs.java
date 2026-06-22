@@ -44,6 +44,7 @@ public interface TransactionControllerDocs {
           - `transactionId` (UUID): 생성된 거래 ID
           - `userId` (UUID): 유저 ID
           - `categoryId` (UUID): 카테고리 ID
+          - `categoryName` (String): 카테고리 이름
           - `type` (TransactionType): 거래 유형
           - `amount` (Long): 거래 금액
           - `memo` (String): 거래 메모
@@ -90,6 +91,7 @@ public interface TransactionControllerDocs {
           - `transactionId` (UUID): 거래 ID
           - `userId` (UUID): 유저 ID
           - `categoryId` (UUID): 카테고리 ID
+          - `categoryName` (String): 카테고리 이름
           - `type` (TransactionType): 거래 유형
           - `amount` (Long): 거래 금액
           - `memo` (String): 거래 메모
@@ -133,6 +135,7 @@ public interface TransactionControllerDocs {
           - `transactionId` (UUID): 거래 ID
           - `userId` (UUID): 유저 ID
           - `categoryId` (UUID): 카테고리 ID
+          - `categoryName` (String): 카테고리 이름
           - `type` (TransactionType): 거래 유형
           - `amount` (Long): 거래 금액
           - `memo` (String): 거래 메모
@@ -146,7 +149,7 @@ public interface TransactionControllerDocs {
           
           ### 유의 사항
           - 존재하지 않는 유저 ID로 요청 시 예외가 발생합니다.
-          - Repository의 `findAllByUserId(UUID userId)` 메서드를 사용하여 조회합니다.
+          - Repository의 `findAllByUserIdWithCategory(UUID userId)` 메서드를 사용하여 카테고리를 함께 조회합니다(N+1 방지).
           - 삭제된 거래 데이터는 조회되지 않습니다.
           
           ### 예외 처리
@@ -178,6 +181,7 @@ public interface TransactionControllerDocs {
           - `transactionId` (UUID): 거래 ID
           - `userId` (UUID): 유저 ID
           - `categoryId` (UUID): 카테고리 ID
+          - `categoryName` (String): 카테고리 이름
           - `type` (TransactionType): 거래 유형
           - `amount` (Long): 거래 금액
           - `memo` (String): 거래 메모
@@ -218,6 +222,7 @@ public interface TransactionControllerDocs {
           - `transactionId` (UUID): 거래 ID
           - `userId` (UUID): 유저 ID
           - `categoryId` (UUID): 카테고리 ID
+          - `categoryName` (String): 카테고리 이름
           - `type` (TransactionType): 거래 유형
           - `amount` (Long): 거래 금액
           - `memo` (String): 거래 메모
@@ -274,6 +279,7 @@ public interface TransactionControllerDocs {
           - `transactionId` (UUID): 거래 ID
           - `userId` (UUID): 유저 ID
           - `categoryId` (UUID): 카테고리 ID
+          - `categoryName` (String): 카테고리 이름
           - `type` (TransactionType): 거래 유형
           - `amount` (Long): 거래 금액
           - `memo` (String): 거래 메모

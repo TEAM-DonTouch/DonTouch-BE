@@ -56,7 +56,7 @@ public class TransactionService {
   }
 
   public List<TransactionResponse> getAllTransactions() {
-    return transactionRepository.findAll().stream()
+    return transactionRepository.findAllWithCategory().stream()
         .map(TransactionResponse::from)
         .toList();
   }
@@ -76,7 +76,7 @@ public class TransactionService {
       throw new CustomException(ErrorCode.USER_NOT_FOUND);
     }
 
-    List<Transaction> transactions = transactionRepository.findAllByUserId(userId);
+    List<Transaction> transactions = transactionRepository.findAllByUserIdWithCategory(userId);
 
     return transactions.stream()
         .map(TransactionResponse::from)
@@ -89,7 +89,7 @@ public class TransactionService {
       throw new CustomException(ErrorCode.CATEGORY_NOT_FOUND);
     }
 
-    List<Transaction> transactions = transactionRepository.findAllByCategoryId(categoryId);
+    List<Transaction> transactions = transactionRepository.findAllByCategoryIdWithCategory(categoryId);
 
     return transactions.stream()
         .map(TransactionResponse::from)

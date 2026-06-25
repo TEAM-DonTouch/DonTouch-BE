@@ -23,6 +23,8 @@ public enum ErrorCode {
 
   // BUDGET
   BUDGET_NOT_FOUND(HttpStatus.NOT_FOUND, "예산을 찾을 수 없습니다."),
+  BUDGET_PERIOD_DATE_REQUIRED(HttpStatus.BAD_REQUEST, "CUSTOM 기간은 시작일과 종료일을 모두 입력해야 합니다."),
+  BUDGET_PERIOD_DATE_INVALID(HttpStatus.BAD_REQUEST, "시작일은 종료일보다 늦을 수 없습니다."),
 
   // User
   USER_EMAIL_DUPLICATE(HttpStatus.CONFLICT, "이미 사용 중인 이메일입니다."),

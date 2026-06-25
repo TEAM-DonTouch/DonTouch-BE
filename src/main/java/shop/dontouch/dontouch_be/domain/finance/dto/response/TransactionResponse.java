@@ -19,6 +19,7 @@ public class TransactionResponse {
   private UUID transactionId;
   private UUID userId;
   private UUID categoryId;
+  private String categoryName;
   private TransactionType type;
   private Long amount;
   private String memo;
@@ -31,6 +32,7 @@ public class TransactionResponse {
         .transactionId(transaction.getId())
         .userId(transaction.getUser().getId())
         .categoryId(transaction.getCategory().getId())
+        .categoryName(transaction.getCategory().getName())
         .type(transaction.getType())
         .amount(transaction.getAmount())
         .memo(transaction.getMemo())

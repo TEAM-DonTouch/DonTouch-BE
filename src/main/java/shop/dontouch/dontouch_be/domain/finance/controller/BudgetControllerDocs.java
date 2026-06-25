@@ -65,13 +65,16 @@ public interface BudgetControllerDocs {
 
           ### 유의 사항
           - `userId`는 실제 존재하는 유저 ID여야 합니다.
+          - 탈퇴(WITHDRAWN) 상태인 유저는 예산을 생성/수정할 수 없습니다.
           - `period`가 `CUSTOM`일 경우 `startDate`와 `endDate`는 필수입니다.
           - `period`가 `CUSTOM`이 아닌 경우 `startDate`, `endDate`는 무시되며 null로 저장됩니다.
           - 유저당 예산은 하나만 존재합니다 (Upsert 방식).
 
           ### 예외 처리
           - `USER_NOT_FOUND` (404 NOT_FOUND): 유저를 찾을 수 없습니다.
-          - `INVALID_INPUT_VALUE` (400 BAD_REQUEST): 유효하지 않은 입력값입니다.
+          - `USER_ALREADY_WITHDRAWN` (409 CONFLICT): 이미 탈퇴한 사용자입니다.
+          - `BUDGET_PERIOD_DATE_REQUIRED` (400 BAD_REQUEST): CUSTOM 기간은 시작일과 종료일을 모두 입력해야 합니다.
+          - `BUDGET_PERIOD_DATE_INVALID` (400 BAD_REQUEST): 시작일은 종료일보다 늦을 수 없습니다.
           """
   )
   ResponseEntity<BudgetResponse> saveBudget(

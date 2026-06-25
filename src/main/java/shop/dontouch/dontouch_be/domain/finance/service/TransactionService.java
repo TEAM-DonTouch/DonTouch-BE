@@ -13,6 +13,7 @@ import shop.dontouch.dontouch_be.domain.finance.entity.Category;
 import shop.dontouch.dontouch_be.domain.finance.entity.Transaction;
 import shop.dontouch.dontouch_be.domain.finance.repository.CategoryRepository;
 import shop.dontouch.dontouch_be.domain.finance.repository.TransactionRepository;
+import shop.dontouch.dontouch_be.domain.user.constant.UserStatus;
 import shop.dontouch.dontouch_be.domain.user.entity.User;
 import shop.dontouch.dontouch_be.domain.user.repository.UserRepository;
 import shop.dontouch.dontouch_be.global.exception.CustomException;
@@ -36,6 +37,11 @@ public class TransactionService {
           return new CustomException(ErrorCode.USER_NOT_FOUND);
         });
 
+    if (user.getStatus() == UserStatus.WITHDRAWN) {
+      log.warn("createTransaction: 탈퇴한 유저의 거래 생성 시도 userId {}", user.getId());
+      throw new CustomException(ErrorCode.USER_ALREADY_WITHDRAWN);
+    }
+
     Category category = categoryRepository.findById(request.getCategoryId())
         .orElseThrow(() -> {
           log.warn("createTransaction: 유효하지 않은 categoryId {}", request.getCategoryId());
@@ -56,7 +62,7 @@ public class TransactionService {
   }
 
   public List<TransactionResponse> getAllTransactions() {
-    return transactionRepository.findAll().stream()
+    return transactionRepository.findAllWithCategory().stream()
         .map(TransactionResponse::from)
         .toList();
   }
@@ -76,7 +82,7 @@ public class TransactionService {
       throw new CustomException(ErrorCode.USER_NOT_FOUND);
     }
 
-    List<Transaction> transactions = transactionRepository.findAllByUserId(userId);
+    List<Transaction> transactions = transactionRepository.findAllByUserIdWithCategory(userId);
 
     return transactions.stream()
         .map(TransactionResponse::from)
@@ -89,7 +95,7 @@ public class TransactionService {
       throw new CustomException(ErrorCode.CATEGORY_NOT_FOUND);
     }
 
-    List<Transaction> transactions = transactionRepository.findAllByCategoryId(categoryId);
+    List<Transaction> transactions = transactionRepository.findAllByCategoryIdWithCategory(categoryId);
 
     return transactions.stream()
         .map(TransactionResponse::from)
@@ -104,6 +110,11 @@ public class TransactionService {
           log.warn("updateTransaction: 유효하지 않은 transactionId {}", transactionId);
           return new CustomException(ErrorCode.TRANSACTION_NOT_FOUND);
         });
+
+    if (transaction.getUser().getStatus() == UserStatus.WITHDRAWN) {
+      log.warn("updateTransaction: 탈퇴한 유저의 거래 수정 시도 userId {}, transactionId {}", transaction.getUser().getId(), transaction.getId());
+      throw new CustomException(ErrorCode.USER_ALREADY_WITHDRAWN);
+    }
 
     Category category = null;
     if (request.getCategoryId() != null) {

@@ -25,7 +25,7 @@ public interface TransactionControllerDocs {
             - `INCOME`: 수입
             - `EXPENSE`: 지출
           - `amount` (Long, required): 거래 금액 (1 이상)
-          - `memo` (String, required): 거래 메모 (최대 30자)
+          - `memo` (String, optional): 거래 메모 (최대 30자)
           - `transactionDate` (LocalDateTime, required): 거래 발생 일시
 
           요청 예시
@@ -44,6 +44,7 @@ public interface TransactionControllerDocs {
           - `transactionId` (UUID): 생성된 거래 ID
           - `userId` (UUID): 유저 ID
           - `categoryId` (UUID): 카테고리 ID
+          - `categoryName` (String): 카테고리 이름
           - `type` (TransactionType): 거래 유형
           - `amount` (Long): 거래 금액
           - `memo` (String): 거래 메모
@@ -60,14 +61,17 @@ public interface TransactionControllerDocs {
 
           ### 유의 사항
           - `userId`는 실제 존재하는 유저 ID여야 합니다.
+          - 탈퇴(WITHDRAWN) 상태인 유저는 거래를 생성할 수 없습니다.
           - `categoryId`는 실제 존재하는 카테고리 ID여야 합니다.
           - `type`은 `INCOME`, `EXPENSE`만 허용됩니다.
           - `amount`는 1 이상이어야 합니다.
-          - `memo`는 공백일 수 없으며 최대 30자까지 입력 가능합니다.
+          - `memo`는 선택 입력값이며 최대 30자까지 입력 가능합니다.
+          - `memo`를 비워두거나 공백만 입력하면 저장 시 `null`로 처리됩니다.
           - `transactionDate`는 필수 입력값입니다.
 
           ### 예외 처리
           - `USER_NOT_FOUND` (404 NOT_FOUND): 유저를 찾을 수 없습니다.
+          - `USER_ALREADY_WITHDRAWN` (409 CONFLICT): 이미 탈퇴한 사용자입니다.
           - `CATEGORY_NOT_FOUND` (404 NOT_FOUND): 카테고리를 찾을 수 없습니다.
           - `INVALID_INPUT_VALUE` (400 BAD_REQUEST): 유효하지 않은 입력값입니다.
           """
@@ -90,6 +94,7 @@ public interface TransactionControllerDocs {
           - `transactionId` (UUID): 거래 ID
           - `userId` (UUID): 유저 ID
           - `categoryId` (UUID): 카테고리 ID
+          - `categoryName` (String): 카테고리 이름
           - `type` (TransactionType): 거래 유형
           - `amount` (Long): 거래 금액
           - `memo` (String): 거래 메모
@@ -133,6 +138,7 @@ public interface TransactionControllerDocs {
           - `transactionId` (UUID): 거래 ID
           - `userId` (UUID): 유저 ID
           - `categoryId` (UUID): 카테고리 ID
+          - `categoryName` (String): 카테고리 이름
           - `type` (TransactionType): 거래 유형
           - `amount` (Long): 거래 금액
           - `memo` (String): 거래 메모
@@ -146,7 +152,7 @@ public interface TransactionControllerDocs {
           
           ### 유의 사항
           - 존재하지 않는 유저 ID로 요청 시 예외가 발생합니다.
-          - Repository의 `findAllByUserId(UUID userId)` 메서드를 사용하여 조회합니다.
+          - Repository의 `findAllByUserIdWithCategory(UUID userId)` 메서드를 사용하여 카테고리를 함께 조회합니다(N+1 방지).
           - 삭제된 거래 데이터는 조회되지 않습니다.
           
           ### 예외 처리
@@ -178,6 +184,7 @@ public interface TransactionControllerDocs {
           - `transactionId` (UUID): 거래 ID
           - `userId` (UUID): 유저 ID
           - `categoryId` (UUID): 카테고리 ID
+          - `categoryName` (String): 카테고리 이름
           - `type` (TransactionType): 거래 유형
           - `amount` (Long): 거래 금액
           - `memo` (String): 거래 메모
@@ -218,6 +225,7 @@ public interface TransactionControllerDocs {
           - `transactionId` (UUID): 거래 ID
           - `userId` (UUID): 유저 ID
           - `categoryId` (UUID): 카테고리 ID
+          - `categoryName` (String): 카테고리 이름
           - `type` (TransactionType): 거래 유형
           - `amount` (Long): 거래 금액
           - `memo` (String): 거래 메모
@@ -274,6 +282,7 @@ public interface TransactionControllerDocs {
           - `transactionId` (UUID): 거래 ID
           - `userId` (UUID): 유저 ID
           - `categoryId` (UUID): 카테고리 ID
+          - `categoryName` (String): 카테고리 이름
           - `type` (TransactionType): 거래 유형
           - `amount` (Long): 거래 금액
           - `memo` (String): 거래 메모
@@ -292,9 +301,11 @@ public interface TransactionControllerDocs {
           - `memo`가 blank 값이면 수정되지 않습니다.
           - `amount`는 1 이상이어야 합니다.
           - 존재하지 않는 거래 ID로 요청 시 예외가 발생합니다.
+          - 거래 소유자가 탈퇴(WITHDRAWN) 상태이면 수정할 수 없습니다.
 
           ### 예외 처리
           - `TRANSACTION_NOT_FOUND` (404 NOT_FOUND): 거래를 찾을 수 없습니다.
+          - `USER_ALREADY_WITHDRAWN` (409 CONFLICT): 이미 탈퇴한 사용자입니다.
           - `CATEGORY_NOT_FOUND` (404 NOT_FOUND): 카테고리를 찾을 수 없습니다.
           - `INVALID_INPUT_VALUE` (400 BAD_REQUEST): 유효하지 않은 입력값입니다.
           """

@@ -25,7 +25,7 @@ public interface TransactionControllerDocs {
             - `INCOME`: 수입
             - `EXPENSE`: 지출
           - `amount` (Long, required): 거래 금액 (1 이상)
-          - `memo` (String, required): 거래 메모 (최대 30자)
+          - `memo` (String, optional): 거래 메모 (최대 30자)
           - `transactionDate` (LocalDateTime, required): 거래 발생 일시
 
           요청 예시
@@ -65,7 +65,8 @@ public interface TransactionControllerDocs {
           - `categoryId`는 실제 존재하는 카테고리 ID여야 합니다.
           - `type`은 `INCOME`, `EXPENSE`만 허용됩니다.
           - `amount`는 1 이상이어야 합니다.
-          - `memo`는 공백일 수 없으며 최대 30자까지 입력 가능합니다.
+          - `memo`는 선택 입력값이며 최대 30자까지 입력 가능합니다.
+          - `memo`를 비워두거나 공백만 입력하면 저장 시 `null`로 처리됩니다.
           - `transactionDate`는 필수 입력값입니다.
 
           ### 예외 처리

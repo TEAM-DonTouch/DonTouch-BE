@@ -10,6 +10,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -58,11 +59,18 @@ public class Transaction extends BaseEntity {
   @Column(nullable = false)
   private Long amount;
 
-  @Column(nullable = false, length = 30)
+  @Column(length = 30)
   private String memo;
 
   @Column(nullable = false)
   private LocalDateTime transactionDate;
+
+  @PrePersist // DB에 저장되기전 Hibernate가 자동으로 호출해주는 메서드
+  private void normalizeMemo() {
+    if (memo != null && memo.isBlank()) {
+      memo = null;
+    }
+  }
 
   public void update(Category category, Long amount, String memo, TransactionType type, LocalDateTime transactionDate) {
     if (category != null) {

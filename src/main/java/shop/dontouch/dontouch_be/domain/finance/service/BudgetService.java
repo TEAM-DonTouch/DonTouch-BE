@@ -41,10 +41,12 @@ public class BudgetService {
 
     if (request.getPeriod() == BudgetPeriod.CUSTOM) {
       if (request.getStartDate() == null || request.getEndDate() == null) {
-        throw new CustomException(ErrorCode.INVALID_INPUT_VALUE);
+        log.warn("saveBudget: CUSTOM 기간인데 날짜 누락 userId-{}", user.getId());
+        throw new CustomException(ErrorCode.BUDGET_PERIOD_DATE_REQUIRED);
       }
       if (request.getStartDate().isAfter(request.getEndDate())) {
-        throw new CustomException(ErrorCode.INVALID_INPUT_VALUE);
+        log.warn("saveBudget: 시작일이 종료일보다 늦음 userId-{}", user.getId());
+        throw new CustomException(ErrorCode.BUDGET_PERIOD_DATE_INVALID);
       }
     }
 

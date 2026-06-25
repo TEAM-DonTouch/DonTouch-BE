@@ -74,7 +74,7 @@ public interface BudgetControllerDocs {
           - `USER_NOT_FOUND` (404 NOT_FOUND): 유저를 찾을 수 없습니다.
           - `USER_ALREADY_WITHDRAWN` (409 CONFLICT): 이미 탈퇴한 사용자입니다.
           - `BUDGET_PERIOD_DATE_REQUIRED` (400 BAD_REQUEST): CUSTOM 기간은 시작일과 종료일을 모두 입력해야 합니다.
-          - `BUDGET_PERIOD_DATE_INVALID` (400 BAD_REQUEST): 시작일은 종료일보다 이전이어야 합니다.
+          - `BUDGET_PERIOD_DATE_INVALID` (400 BAD_REQUEST): 시작일은 종료일보다 늦을 수 없습니다.
           """
   )
   ResponseEntity<BudgetResponse> saveBudget(

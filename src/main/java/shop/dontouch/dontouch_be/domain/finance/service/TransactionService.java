@@ -13,6 +13,7 @@ import shop.dontouch.dontouch_be.domain.finance.entity.Category;
 import shop.dontouch.dontouch_be.domain.finance.entity.Transaction;
 import shop.dontouch.dontouch_be.domain.finance.repository.CategoryRepository;
 import shop.dontouch.dontouch_be.domain.finance.repository.TransactionRepository;
+import shop.dontouch.dontouch_be.domain.user.constant.UserStatus;
 import shop.dontouch.dontouch_be.domain.user.entity.User;
 import shop.dontouch.dontouch_be.domain.user.repository.UserRepository;
 import shop.dontouch.dontouch_be.global.exception.CustomException;
@@ -35,6 +36,11 @@ public class TransactionService {
           log.warn("createTransaction: 유효하지 않은 userId {}", request.getUserId());
           return new CustomException(ErrorCode.USER_NOT_FOUND);
         });
+
+    if (user.getStatus() == UserStatus.WITHDRAWN) {
+      log.warn("createTransaction: 탈퇴한 유저의 거래 생성 시도 userId {}", user.getId());
+      throw new CustomException(ErrorCode.USER_ALREADY_WITHDRAWN);
+    }
 
     Category category = categoryRepository.findById(request.getCategoryId())
         .orElseThrow(() -> {
@@ -104,6 +110,11 @@ public class TransactionService {
           log.warn("updateTransaction: 유효하지 않은 transactionId {}", transactionId);
           return new CustomException(ErrorCode.TRANSACTION_NOT_FOUND);
         });
+
+    if (transaction.getUser().getStatus() == UserStatus.WITHDRAWN) {
+      log.warn("updateTransaction: 탈퇴한 유저의 거래 수정 시도 userId {}, transactionId {}", transaction.getUser().getId(), transaction.getId());
+      throw new CustomException(ErrorCode.USER_ALREADY_WITHDRAWN);
+    }
 
     Category category = null;
     if (request.getCategoryId() != null) {

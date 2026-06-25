@@ -11,6 +11,7 @@ import shop.dontouch.dontouch_be.domain.finance.dto.request.BudgetRequest;
 import shop.dontouch.dontouch_be.domain.finance.dto.response.BudgetResponse;
 import shop.dontouch.dontouch_be.domain.finance.entity.Budget;
 import shop.dontouch.dontouch_be.domain.finance.repository.BudgetRepository;
+import shop.dontouch.dontouch_be.domain.user.constant.UserStatus;
 import shop.dontouch.dontouch_be.domain.user.entity.User;
 import shop.dontouch.dontouch_be.domain.user.repository.UserRepository;
 import shop.dontouch.dontouch_be.global.exception.CustomException;
@@ -33,11 +34,16 @@ public class BudgetService {
           return new CustomException(ErrorCode.USER_NOT_FOUND);
         });
 
+    if (user.getStatus() == UserStatus.WITHDRAWN) {
+      log.warn("saveBudget: 탈퇴한 유저의 예산 생성/수정 시도 userId {}", user.getId());
+      throw new CustomException(ErrorCode.USER_ALREADY_WITHDRAWN);
+    }
+
     if (request.getPeriod() == BudgetPeriod.CUSTOM) {
       if (request.getStartDate() == null || request.getEndDate() == null) {
         throw new CustomException(ErrorCode.INVALID_INPUT_VALUE);
       }
-      if(request.getStartDate().isAfter(request.getEndDate())) {
+      if (request.getStartDate().isAfter(request.getEndDate())) {
         throw new CustomException(ErrorCode.INVALID_INPUT_VALUE);
       }
     }

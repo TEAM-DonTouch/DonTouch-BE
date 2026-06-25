@@ -61,6 +61,7 @@ public interface TransactionControllerDocs {
 
           ### 유의 사항
           - `userId`는 실제 존재하는 유저 ID여야 합니다.
+          - 탈퇴(WITHDRAWN) 상태인 유저는 거래를 생성할 수 없습니다.
           - `categoryId`는 실제 존재하는 카테고리 ID여야 합니다.
           - `type`은 `INCOME`, `EXPENSE`만 허용됩니다.
           - `amount`는 1 이상이어야 합니다.
@@ -69,6 +70,7 @@ public interface TransactionControllerDocs {
 
           ### 예외 처리
           - `USER_NOT_FOUND` (404 NOT_FOUND): 유저를 찾을 수 없습니다.
+          - `USER_ALREADY_WITHDRAWN` (409 CONFLICT): 이미 탈퇴한 사용자입니다.
           - `CATEGORY_NOT_FOUND` (404 NOT_FOUND): 카테고리를 찾을 수 없습니다.
           - `INVALID_INPUT_VALUE` (400 BAD_REQUEST): 유효하지 않은 입력값입니다.
           """
@@ -298,9 +300,11 @@ public interface TransactionControllerDocs {
           - `memo`가 blank 값이면 수정되지 않습니다.
           - `amount`는 1 이상이어야 합니다.
           - 존재하지 않는 거래 ID로 요청 시 예외가 발생합니다.
+          - 거래 소유자가 탈퇴(WITHDRAWN) 상태이면 수정할 수 없습니다.
 
           ### 예외 처리
           - `TRANSACTION_NOT_FOUND` (404 NOT_FOUND): 거래를 찾을 수 없습니다.
+          - `USER_ALREADY_WITHDRAWN` (409 CONFLICT): 이미 탈퇴한 사용자입니다.
           - `CATEGORY_NOT_FOUND` (404 NOT_FOUND): 카테고리를 찾을 수 없습니다.
           - `INVALID_INPUT_VALUE` (400 BAD_REQUEST): 유효하지 않은 입력값입니다.
           """

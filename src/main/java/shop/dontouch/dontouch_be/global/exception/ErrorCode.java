@@ -17,7 +17,16 @@ public enum ErrorCode {
   // Transaction
   TRANSACTION_NOT_FOUND(HttpStatus.NOT_FOUND, "거래를 찾을 수 없습니다."),
 
-  //User
+  // Category
+  CATEGORY_NAME_DUPLICATE(HttpStatus.CONFLICT, "이미 존재하는 카테고리입니다."),
+  CATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND, "카테고리를 찾을 수 없습니다."),
+
+  // BUDGET
+  BUDGET_NOT_FOUND(HttpStatus.NOT_FOUND, "예산을 찾을 수 없습니다."),
+  BUDGET_PERIOD_DATE_REQUIRED(HttpStatus.BAD_REQUEST, "CUSTOM 기간은 시작일과 종료일을 모두 입력해야 합니다."),
+  BUDGET_PERIOD_DATE_INVALID(HttpStatus.BAD_REQUEST, "시작일은 종료일보다 늦을 수 없습니다."),
+
+  // User
   USER_EMAIL_DUPLICATE(HttpStatus.CONFLICT, "이미 사용 중인 이메일입니다."),
   USER_NICKNAME_DUPLICATE(HttpStatus.CONFLICT, "이미 사용 중인 닉네임입니다."),
   USER_NOT_FOUND(HttpStatus.NOT_FOUND, "사용자를 찾을 수 없습니다."),

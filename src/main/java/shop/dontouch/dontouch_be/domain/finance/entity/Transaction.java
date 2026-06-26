@@ -10,6 +10,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -42,13 +43,13 @@ public class Transaction extends BaseEntity {
   @JoinColumn(name = "user_id", nullable = false)
   private User user;
 
-//  @ManyToOne(fetch = FetchType.LAZY)
+  //  @ManyToOne(fetch = FetchType.LAZY)
 //  @JoinColumn(name = "ai_image_id", nullable = false)
 //  private AiImage aiImage;
 //
-//  @ManyToOne(fetch = FetchType.LAZY)
-//  @JoinColumn(name = "category_id", nullable = false)
-//  private Category category;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "category_id", nullable = false)
+  private Category category;
 
   @Enumerated(EnumType.STRING)
   @Column(nullable = false)
@@ -58,21 +59,31 @@ public class Transaction extends BaseEntity {
   @Column(nullable = false)
   private Long amount;
 
-  @Column(nullable = false, length = 30)
+  @Column(length = 30)
   private String memo;
 
   @Column(nullable = false)
   private LocalDateTime transactionDate;
 
-  public void update(Long amount, String memo, TransactionType type, LocalDateTime transactionDate) {
+  @PrePersist // DB에 저장되기전 Hibernate가 자동으로 호출해주는 메서드
+  private void normalizeMemo() {
+    if (memo != null && memo.isBlank()) {
+      memo = null;
+    }
+  }
+
+  public void update(Category category, Long amount, String memo, TransactionType type, LocalDateTime transactionDate) {
+    if (category != null) {
+      this.category = category;
+    }
+    if (type != null) {
+      this.type = type;
+    }
     if (amount != null) {
       this.amount = amount;
     }
     if (memo != null && !memo.isBlank()) {
       this.memo = memo;
-    }
-    if (type != null) {
-      this.type = type;
     }
     if (transactionDate != null) {
       this.transactionDate = transactionDate;

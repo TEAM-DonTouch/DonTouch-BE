@@ -1,4 +1,4 @@
-package shop.dontouch.dontouch_be.domain.finance.dto;
+package shop.dontouch.dontouch_be.domain.finance.dto.response;
 
 
 import java.time.LocalDateTime;
@@ -18,6 +18,8 @@ public class TransactionResponse {
 
   private UUID transactionId;
   private UUID userId;
+  private UUID categoryId;
+  private String categoryName;
   private TransactionType type;
   private Long amount;
   private String memo;
@@ -29,6 +31,8 @@ public class TransactionResponse {
     return TransactionResponse.builder()
         .transactionId(transaction.getId())
         .userId(transaction.getUser().getId())
+        .categoryId(transaction.getCategory().getId())
+        .categoryName(transaction.getCategory().getName())
         .type(transaction.getType())
         .amount(transaction.getAmount())
         .memo(transaction.getMemo())

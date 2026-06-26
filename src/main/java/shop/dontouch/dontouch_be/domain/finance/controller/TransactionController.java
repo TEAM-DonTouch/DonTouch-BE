@@ -14,9 +14,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import shop.dontouch.dontouch_be.domain.finance.dto.TransactionRequest;
-import shop.dontouch.dontouch_be.domain.finance.dto.TransactionResponse;
-import shop.dontouch.dontouch_be.domain.finance.dto.TransactionUpdateRequest;
+import shop.dontouch.dontouch_be.domain.finance.dto.request.TransactionRequest;
+import shop.dontouch.dontouch_be.domain.finance.dto.response.TransactionResponse;
+import shop.dontouch.dontouch_be.domain.finance.dto.request.TransactionUpdateRequest;
 import shop.dontouch.dontouch_be.domain.finance.service.TransactionService;
 
 @RestController
@@ -39,6 +39,14 @@ public class TransactionController implements TransactionControllerDocs {
     return ResponseEntity.ok(responses);
   }
 
+  @GetMapping("/{transaction-id}")
+  public ResponseEntity<TransactionResponse> getTransactionByTransactionId(
+      @PathVariable(name = "transaction-id") UUID transactionId
+  ) {
+    TransactionResponse response = transactionService.getTransactionByTransactionId(transactionId);
+    return ResponseEntity.ok(response);
+  }
+
   @GetMapping("/users/{user-id}")
   public ResponseEntity<List<TransactionResponse>> getAllTransactionsByUserId(
       @PathVariable(name = "user-id") UUID userId
@@ -47,12 +55,12 @@ public class TransactionController implements TransactionControllerDocs {
     return ResponseEntity.ok(responses);
   }
 
-  @GetMapping("/{transaction-id}")
-  public ResponseEntity<TransactionResponse> getTransactionByTransactionId(
-      @PathVariable(name = "transaction-id") UUID transactionId
+  @GetMapping("/categories/{category-id}")
+  public ResponseEntity<List<TransactionResponse>> getAllTransactionsByCategoryId(
+      @PathVariable(name = "category-id") UUID categoryId
   ) {
-    TransactionResponse response = transactionService.getTransactionByTransactionId(transactionId);
-    return ResponseEntity.ok(response);
+    List<TransactionResponse> responses = transactionService.getAllTransactionsByCategoryId(categoryId);
+    return ResponseEntity.ok(responses);
   }
 
   @PatchMapping("/{transaction-id}")

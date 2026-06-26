@@ -1,8 +1,7 @@
-package shop.dontouch.dontouch_be.domain.finance.dto;
+package shop.dontouch.dontouch_be.domain.finance.dto.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.time.LocalDateTime;
@@ -19,6 +18,10 @@ public class TransactionRequest {
   @NotNull
   private UUID userId;
 
+  @Schema(description = "카테고리 ID", example = "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa")
+  @NotNull
+  private UUID categoryId;
+
   @Schema(description = "거래 유형 (INCOME / EXPENSE)", example = "INCOME")
   @NotNull
   private TransactionType type; // INCOME,EXPENSE
@@ -29,7 +32,6 @@ public class TransactionRequest {
   private Long amount;
 
   @Schema(description = "메모")
-  @NotBlank
   @Size(max = 30)
   private String memo;
 

@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import shop.dontouch.dontouch_be.domain.user.constant.UserStatus;
 import shop.dontouch.dontouch_be.domain.user.entity.User;
 
 @Getter
@@ -52,6 +53,6 @@ public class CustomUserDetails implements UserDetails {
 
   @Override
   public boolean isEnabled() {
-    return true;
+    return user.getStatus() != UserStatus.WITHDRAWN;
   }
 }

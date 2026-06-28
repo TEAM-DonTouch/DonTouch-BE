@@ -146,7 +146,7 @@ public interface UserControllerDocs {
           Request Body(JSON)
 
           - `loginId` (String, required): 로그인 아이디 (4자 이상 30자 이하)
-          - `password` (String, required): 비밀번호 (8자 이상 100자 이하)
+          - `password` (String, required): 비밀번호 (8자 이상 72자 이하)
           - `email` (String, required): 이메일
           - `nickname` (String, required): 닉네임 (최대 30자)
           - `profileImageUrl` (String, optional): 프로필 이미지 URL (최대 500자)
@@ -312,7 +312,7 @@ public interface UserControllerDocs {
           Request Body(JSON)
 
           - `userRole` (UserRole, required): 변경할 권한
-            - `USER`: 일반 유저
+            - `GENERAL_USER`: 일반 유저
             - `ADMIN`: 관리자
 
           요청 예시

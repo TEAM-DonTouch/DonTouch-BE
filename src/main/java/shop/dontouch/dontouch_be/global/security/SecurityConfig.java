@@ -1,59 +1,55 @@
 package shop.dontouch.dontouch_be.global.security;
 
-import io.jsonwebtoken.security.Keys;
-import java.nio.charset.StandardCharsets;
-import javax.crypto.SecretKey;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
-import org.springframework.security.oauth2.jwt.JwtDecoder;
-import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
+
+  // 우리가 만든 JWT 필터를 주입받아 필터 체인에 등록
+  private final JwtAuthenticationFilter jwtAuthenticationFilter;
+
   @Bean
   public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
     http
         .csrf(AbstractHttpConfigurer::disable)
+
         .sessionManagement(session ->
             session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
         )
+
         .authorizeHttpRequests(auth -> auth
             .requestMatchers(
                 "/api/auth/signup",
                 "/api/auth/login",
+                "/api/auth/refresh",
                 "/docs/swagger",
-                "/docs/swagger/**",
-                "/docs/swagger-ui/**",
-                "/swagger-ui/**",
-                "/v3/api-docs",
                 "/v3/api-docs/**",
-                "/actuator/health"
+                "/docs/swagger-ui/**",
+                "/actuator/health",
+                "/error"
             ).permitAll()
             .anyRequest().authenticated()
         )
-        .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()));
+
+        // JwtAuthenticationFilter를 UsernamePasswordAuthenticationFilter 앞에 등록
+        // 요청이 오면 UsernamePasswordAuthenticationFilter 전에 JWT 검증을 먼저 수행
+        .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
     return http.build();
-  }
-
-  @Bean
-  public JwtDecoder jwtDecoder(@Value("${jwt.secret}") String secretKey) {
-    SecretKey key = Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));
-
-    return NimbusJwtDecoder.withSecretKey(key)
-        .macAlgorithm(MacAlgorithm.HS256)
-        .build();
   }
 
   @Bean

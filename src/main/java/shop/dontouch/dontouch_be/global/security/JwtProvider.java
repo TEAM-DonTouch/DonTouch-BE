@@ -1,24 +1,35 @@
 package shop.dontouch.dontouch_be.global.security;
 
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.Jwts.SIG;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
 import java.nio.charset.StandardCharsets;
+import java.util.UUID;
 import javax.crypto.SecretKey;
 import java.util.Date;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import shop.dontouch.dontouch_be.domain.user.entity.User;
+import shop.dontouch.dontouch_be.global.exception.CustomException;
+import shop.dontouch.dontouch_be.global.exception.ErrorCode;
 
 @Component
 public class JwtProvider {
+
   @Value("${jwt.secret}")
   private String secretKey;
 
   @Value("${jwt.access-token-expiration}")
-  private long accessTokenExpiration;
+  private Long accessTokenExpiration;
 
-  private SecretKey  key;
+  @Value("${jwt.refresh-token-expiration}")
+  private Long refreshTokenExpiration;
+
+  private SecretKey key;
 
   @PostConstruct
   public void init() {
@@ -27,7 +38,7 @@ public class JwtProvider {
 
   public String createAccessToken(User user) {
     Date now = new Date();
-    Date expiration = new Date(now.getTime() + accessTokenExpiration);
+    Date expirationDate = new Date(now.getTime() + accessTokenExpiration);
 
     return Jwts.builder()
         .subject(user.getId().toString())
@@ -35,8 +46,40 @@ public class JwtProvider {
         .claim("email", user.getEmail())
         .claim("role", user.getRole().name())
         .issuedAt(now)
-        .expiration(expiration)
-        .signWith(key, Jwts.SIG.HS256)
+        .expiration(expirationDate)
+        .signWith(key, SIG.HS256)
         .compact();
+
+  }
+
+  // Refresh Token 생성
+  public String createRefreshToken() {
+    return UUID.randomUUID().toString();
+  }
+
+  public String extractUserId(String token) {
+    return getClaims(token).getSubject();
+  }
+
+  public void validateToken(String token) {
+    try {
+      getClaims(token);
+    } catch (ExpiredJwtException e) {
+      throw new CustomException(ErrorCode.TOKEN_EXPIRED);
+    } catch (JwtException | IllegalArgumentException e) {
+      throw new CustomException(ErrorCode.TOKEN_INVALID);
+    }
+  }
+
+  private Claims getClaims(String token) {
+    return Jwts.parser()
+        .verifyWith(key)
+        .build()
+        .parseSignedClaims(token)
+        .getPayload();
+  }
+
+  public Long getRefreshTokenExpiration() {
+    return refreshTokenExpiration;
   }
 }

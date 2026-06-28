@@ -8,6 +8,6 @@ import shop.dontouch.dontouch_be.domain.user.dto.response.UserResponse;
 @Builder
 public class AuthResponse {
   private String accessToken;
-  private String tokenType;
+  private String refreshToken;
   private UserResponse user;
 }

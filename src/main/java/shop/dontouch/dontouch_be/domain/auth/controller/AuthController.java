@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import shop.dontouch.dontouch_be.domain.auth.dto.request.LoginRequest;
+import shop.dontouch.dontouch_be.domain.auth.dto.request.RefreshTokenRequest;
 import shop.dontouch.dontouch_be.domain.auth.dto.request.SignupRequest;
 import shop.dontouch.dontouch_be.domain.auth.dto.response.AuthResponse;
 import shop.dontouch.dontouch_be.domain.auth.service.AuthService;
@@ -33,5 +34,20 @@ public class AuthController implements AuthControllerDocs {
       @Valid @RequestBody LoginRequest request
   ) {
     return ResponseEntity.ok(authService.login(request));
+  }
+
+  @PostMapping("/refresh")
+  public ResponseEntity<AuthResponse> refresh(
+      @Valid @RequestBody RefreshTokenRequest request
+  ) {
+    return ResponseEntity.ok(authService.refresh(request));
+  }
+
+  @PostMapping("/logout")
+  public ResponseEntity<Void> logout(
+      @Valid @RequestBody RefreshTokenRequest request
+  ) {
+    authService.logout(request);
+    return ResponseEntity.noContent().build();
   }
 }

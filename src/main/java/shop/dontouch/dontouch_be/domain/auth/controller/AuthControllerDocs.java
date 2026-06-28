@@ -19,7 +19,7 @@ public interface AuthControllerDocs {
 
           - `email` (String, required): 이메일
           - `loginId` (String, required): 로그인 아이디 (4자 이상 30자 이하)
-          - `password` (String, required): 비밀번호 (8자 이상 100자 이하)
+          - `password` (String, required): 비밀번호 (8자 이상 72자 이하)
           - `nickname` (String, required): 닉네임 (최대 30자)
           - `age` (Integer, optional): 나이 (1 이상)
           - `gender` (UserGender, optional): 성별
@@ -133,7 +133,7 @@ public interface AuthControllerDocs {
           요청 예시
           ```json
           {
-            "refreshToken": "550e8400-e29b-41d4-a716-446655440000"
+            "refreshToken": "v9JmYQq4vWq2pQ9y3K6z8sFh0u2nLxA1bC4dE5fG6hI"
           }
           ```
 
@@ -172,7 +172,7 @@ public interface AuthControllerDocs {
           요청 예시
           ```json
           {
-            "refreshToken": "550e8400-e29b-41d4-a716-446655440000"
+            "refreshToken": "v9JmYQq4vWq2pQ9y3K6z8sFh0u2nLxA1bC4dE5fG6hI"
           }
           ```
 

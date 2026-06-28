@@ -48,6 +48,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         // 사용자 정보로 UserDetails 객체 생성
         UserDetails userDetails = customUserDetailsService.loadUserByUsername(userId);
 
+        if (!userDetails.isEnabled()) {
+          writeErrorResponse(response, ErrorCode.USER_ALREADY_WITHDRAWN);
+          return;
+        }
+
         // SecurityContext에 인증 객체 생성
         UsernamePasswordAuthenticationToken authentication =
             new UsernamePasswordAuthenticationToken(
@@ -58,10 +63,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         // SecurityContext에 인증 정보 저장
         SecurityContextHolder.getContext().setAuthentication(authentication);
-      } catch (ExpiredJwtException e) {
-        writeErrorResponse(response, ErrorCode.TOKEN_EXPIRED);
+      } catch (CustomException e) {
+        writeErrorResponse(response, e.getErrorCode());
         return;
-      } catch (JwtException | CustomException e) {
+      } catch (JwtException e) {
         writeErrorResponse(response, ErrorCode.TOKEN_INVALID);
         return;
       }

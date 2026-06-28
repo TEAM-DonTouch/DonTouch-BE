@@ -16,6 +16,8 @@ import org.springframework.stereotype.Component;
 import shop.dontouch.dontouch_be.domain.user.entity.User;
 import shop.dontouch.dontouch_be.global.exception.CustomException;
 import shop.dontouch.dontouch_be.global.exception.ErrorCode;
+import java.security.SecureRandom;
+import java.util.Base64;
 
 @Component
 public class JwtProvider {
@@ -31,6 +33,8 @@ public class JwtProvider {
 
   private SecretKey key;
 
+  private static final SecureRandom SECURE_RANDOM = new SecureRandom();
+
   @PostConstruct
   public void init() {
     this.key = Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));
@@ -42,19 +46,18 @@ public class JwtProvider {
 
     return Jwts.builder()
         .subject(user.getId().toString())
-        .claim("loginId", user.getLoginId())
-        .claim("email", user.getEmail())
         .claim("role", user.getRole().name())
         .issuedAt(now)
         .expiration(expirationDate)
         .signWith(key, SIG.HS256)
         .compact();
-
   }
 
   // Refresh Token 생성
   public String createRefreshToken() {
-    return UUID.randomUUID().toString();
+    byte[] bytes = new byte[32]; // 256-bit
+    SECURE_RANDOM.nextBytes(bytes);
+    return Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
   }
 
   public String extractUserId(String token) {

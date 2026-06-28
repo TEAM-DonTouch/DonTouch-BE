@@ -15,7 +15,7 @@ public class RefreshToken {
 
   // Redis Key
   @Id
-  private String token;
+  private String tokenKey;
 
 
   private String userId;
@@ -24,8 +24,8 @@ public class RefreshToken {
   private Long expiration;
 
   // 로그인 / 회원가 시 최초 생할 때 사용
-  public RefreshToken(String token, String userId, Long expiration) {
-    this.token = token;
+  public RefreshToken(String tokenKey, String userId, Long expiration) {
+    this.tokenKey = tokenKey;
     this.userId = userId;
     this.expiration = expiration;
   }

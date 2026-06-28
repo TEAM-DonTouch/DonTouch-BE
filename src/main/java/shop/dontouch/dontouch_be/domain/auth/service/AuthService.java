@@ -1,5 +1,9 @@
 package shop.dontouch.dontouch_be.domain.auth.service;
 
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Base64;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -38,15 +42,15 @@ public class AuthService {
   @Transactional
   public AuthResponse signup(SignupRequest request) {
     if (userRepository.existsByLoginId(request.getLoginId())) {
-      log.warn("signup: 중복 loginId {}", request.getLoginId());
+      log.warn("signup: 중복 loginId");
       throw new CustomException(ErrorCode.USER_LOGIN_ID_DUPLICATE);
     }
     if (userRepository.existsByEmail(request.getEmail())) {
-      log.warn("signup: 중복 email {}", request.getEmail());
+      log.warn("signup: 중복 email");
       throw new CustomException(ErrorCode.USER_EMAIL_DUPLICATE);
     }
     if (userRepository.existsByNickname(request.getNickname())) {
-      log.warn("signup: 중복 nickname {}", request.getNickname());
+      log.warn("signup: 중복 nickname");
       throw new CustomException(ErrorCode.USER_NICKNAME_DUPLICATE);
     }
 
@@ -65,14 +69,21 @@ public class AuthService {
     try {
       savedUser = userRepository.saveAndFlush(user);
     } catch (DataIntegrityViolationException e) {
-      log.warn("signup: DB 제약조건 위반 {}", e.getMessage());
+      log.warn("signup: DB 제약조건 위반");
       throw new CustomException(ErrorCode.USER_DUPLICATE);
     }
 
     String accessToken = jwtProvider.createAccessToken(savedUser);
     String refreshToken = jwtProvider.createRefreshToken();
+    String refreshTokenKey = hashRefreshToken(refreshToken);
+
     refreshTokenRepository.save(
-        new RefreshToken(refreshToken, savedUser.getId().toString(), jwtProvider.getRefreshTokenExpiration()));
+        new RefreshToken(
+            refreshTokenKey,
+            savedUser.getId().toString(),
+            jwtProvider.getRefreshTokenExpiration()
+        )
+    );
 
     return AuthResponse.builder()
         .accessToken(accessToken)
@@ -84,23 +95,30 @@ public class AuthService {
   public AuthResponse login(LoginRequest request) {
     User user = userRepository.findByLoginId(request.getLoginId())
         .orElseThrow(() -> {
-          log.warn("login: 존재하지 않는 loginId {}", request.getLoginId());
+          log.warn("login: 존재하지 않는 loginId");
           return new CustomException(ErrorCode.LOGIN_FAILED);
         });
 
     if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-      log.warn("login: 비밀번호 불일치 loginId {}", request.getLoginId());
+      log.warn("login: 비밀번호 불일치");
       throw new CustomException(ErrorCode.LOGIN_FAILED);
     }
     if (user.getStatus() == UserStatus.WITHDRAWN) {
-      log.warn("login: 탈퇴한 유저 loginId {}", request.getLoginId());
+      log.warn("login: 탈퇴한 유저");
       throw new CustomException(ErrorCode.USER_ALREADY_WITHDRAWN);
     }
 
     String accessToken = jwtProvider.createAccessToken(user);
     String refreshToken = jwtProvider.createRefreshToken();
+    String refreshTokenKey = hashRefreshToken(refreshToken);
+
     refreshTokenRepository.save(
-        new RefreshToken(refreshToken, user.getId().toString(), jwtProvider.getRefreshTokenExpiration()));
+        new RefreshToken(
+            refreshTokenKey,
+            user.getId().toString(),
+            jwtProvider.getRefreshTokenExpiration()
+        )
+    );
 
     return AuthResponse.builder()
         .accessToken(accessToken)
@@ -110,16 +128,21 @@ public class AuthService {
   }
 
   public void logout(RefreshTokenRequest request) {
-    refreshTokenRepository.findById(request.getRefreshToken())
+    String refreshTokenKey = hashRefreshToken(request.getRefreshToken());
+
+    refreshTokenRepository.findById(refreshTokenKey)
         .orElseThrow(() -> {
           log.warn("logout: 존재하지 않거나 만료된 refreshToken");
           return new CustomException(ErrorCode.REFRESH_TOKEN_NOT_FOUND);
         });
-    refreshTokenRepository.deleteById(request.getRefreshToken());
+
+    refreshTokenRepository.deleteById(refreshTokenKey);
   }
 
   public AuthResponse refresh(RefreshTokenRequest request) {
-    RefreshToken savedToken = refreshTokenRepository.findById(request.getRefreshToken())
+    String oldRefreshTokenKey = hashRefreshToken(request.getRefreshToken());
+
+    RefreshToken savedToken = refreshTokenRepository.findById(oldRefreshTokenKey)
         .orElseThrow(() -> {
           log.warn("refresh: 존재하지 않거나 만료된 refreshToken");
           return new CustomException(ErrorCode.REFRESH_TOKEN_NOT_FOUND);
@@ -128,21 +151,44 @@ public class AuthService {
     UUID userId = UUID.fromString(savedToken.getUserId());
     User user = userRepository.findById(userId)
         .orElseThrow(() -> {
-          log.warn("refresh: refreshToken의 userId에 해당하는 유저 없음 userId {}", userId);
+          log.warn("refresh: refreshToken의 userId에 해당하는 유저 없음");
           return new CustomException(ErrorCode.USER_NOT_FOUND);
         });
 
-    refreshTokenRepository.deleteById(request.getRefreshToken());
+    if (user.getStatus() == UserStatus.WITHDRAWN) {
+      refreshTokenRepository.deleteById(oldRefreshTokenKey);
+      log.warn("refresh: 탈퇴한 유저의 refreshToken");
+      throw new CustomException(ErrorCode.USER_ALREADY_WITHDRAWN);
+    }
+
+    refreshTokenRepository.deleteById(oldRefreshTokenKey);
 
     String newAccessToken = jwtProvider.createAccessToken(user);
     String newRefreshToken = jwtProvider.createRefreshToken();
+    String newRefreshTokenKey = hashRefreshToken(newRefreshToken);
+
     refreshTokenRepository.save(
-        new RefreshToken(newRefreshToken, savedToken.getUserId(), jwtProvider.getRefreshTokenExpiration()));
+        new RefreshToken(
+            newRefreshTokenKey,
+            savedToken.getUserId(),
+            jwtProvider.getRefreshTokenExpiration()
+        )
+    );
 
     return AuthResponse.builder()
         .accessToken(newAccessToken)
         .refreshToken(newRefreshToken)
         .user(UserResponse.from(user))
         .build();
+  }
+
+  private String hashRefreshToken(String refreshToken) {
+    try {
+      MessageDigest digest = MessageDigest.getInstance("SHA-256");
+      byte[] hash = digest.digest(refreshToken.getBytes(StandardCharsets.UTF_8));
+      return Base64.getUrlEncoder().withoutPadding().encodeToString(hash);
+    } catch (NoSuchAlgorithmException e) {
+      throw new IllegalStateException("SHA-256 algorithm not available", e);
+    }
   }
 }

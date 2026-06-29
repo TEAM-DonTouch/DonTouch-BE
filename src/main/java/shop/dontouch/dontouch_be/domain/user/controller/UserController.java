@@ -6,6 +6,8 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -20,15 +22,44 @@ import shop.dontouch.dontouch_be.domain.user.dto.request.UserStatusUpdateRequest
 import shop.dontouch.dontouch_be.domain.user.dto.request.UserUpdateRequest;
 import shop.dontouch.dontouch_be.domain.user.dto.response.UserResponse;
 import shop.dontouch.dontouch_be.domain.user.service.UserService;
+import shop.dontouch.dontouch_be.global.security.CustomUserDetails;
 
 @RestController
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
-public class UserController {
+public class UserController implements UserControllerDocs {
 
   private final UserService userService;
 
-  @PostMapping
+
+
+  @GetMapping("/me")
+  public ResponseEntity<UserResponse> getMe(
+      @AuthenticationPrincipal CustomUserDetails currentUser
+  ) {
+    return ResponseEntity.ok(userService.getUser(currentUser.getUserId()));
+  }
+
+  @PatchMapping("/me")
+  public ResponseEntity<UserResponse> updateMe(
+      @AuthenticationPrincipal CustomUserDetails currentUser,
+      @Valid @RequestBody UserUpdateRequest request
+  ) {
+    return ResponseEntity.ok(userService.updateUser(currentUser.getUserId(), request));
+  }
+
+  @DeleteMapping("/me")
+  public ResponseEntity<Void> deleteMe(
+      @AuthenticationPrincipal CustomUserDetails currentUser
+  ) {
+    userService.deleteUser(currentUser.getUserId());
+    return ResponseEntity.noContent().build();
+  }
+
+  ///  ADMIN
+
+  @PreAuthorize("hasAuthority('ADMIN')")
+  @PostMapping("/admin")
   public ResponseEntity<UserResponse> createUser(
       @Valid @RequestBody UserCreateRequest request
   ) {
@@ -36,25 +67,21 @@ public class UserController {
         .body(userService.createUser(request));
   }
 
-  @GetMapping("/{user-id}")
-  public ResponseEntity<UserResponse> getUser(
-      @PathVariable(name = "user-id") UUID userId) {
-    return ResponseEntity.ok(userService.getUser(userId));
-  }
-
+  @PreAuthorize("hasAuthority('ADMIN')")
   @GetMapping
   public ResponseEntity<List<UserResponse>> getAllUsers() {
     return ResponseEntity.ok(userService.getAllUsers());
   }
 
-  @PatchMapping("/{user-id}")
-  public ResponseEntity<UserResponse> updateUser(
-      @PathVariable(name = "user-id") UUID userId,
-      @Valid @RequestBody UserUpdateRequest request
+  @PreAuthorize("hasAuthority('ADMIN')")
+  @GetMapping("/{user-id}")
+  public ResponseEntity<UserResponse> getUser(
+      @PathVariable(name = "user-id") UUID userId
   ) {
-    return ResponseEntity.ok(userService.updateUser(userId, request));
+    return ResponseEntity.ok(userService.getUser(userId));
   }
 
+  @PreAuthorize("hasAuthority('ADMIN')")
   @PatchMapping("/{user-id}/status")
   public ResponseEntity<UserResponse> updateUserStatus(
       @PathVariable(name = "user-id") UUID userId,
@@ -63,18 +90,12 @@ public class UserController {
     return ResponseEntity.ok(userService.updateUserStatus(userId, request));
   }
 
+  @PreAuthorize("hasAuthority('ADMIN')")
   @PatchMapping("/{user-id}/role")
   public ResponseEntity<UserResponse> updateUserRole(
       @PathVariable(name = "user-id") UUID userId,
       @Valid @RequestBody UserRoleUpdateRequest request
   ) {
     return ResponseEntity.ok(userService.updateUserRole(userId, request));
-  }
-
-  @DeleteMapping("/{user-id}")
-  public ResponseEntity<Void> deleteUser(
-      @PathVariable(name = "user-id") UUID userId) {
-    userService.deleteUser(userId);
-    return ResponseEntity.noContent().build();
   }
 }

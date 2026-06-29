@@ -1,12 +1,16 @@
 package shop.dontouch.dontouch_be.global.exception;
 
+import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 @RestControllerAdvice
 @Slf4j
@@ -17,9 +21,12 @@ public class GlobalExceptionHandler {
    */
   @ExceptionHandler(CustomException.class)
   public ResponseEntity<ErrorResponse> handleCustomException(CustomException e) {
-    log.error("CustomException 발생: {}", e.getErrorCode(), e);
-
     ErrorCode errorCode = e.getErrorCode();
+
+    log.warn("CustomException: code={}, message={}",
+        errorCode,
+        errorCode.getMessage()
+    );
 
     ErrorResponse response = ErrorResponse.builder()
         .errorCode(errorCode)
@@ -34,15 +41,80 @@ public class GlobalExceptionHandler {
    */
   @ExceptionHandler(MethodArgumentNotValidException.class)
   public ResponseEntity<ErrorResponse> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
-    log.error("MethodArgumentNotValidException 발생: {}", e.getMessage(), e);
 
     // 에러 메시지 중 첫 번째 것을 가져옵니다.
-    String errorMessage = e.getBindingResult().getFieldErrors().stream()
+    String errorMessage = e.getBindingResult()
+        .getFieldErrors()
+        .stream()
         .findFirst()
-        .map(fieldError->fieldError.getDefaultMessage())
+        .map(fieldError -> fieldError.getDefaultMessage())
         .orElse(ErrorCode.INVALID_INPUT_VALUE.getMessage());
 
+    log.warn("Validation failed: {}", errorMessage);
+
     // ErrorCode.INVALID_INPUT_VALUE(400)를 기본으로 사용하되, 메시지만 DTO에서 전달된 메시지로 설정합니다.
+    ErrorResponse response = ErrorResponse.builder()
+        .errorCode(ErrorCode.INVALID_INPUT_VALUE)
+        .errorMessage(errorMessage)
+        .build();
+
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+  }
+
+  /**
+   * @RequestParam, @PathVariable 등의 검증 실패 처리
+   */
+  @ExceptionHandler(ConstraintViolationException.class)
+  public ResponseEntity<ErrorResponse> handleConstraintViolationException(
+      ConstraintViolationException e
+  ) {
+    String errorMessage = e.getConstraintViolations()
+        .stream()
+        .findFirst()
+        .map(violation -> violation.getMessage())
+        .orElse(ErrorCode.INVALID_INPUT_VALUE.getMessage());
+
+    log.warn("Constraint violation: {}", errorMessage);
+
+    ErrorResponse response = ErrorResponse.builder()
+        .errorCode(ErrorCode.INVALID_INPUT_VALUE)
+        .errorMessage(errorMessage)
+        .build();
+
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+  }
+
+  /**
+   * PathVariable 타입 변환 실패 처리
+   * 예: UUID 자리에 이상한 문자열 입력
+   */
+  @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+  public ResponseEntity<ErrorResponse> handleMethodArgumentTypeMismatchException(
+      MethodArgumentTypeMismatchException e
+  ) {
+    String errorMessage = "요청 파라미터 형식이 올바르지 않습니다.";
+
+    log.warn("Type mismatch: parameter={}, value={}", e.getName(), e.getValue());
+
+    ErrorResponse response = ErrorResponse.builder()
+        .errorCode(ErrorCode.INVALID_INPUT_VALUE)
+        .errorMessage(errorMessage)
+        .build();
+
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+  }
+
+  /**
+   * 필수 요청 파라미터 누락 처리
+   */
+  @ExceptionHandler(MissingServletRequestParameterException.class)
+  public ResponseEntity<ErrorResponse> handleMissingServletRequestParameterException(
+      MissingServletRequestParameterException e
+  ) {
+    String errorMessage = "필수 요청 파라미터가 누락되었습니다.";
+
+    log.warn("Missing request parameter: {}", e.getParameterName());
+
     ErrorResponse response = ErrorResponse.builder()
         .errorCode(ErrorCode.INVALID_INPUT_VALUE)
         .errorMessage(errorMessage)
@@ -56,7 +128,7 @@ public class GlobalExceptionHandler {
    */
   @ExceptionHandler(HttpMessageNotReadableException.class)
   public ResponseEntity<ErrorResponse> handleHttpMessageNotReadableException(HttpMessageNotReadableException e) {
-    log.error("HttpMessageNotReadableException 발생: {}", e.getMessage(), e);
+    log.warn("Invalid request body: {}", e.getMostSpecificCause().getMessage());
 
     ErrorResponse response = ErrorResponse.builder()
         .errorCode(ErrorCode.INVALID_REQUEST)
@@ -66,12 +138,24 @@ public class GlobalExceptionHandler {
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
   }
 
+  @ExceptionHandler(AccessDeniedException.class)
+  public ResponseEntity<ErrorResponse> handleAccessDeniedException(AccessDeniedException e) {
+    log.warn("AccessDeniedException: {}", e.getMessage());
+
+    ErrorResponse response = ErrorResponse.builder()
+        .errorCode(ErrorCode.ACCESS_DENIED)
+        .errorMessage(ErrorCode.ACCESS_DENIED.getMessage())
+        .build();
+
+    return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
+  }
+
   /**
    * 기타 예외를 처리하는 핸들러 메서드
    */
   @ExceptionHandler(Exception.class)
   public ResponseEntity<ErrorResponse> handleException(Exception e) {
-    log.error("Unhandled exception 발생: {}", e.getMessage(), e);
+    log.error("Unhandled exception", e);
 
     ErrorResponse response = ErrorResponse.builder()
         .errorCode(ErrorCode.INTERNAL_SERVER_ERROR)

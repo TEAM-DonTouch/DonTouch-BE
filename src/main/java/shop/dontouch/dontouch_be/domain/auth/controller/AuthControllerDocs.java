@@ -112,11 +112,12 @@ public interface AuthControllerDocs {
           ### 유의 사항
           - `loginId`와 `password`는 필수 입력값입니다.
           - 존재하지 않는 아이디이거나 비밀번호가 일치하지 않으면 로그인에 실패합니다.
-          - 탈퇴 처리된 유저는 로그인할 수 없습니다.
+          - 정지 또는 탈퇴 처리된 유저는 로그인할 수 없습니다.
 
           ### 예외 처리
           - `LOGIN_FAILED` (401 UNAUTHORIZED): 아이디 또는 비밀번호가 일치하지 않습니다.
-          - `USER_ALREADY_WITHDRAWN` (409 CONFLICT): 이미 탈퇴한 사용자입니다.
+          - `USER_SUSPENDED` (403 FORBIDDEN): 정지된 계정입니다.
+          - `USER_WITHDRAWN` (403 FORBIDDEN): 탈퇴한 계정입니다.
           - `INVALID_INPUT_VALUE` (400 BAD_REQUEST): 유효하지 않은 입력값입니다.
           """
   )
@@ -155,6 +156,8 @@ public interface AuthControllerDocs {
           ### 예외 처리
           - `REFRESH_TOKEN_NOT_FOUND` (401 UNAUTHORIZED): 존재하지 않거나 만료된 리프레시 토큰입니다.
           - `USER_NOT_FOUND` (404 NOT_FOUND): 유저 정보를 찾을 수 없습니다.
+          - `USER_SUSPENDED` (403 FORBIDDEN): 정지된 계정입니다.
+          - `USER_WITHDRAWN` (403 FORBIDDEN): 탈퇴한 계정입니다.
           """
   )
   ResponseEntity<AuthResponse> refresh(@Valid @RequestBody RefreshTokenRequest request);

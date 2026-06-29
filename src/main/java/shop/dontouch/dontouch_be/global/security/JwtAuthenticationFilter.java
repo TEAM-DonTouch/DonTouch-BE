@@ -1,6 +1,5 @@
 package shop.dontouch.dontouch_be.global.security;
 
-import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -14,6 +13,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+import shop.dontouch.dontouch_be.domain.user.constant.UserStatus;
 import shop.dontouch.dontouch_be.global.exception.CustomException;
 import shop.dontouch.dontouch_be.global.exception.ErrorCode;
 import shop.dontouch.dontouch_be.global.exception.ErrorResponse;
@@ -49,7 +49,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         UserDetails userDetails = customUserDetailsService.loadUserByUsername(userId);
 
         if (!userDetails.isEnabled()) {
-          writeErrorResponse(response, ErrorCode.USER_ALREADY_WITHDRAWN);
+          CustomUserDetails customUserDetails = (CustomUserDetails) userDetails;
+          ErrorCode errorCode = customUserDetails.getStatus() == UserStatus.SUSPENDED
+              ? ErrorCode.USER_SUSPENDED
+              : ErrorCode.USER_WITHDRAWN;
+          writeErrorResponse(response, errorCode);
           return;
         }
 

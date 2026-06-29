@@ -46,6 +46,10 @@ public class CustomUserDetails implements UserDetails {
     return true;
   }
 
+  public UserStatus getStatus() {
+    return user.getStatus();
+  }
+
   @Override
   public boolean isCredentialsNonExpired() {
     return true;
@@ -53,6 +57,6 @@ public class CustomUserDetails implements UserDetails {
 
   @Override
   public boolean isEnabled() {
-    return user.getStatus() != UserStatus.WITHDRAWN;
+    return user.getStatus() == UserStatus.ACTIVE;
   }
 }

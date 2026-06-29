@@ -141,6 +141,15 @@ public class UserService {
     User user = userRepository.findById(userId)
         .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
+    if (user.getStatus() == request.getUserStatus()) {
+      if (request.getUserStatus() == UserStatus.SUSPENDED) {
+        throw new CustomException(ErrorCode.USER_ALREADY_SUSPENDED);
+      }
+      if (request.getUserStatus() == UserStatus.WITHDRAWN) {
+        throw new CustomException(ErrorCode.USER_ALREADY_WITHDRAWN);
+      }
+    }
+
     user.updateStatus(request.getUserStatus());
 
     return UserResponse.from(user);

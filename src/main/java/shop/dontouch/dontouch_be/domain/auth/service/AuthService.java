@@ -100,9 +100,13 @@ public class AuthService {
       log.warn("login: 비밀번호 불일치");
       throw new CustomException(ErrorCode.LOGIN_FAILED);
     }
+    if (user.getStatus() == UserStatus.SUSPENDED) {
+      log.warn("login: 정지된 유저");
+      throw new CustomException(ErrorCode.USER_SUSPENDED);
+    }
     if (user.getStatus() == UserStatus.WITHDRAWN) {
       log.warn("login: 탈퇴한 유저");
-      throw new CustomException(ErrorCode.USER_ALREADY_WITHDRAWN);
+      throw new CustomException(ErrorCode.USER_WITHDRAWN);
     }
 
     String accessToken = jwtProvider.createAccessToken(user);
@@ -157,10 +161,16 @@ public class AuthService {
           return new CustomException(ErrorCode.USER_NOT_FOUND);
         });
 
+    if (user.getStatus() == UserStatus.SUSPENDED) {
+      refreshTokenRepository.deleteById(oldRefreshTokenKey);
+      log.warn("refresh: 정지된 유저의 refreshToken");
+      throw new CustomException(ErrorCode.USER_SUSPENDED);
+    }
+
     if (user.getStatus() == UserStatus.WITHDRAWN) {
       refreshTokenRedisRepository.delete(newRefreshTokenKey);
       log.warn("refresh: 탈퇴한 유저의 refreshToken");
-      throw new CustomException(ErrorCode.USER_ALREADY_WITHDRAWN);
+      throw new CustomException(ErrorCode.USER_WITHDRAWN);
     }
 
     String newAccessToken = jwtProvider.createAccessToken(user);

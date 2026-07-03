@@ -15,8 +15,7 @@ import shop.dontouch.dontouch_be.domain.auth.dto.request.LoginRequest;
 import shop.dontouch.dontouch_be.domain.auth.dto.request.RefreshTokenRequest;
 import shop.dontouch.dontouch_be.domain.auth.dto.request.SignupRequest;
 import shop.dontouch.dontouch_be.domain.auth.dto.response.AuthResponse;
-import shop.dontouch.dontouch_be.domain.auth.entity.RefreshToken;
-import shop.dontouch.dontouch_be.domain.auth.repository.RefreshTokenRepository;
+import shop.dontouch.dontouch_be.domain.auth.repository.RefreshTokenRedisRepository;
 import shop.dontouch.dontouch_be.domain.user.constant.UserGender;
 import shop.dontouch.dontouch_be.domain.user.constant.UserJobType;
 import shop.dontouch.dontouch_be.domain.user.constant.UserRegion;
@@ -37,7 +36,7 @@ public class AuthService {
   private final UserRepository userRepository;
   private final JwtProvider jwtProvider;
   private final PasswordEncoder passwordEncoder;
-  private final RefreshTokenRepository refreshTokenRepository;
+  private final RefreshTokenRedisRepository refreshTokenRedisRepository;
 
   @Transactional
   public AuthResponse signup(SignupRequest request) {
@@ -77,12 +76,10 @@ public class AuthService {
     String refreshToken = jwtProvider.createRefreshToken();
     String refreshTokenKey = hashRefreshToken(refreshToken);
 
-    refreshTokenRepository.save(
-        new RefreshToken(
-            refreshTokenKey,
-            savedUser.getId().toString(),
-            jwtProvider.getRefreshTokenExpiration()
-        )
+    refreshTokenRedisRepository.save(
+        refreshTokenKey,
+        savedUser.getId().toString(),
+        jwtProvider.getRefreshTokenExpiration()
     );
 
     return AuthResponse.builder()
@@ -116,12 +113,10 @@ public class AuthService {
     String refreshToken = jwtProvider.createRefreshToken();
     String refreshTokenKey = hashRefreshToken(refreshToken);
 
-    refreshTokenRepository.save(
-        new RefreshToken(
-            refreshTokenKey,
-            user.getId().toString(),
-            jwtProvider.getRefreshTokenExpiration()
-        )
+    refreshTokenRedisRepository.save(
+        refreshTokenKey,
+        user.getId().toString(),
+        jwtProvider.getRefreshTokenExpiration()
     );
 
     return AuthResponse.builder()
@@ -134,27 +129,34 @@ public class AuthService {
   public void logout(RefreshTokenRequest request) {
     String refreshTokenKey = hashRefreshToken(request.getRefreshToken());
 
-    refreshTokenRepository.findById(refreshTokenKey)
-        .orElseThrow(() -> {
-          log.warn("logout: 존재하지 않거나 만료된 refreshToken");
-          return new CustomException(ErrorCode.REFRESH_TOKEN_NOT_FOUND);
-        });
+    boolean deleted = refreshTokenRedisRepository.delete(refreshTokenKey);
 
-    refreshTokenRepository.deleteById(refreshTokenKey);
+    if (!deleted) {
+      log.warn("logout: 존재하지 않거나 만료된 refreshToken");
+      throw new CustomException(ErrorCode.REFRESH_TOKEN_NOT_FOUND);
+    }
   }
 
   public AuthResponse refresh(RefreshTokenRequest request) {
     String oldRefreshTokenKey = hashRefreshToken(request.getRefreshToken());
 
-    RefreshToken savedToken = refreshTokenRepository.findById(oldRefreshTokenKey)
-        .orElseThrow(() -> {
-          log.warn("refresh: 존재하지 않거나 만료된 refreshToken");
-          return new CustomException(ErrorCode.REFRESH_TOKEN_NOT_FOUND);
-        });
+    String newRefreshToken = jwtProvider.createRefreshToken();
+    String newRefreshTokenKey = hashRefreshToken(newRefreshToken);
 
-    UUID userId = UUID.fromString(savedToken.getUserId());
+    String userIdValue = refreshTokenRedisRepository.rotate(
+        oldRefreshTokenKey,
+        newRefreshTokenKey,
+        jwtProvider.getRefreshTokenExpiration()
+    ).orElseThrow(() -> {
+      log.warn("refresh: 존재하지 않거나 만료된 refreshToken");
+      return new CustomException(ErrorCode.REFRESH_TOKEN_NOT_FOUND);
+    });
+
+    UUID userId = UUID.fromString(userIdValue);
+
     User user = userRepository.findById(userId)
         .orElseThrow(() -> {
+          refreshTokenRedisRepository.delete(newRefreshTokenKey);
           log.warn("refresh: refreshToken의 userId에 해당하는 유저 없음");
           return new CustomException(ErrorCode.USER_NOT_FOUND);
         });
@@ -166,24 +168,12 @@ public class AuthService {
     }
 
     if (user.getStatus() == UserStatus.WITHDRAWN) {
-      refreshTokenRepository.deleteById(oldRefreshTokenKey);
+      refreshTokenRedisRepository.delete(newRefreshTokenKey);
       log.warn("refresh: 탈퇴한 유저의 refreshToken");
       throw new CustomException(ErrorCode.USER_WITHDRAWN);
     }
 
-    refreshTokenRepository.deleteById(oldRefreshTokenKey);
-
     String newAccessToken = jwtProvider.createAccessToken(user);
-    String newRefreshToken = jwtProvider.createRefreshToken();
-    String newRefreshTokenKey = hashRefreshToken(newRefreshToken);
-
-    refreshTokenRepository.save(
-        new RefreshToken(
-            newRefreshTokenKey,
-            savedToken.getUserId(),
-            jwtProvider.getRefreshTokenExpiration()
-        )
-    );
 
     return AuthResponse.builder()
         .accessToken(newAccessToken)

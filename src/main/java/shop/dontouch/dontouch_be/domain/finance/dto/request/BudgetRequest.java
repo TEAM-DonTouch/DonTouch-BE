@@ -3,7 +3,6 @@ package shop.dontouch.dontouch_be.domain.finance.dto.request;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
-import java.util.UUID;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import shop.dontouch.dontouch_be.domain.finance.constant.BudgetPeriod;
@@ -11,9 +10,6 @@ import shop.dontouch.dontouch_be.domain.finance.constant.BudgetPeriod;
 @Getter
 @NoArgsConstructor
 public class BudgetRequest {
-
-  @NotNull
-  private UUID userId;
 
   @NotNull
   private BudgetPeriod period;

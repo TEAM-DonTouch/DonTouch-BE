@@ -6,6 +6,8 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -18,6 +20,7 @@ import shop.dontouch.dontouch_be.domain.finance.dto.request.TransactionRequest;
 import shop.dontouch.dontouch_be.domain.finance.dto.response.TransactionResponse;
 import shop.dontouch.dontouch_be.domain.finance.dto.request.TransactionUpdateRequest;
 import shop.dontouch.dontouch_be.domain.finance.service.TransactionService;
+import shop.dontouch.dontouch_be.global.security.CustomUserDetails;
 
 @RestController
 @RequiredArgsConstructor
@@ -26,19 +29,59 @@ public class TransactionController implements TransactionControllerDocs {
 
   private final TransactionService transactionService;
 
-  @PostMapping
-  public ResponseEntity<TransactionResponse> createTransaction(@Valid @RequestBody TransactionRequest request) {
-    TransactionResponse response = transactionService.createTransaction(request);
+  @PostMapping("/me")
+  public ResponseEntity<TransactionResponse> createTransaction(
+      @AuthenticationPrincipal CustomUserDetails currentUser,
+      @Valid @RequestBody TransactionRequest request) {
+    TransactionResponse response = transactionService.createTransaction(currentUser.getUserId(), request);
     return ResponseEntity.status(HttpStatus.CREATED).body(response);
   }
 
-  // TODO 추후 ADMIN 권한 접근으로 변경 예정
+  @GetMapping("/me")
+  public ResponseEntity<List<TransactionResponse>> getMyTransactions(
+      @AuthenticationPrincipal CustomUserDetails currentUser) {
+    List<TransactionResponse> responses = transactionService.getAllTransactionsByUserId(currentUser.getUserId());
+    return ResponseEntity.ok(responses);
+  }
+
+  @GetMapping("/me/categories/{category-id}")
+  public ResponseEntity<List<TransactionResponse>> getAllTransactionsByCategoryId(
+      @AuthenticationPrincipal CustomUserDetails currentUser,
+      @PathVariable(name = "category-id") UUID categoryId
+  ) {
+    List<TransactionResponse> responses = transactionService.getAllTransactionsByCategoryId(currentUser.getUserId(), categoryId);
+    return ResponseEntity.ok(responses);
+  }
+
+  @PatchMapping("/me/{transaction-id}")
+  public ResponseEntity<TransactionResponse> updateTransaction(
+      @AuthenticationPrincipal CustomUserDetails currentUser,
+      @PathVariable(name = "transaction-id") UUID transactionId,
+      @Valid @RequestBody TransactionUpdateRequest request
+  ) {
+    TransactionResponse response = transactionService.updateTransaction(currentUser.getUserId(), transactionId, request);
+    return ResponseEntity.ok(response);
+  }
+
+  @DeleteMapping("/me/{transaction-id}")
+  public ResponseEntity<Void> deleteTransaction(
+      @AuthenticationPrincipal CustomUserDetails currentUser,
+      @PathVariable(name = "transaction-id") UUID transactionId
+  ) {
+    transactionService.deleteTransaction(currentUser.getUserId(), transactionId);
+    return ResponseEntity.noContent().build();
+  }
+
+  ///  ADMIN
+
+  @PreAuthorize("hasAuthority('ADMIN')")
   @GetMapping
   public ResponseEntity<List<TransactionResponse>> getAllTransactions() {
     List<TransactionResponse> responses = transactionService.getAllTransactions();
     return ResponseEntity.ok(responses);
   }
 
+  @PreAuthorize("hasAuthority('ADMIN')")
   @GetMapping("/{transaction-id}")
   public ResponseEntity<TransactionResponse> getTransactionByTransactionId(
       @PathVariable(name = "transaction-id") UUID transactionId
@@ -47,36 +90,12 @@ public class TransactionController implements TransactionControllerDocs {
     return ResponseEntity.ok(response);
   }
 
+  @PreAuthorize("hasAuthority('ADMIN')")
   @GetMapping("/users/{user-id}")
   public ResponseEntity<List<TransactionResponse>> getAllTransactionsByUserId(
       @PathVariable(name = "user-id") UUID userId
   ) {
     List<TransactionResponse> responses = transactionService.getAllTransactionsByUserId(userId);
     return ResponseEntity.ok(responses);
-  }
-
-  @GetMapping("/categories/{category-id}")
-  public ResponseEntity<List<TransactionResponse>> getAllTransactionsByCategoryId(
-      @PathVariable(name = "category-id") UUID categoryId
-  ) {
-    List<TransactionResponse> responses = transactionService.getAllTransactionsByCategoryId(categoryId);
-    return ResponseEntity.ok(responses);
-  }
-
-  @PatchMapping("/{transaction-id}")
-  public ResponseEntity<TransactionResponse> updateTransaction(
-      @PathVariable(name = "transaction-id") UUID transactionId,
-      @Valid @RequestBody TransactionUpdateRequest request
-  ) {
-    TransactionResponse response = transactionService.updateTransaction(transactionId, request);
-    return ResponseEntity.ok(response);
-  }
-
-  @DeleteMapping("/{transaction-id}")
-  public ResponseEntity<Void> deleteTransaction(
-      @PathVariable(name = "transaction-id") UUID transactionId
-  ) {
-    transactionService.deleteTransaction(transactionId);
-    return ResponseEntity.noContent().build();
   }
 }

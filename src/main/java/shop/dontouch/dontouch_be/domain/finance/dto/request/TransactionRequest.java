@@ -14,10 +14,6 @@ import shop.dontouch.dontouch_be.domain.finance.constant.TransactionType;
 @NoArgsConstructor
 public class TransactionRequest {
 
-  @Schema(description = "유저 ID", example = "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa")
-  @NotNull
-  private UUID userId;
-
   @Schema(description = "카테고리 ID", example = "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa")
   @NotNull
   private UUID categoryId;

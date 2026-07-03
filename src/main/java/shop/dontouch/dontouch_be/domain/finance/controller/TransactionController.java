@@ -1,5 +1,6 @@
 package shop.dontouch.dontouch_be.domain.finance.controller;
 
+import com.chuseok22.logging.annotation.LogMonitoring;
 import jakarta.validation.Valid;
 import java.util.List;
 import java.util.UUID;
@@ -29,6 +30,7 @@ public class TransactionController implements TransactionControllerDocs {
 
   private final TransactionService transactionService;
 
+  @LogMonitoring
   @PostMapping("/me")
   public ResponseEntity<TransactionResponse> createTransaction(
       @AuthenticationPrincipal CustomUserDetails currentUser,
@@ -37,6 +39,7 @@ public class TransactionController implements TransactionControllerDocs {
     return ResponseEntity.status(HttpStatus.CREATED).body(response);
   }
 
+  @LogMonitoring
   @GetMapping("/me")
   public ResponseEntity<List<TransactionResponse>> getMyTransactions(
       @AuthenticationPrincipal CustomUserDetails currentUser) {
@@ -44,6 +47,7 @@ public class TransactionController implements TransactionControllerDocs {
     return ResponseEntity.ok(responses);
   }
 
+  @LogMonitoring
   @GetMapping("/me/categories/{category-id}")
   public ResponseEntity<List<TransactionResponse>> getAllTransactionsByCategoryId(
       @AuthenticationPrincipal CustomUserDetails currentUser,
@@ -53,6 +57,7 @@ public class TransactionController implements TransactionControllerDocs {
     return ResponseEntity.ok(responses);
   }
 
+  @LogMonitoring
   @PatchMapping("/me/{transaction-id}")
   public ResponseEntity<TransactionResponse> updateTransaction(
       @AuthenticationPrincipal CustomUserDetails currentUser,
@@ -63,6 +68,7 @@ public class TransactionController implements TransactionControllerDocs {
     return ResponseEntity.ok(response);
   }
 
+  @LogMonitoring
   @DeleteMapping("/me/{transaction-id}")
   public ResponseEntity<Void> deleteTransaction(
       @AuthenticationPrincipal CustomUserDetails currentUser,
@@ -74,6 +80,7 @@ public class TransactionController implements TransactionControllerDocs {
 
   ///  ADMIN
 
+  @LogMonitoring
   @PreAuthorize("hasAuthority('ADMIN')")
   @GetMapping
   public ResponseEntity<List<TransactionResponse>> getAllTransactions() {
@@ -81,6 +88,7 @@ public class TransactionController implements TransactionControllerDocs {
     return ResponseEntity.ok(responses);
   }
 
+  @LogMonitoring
   @PreAuthorize("hasAuthority('ADMIN')")
   @GetMapping("/{transaction-id}")
   public ResponseEntity<TransactionResponse> getTransactionByTransactionId(
@@ -90,6 +98,7 @@ public class TransactionController implements TransactionControllerDocs {
     return ResponseEntity.ok(response);
   }
 
+  @LogMonitoring
   @PreAuthorize("hasAuthority('ADMIN')")
   @GetMapping("/users/{user-id}")
   public ResponseEntity<List<TransactionResponse>> getAllTransactionsByUserId(

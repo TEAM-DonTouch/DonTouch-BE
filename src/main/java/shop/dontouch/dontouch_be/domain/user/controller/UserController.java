@@ -1,5 +1,6 @@
 package shop.dontouch.dontouch_be.domain.user.controller;
 
+import com.chuseok22.logging.annotation.LogMonitoring;
 import jakarta.validation.Valid;
 import java.util.List;
 import java.util.UUID;
@@ -33,6 +34,7 @@ public class UserController implements UserControllerDocs {
 
 
 
+  @LogMonitoring
   @GetMapping("/me")
   public ResponseEntity<UserResponse> getMe(
       @AuthenticationPrincipal CustomUserDetails currentUser
@@ -40,6 +42,7 @@ public class UserController implements UserControllerDocs {
     return ResponseEntity.ok(userService.getUser(currentUser.getUserId()));
   }
 
+  @LogMonitoring
   @PatchMapping("/me")
   public ResponseEntity<UserResponse> updateMe(
       @AuthenticationPrincipal CustomUserDetails currentUser,
@@ -48,6 +51,7 @@ public class UserController implements UserControllerDocs {
     return ResponseEntity.ok(userService.updateUser(currentUser.getUserId(), request));
   }
 
+  @LogMonitoring
   @DeleteMapping("/me")
   public ResponseEntity<Void> deleteMe(
       @AuthenticationPrincipal CustomUserDetails currentUser
@@ -58,6 +62,7 @@ public class UserController implements UserControllerDocs {
 
   ///  ADMIN
 
+  @LogMonitoring(logParameters = false)
   @PreAuthorize("hasAuthority('ADMIN')")
   @PostMapping("/admin")
   public ResponseEntity<UserResponse> createUser(
@@ -67,12 +72,14 @@ public class UserController implements UserControllerDocs {
         .body(userService.createUser(request));
   }
 
+  @LogMonitoring
   @PreAuthorize("hasAuthority('ADMIN')")
   @GetMapping
   public ResponseEntity<List<UserResponse>> getAllUsers() {
     return ResponseEntity.ok(userService.getAllUsers());
   }
 
+  @LogMonitoring
   @PreAuthorize("hasAuthority('ADMIN')")
   @GetMapping("/{user-id}")
   public ResponseEntity<UserResponse> getUser(
@@ -81,6 +88,7 @@ public class UserController implements UserControllerDocs {
     return ResponseEntity.ok(userService.getUser(userId));
   }
 
+  @LogMonitoring
   @PreAuthorize("hasAuthority('ADMIN')")
   @PatchMapping("/{user-id}/status")
   public ResponseEntity<UserResponse> updateUserStatus(
@@ -90,6 +98,7 @@ public class UserController implements UserControllerDocs {
     return ResponseEntity.ok(userService.updateUserStatus(userId, request));
   }
 
+  @LogMonitoring
   @PreAuthorize("hasAuthority('ADMIN')")
   @PatchMapping("/{user-id}/role")
   public ResponseEntity<UserResponse> updateUserRole(

@@ -1,5 +1,6 @@
 package shop.dontouch.dontouch_be.domain.finance.controller;
 
+import com.chuseok22.logging.annotation.LogMonitoring;
 import jakarta.validation.Valid;
 import java.util.List;
 import java.util.UUID;
@@ -25,24 +26,28 @@ public class CategoryController implements CategoryControllerDocs {
 
   private final CategoryService categoryService;
 
+  @LogMonitoring
   @PostMapping
   public ResponseEntity<CategoryResponse> createCategory(@Valid @RequestBody CategoryRequest request) {
     CategoryResponse response = categoryService.createCategory(request);
     return ResponseEntity.status(HttpStatus.CREATED).body(response);
   }
 
+  @LogMonitoring
   @GetMapping("/{category-id}")
   public ResponseEntity<CategoryResponse> getCategoryByCategoryId(@PathVariable(name = "category-id") UUID categoryId) {
     CategoryResponse response = categoryService.getCategoryByCategoryId(categoryId);
     return ResponseEntity.ok(response);
   }
 
+  @LogMonitoring
   @GetMapping
   public ResponseEntity<List<CategoryResponse>> getAllCategories() {
     List<CategoryResponse> responses = categoryService.getAllCategories();
     return ResponseEntity.ok(responses);
   }
 
+  @LogMonitoring
   @PatchMapping("/{category-id}")
   public ResponseEntity<CategoryResponse> updateCategory(
       @PathVariable(name = "category-id") UUID categoryId,
@@ -51,6 +56,7 @@ public class CategoryController implements CategoryControllerDocs {
     return ResponseEntity.ok(response);
   }
 
+  @LogMonitoring
   @DeleteMapping("/{category-id}")
   public ResponseEntity<Void> deleteCategory(@PathVariable(name = "category-id") UUID categoryId) {
     categoryService.deleteCategory(categoryId);

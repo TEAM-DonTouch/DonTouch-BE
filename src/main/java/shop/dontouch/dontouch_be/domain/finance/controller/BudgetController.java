@@ -1,5 +1,6 @@
 package shop.dontouch.dontouch_be.domain.finance.controller;
 
+import com.chuseok22.logging.annotation.LogMonitoring;
 import jakarta.validation.Valid;
 import java.util.List;
 import java.util.UUID;
@@ -26,6 +27,7 @@ public class BudgetController implements BudgetControllerDocs {
 
   private final BudgetService budgetService;
 
+  @LogMonitoring
   @PutMapping("/me")
   public ResponseEntity<BudgetResponse> saveBudget(
       @AuthenticationPrincipal CustomUserDetails currentUser,
@@ -35,6 +37,7 @@ public class BudgetController implements BudgetControllerDocs {
     return ResponseEntity.ok(response);
   }
 
+  @LogMonitoring
   @GetMapping("/me")
   public ResponseEntity<BudgetResponse> getMyBudget(
       @AuthenticationPrincipal CustomUserDetails currentUser
@@ -43,6 +46,7 @@ public class BudgetController implements BudgetControllerDocs {
     return ResponseEntity.ok(response);
   }
 
+  @LogMonitoring
   @DeleteMapping("/me/{budget-id}")
   public ResponseEntity<Void> deleteBudget(
       @AuthenticationPrincipal CustomUserDetails currentUser,
@@ -54,6 +58,7 @@ public class BudgetController implements BudgetControllerDocs {
 
   ///  ADMIN
 
+  @LogMonitoring
   @PreAuthorize("hasAuthority('ADMIN')")
   @GetMapping
   public ResponseEntity<List<BudgetResponse>> getAllBudgets() {
@@ -61,6 +66,7 @@ public class BudgetController implements BudgetControllerDocs {
     return ResponseEntity.ok(responses);
   }
 
+  @LogMonitoring
   @PreAuthorize("hasAuthority('ADMIN')")
   @GetMapping("/users/{user-id}")
   public ResponseEntity<BudgetResponse> getBudgetByUserId(

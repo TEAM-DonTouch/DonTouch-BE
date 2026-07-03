@@ -162,7 +162,7 @@ public class AuthService {
         });
 
     if (user.getStatus() == UserStatus.SUSPENDED) {
-      refreshTokenRepository.deleteById(oldRefreshTokenKey);
+      refreshTokenRedisRepository.delete(newRefreshTokenKey);
       log.warn("refresh: 정지된 유저의 refreshToken");
       throw new CustomException(ErrorCode.USER_SUSPENDED);
     }

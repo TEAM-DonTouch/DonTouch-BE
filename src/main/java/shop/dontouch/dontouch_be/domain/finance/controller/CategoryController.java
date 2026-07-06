@@ -7,6 +7,7 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -27,6 +28,7 @@ public class CategoryController implements CategoryControllerDocs {
   private final CategoryService categoryService;
 
   @LogMonitoring
+  @PreAuthorize("hasAuthority('ADMIN')")
   @PostMapping
   public ResponseEntity<CategoryResponse> createCategory(@Valid @RequestBody CategoryRequest request) {
     CategoryResponse response = categoryService.createCategory(request);
@@ -48,6 +50,7 @@ public class CategoryController implements CategoryControllerDocs {
   }
 
   @LogMonitoring
+  @PreAuthorize("hasAuthority('ADMIN')")
   @PatchMapping("/{category-id}")
   public ResponseEntity<CategoryResponse> updateCategory(
       @PathVariable(name = "category-id") UUID categoryId,
@@ -57,6 +60,7 @@ public class CategoryController implements CategoryControllerDocs {
   }
 
   @LogMonitoring
+  @PreAuthorize("hasAuthority('ADMIN')")
   @DeleteMapping("/{category-id}")
   public ResponseEntity<Void> deleteCategory(@PathVariable(name = "category-id") UUID categoryId) {
     categoryService.deleteCategory(categoryId);

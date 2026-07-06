@@ -13,9 +13,11 @@ import shop.dontouch.dontouch_be.domain.finance.dto.response.CategoryResponse;
 public interface CategoryControllerDocs {
 
   @Operation(
-      summary = "카테고리 생성",
+      summary = "[ADMIN] 카테고리 생성",
       description = """
           ### 요청 파라미터
+          Header: `Authorization: Bearer {accessToken}` (ADMIN 권한 필요)
+
           Request Body(JSON)
 
           - `categoryName` (String, required): 카테고리 이름 (최대 10자, 공백 불가)
@@ -43,6 +45,7 @@ public interface CategoryControllerDocs {
           - 이미 존재하는 카테고리 이름으로 생성 시 예외가 발생합니다.
 
           ### 예외 처리
+          - `ACCESS_DENIED` (403 FORBIDDEN): ADMIN 권한이 필요합니다.
           - `CATEGORY_NAME_DUPLICATE` (409 CONFLICT): 이미 존재하는 카테고리입니다.
           - `INVALID_INPUT_VALUE` (400 BAD_REQUEST): 유효하지 않은 입력값입니다.
           """
@@ -117,9 +120,11 @@ public interface CategoryControllerDocs {
   );
 
   @Operation(
-      summary = "카테고리 수정",
+      summary = "[ADMIN] 카테고리 수정",
       description = """
           ### 요청 파라미터
+          Header: `Authorization: Bearer {accessToken}` (ADMIN 권한 필요)
+
           Path Variable
 
           - `category-id` (UUID, required): 수정할 카테고리 ID
@@ -152,6 +157,7 @@ public interface CategoryControllerDocs {
           - 존재하지 않는 카테고리 ID로 요청 시 예외가 발생합니다.
 
           ### 예외 처리
+          - `ACCESS_DENIED` (403 FORBIDDEN): ADMIN 권한이 필요합니다.
           - `CATEGORY_NOT_FOUND` (404 NOT_FOUND): 카테고리를 찾을 수 없습니다.
           - `CATEGORY_NAME_DUPLICATE` (409 CONFLICT): 이미 존재하는 카테고리입니다.
           - `INVALID_INPUT_VALUE` (400 BAD_REQUEST): 유효하지 않은 입력값입니다.
@@ -163,9 +169,11 @@ public interface CategoryControllerDocs {
   );
 
   @Operation(
-      summary = "카테고리 삭제",
+      summary = "[ADMIN] 카테고리 삭제",
       description = """
           ### 요청 파라미터
+          Header: `Authorization: Bearer {accessToken}` (ADMIN 권한 필요)
+
           Path Variable
 
           - `category-id` (UUID, required): 삭제할 카테고리 ID
@@ -189,6 +197,7 @@ public interface CategoryControllerDocs {
           - 존재하지 않는 카테고리 ID로 요청 시 예외가 발생합니다.
 
           ### 예외 처리
+          - `ACCESS_DENIED` (403 FORBIDDEN): ADMIN 권한이 필요합니다.
           - `CATEGORY_NOT_FOUND` (404 NOT_FOUND): 카테고리를 찾을 수 없습니다.
           """
   )

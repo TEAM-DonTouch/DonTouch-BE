@@ -21,6 +21,8 @@ public class SecurityConfig {
 
   // 우리가 만든 JWT 필터를 주입받아 필터 체인에 등록
   private final JwtAuthenticationFilter jwtAuthenticationFilter;
+  private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+  private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
 
   @Bean
   public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -29,6 +31,11 @@ public class SecurityConfig {
 
         .sessionManagement(session ->
             session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+        )
+
+        .exceptionHandling((ex) -> ex
+            .authenticationEntryPoint(jwtAuthenticationEntryPoint)
+            .accessDeniedHandler(jwtAccessDeniedHandler)
         )
 
         .authorizeHttpRequests(auth -> auth

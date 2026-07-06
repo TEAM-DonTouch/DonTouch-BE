@@ -67,12 +67,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         // SecurityContext에 인증 정보 저장
         SecurityContextHolder.getContext().setAuthentication(authentication);
-      } catch (CustomException e) {
-        writeErrorResponse(response, e.getErrorCode());
-        return;
-      } catch (JwtException e) {
-        writeErrorResponse(response, ErrorCode.TOKEN_INVALID);
-        return;
+      } catch (CustomException | JwtException e) {
+        SecurityContextHolder.clearContext();
       }
     }
 

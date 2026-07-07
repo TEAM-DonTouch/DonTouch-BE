@@ -266,7 +266,8 @@ public interface UserControllerDocs {
 
           - `userStatus` (UserStatus, required): 변경할 상태
             - `ACTIVE`: 활성
-            - `INACTIVE`: 비활성
+            - `DORMANT`: 휴면
+            - `SUSPENDED`: 정지
             - `WITHDRAWN`: 탈퇴
 
           요청 예시

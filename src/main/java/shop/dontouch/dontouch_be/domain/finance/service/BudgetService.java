@@ -27,10 +27,10 @@ public class BudgetService {
   private final UserRepository userRepository;
 
   @Transactional
-  public BudgetResponse saveBudget(BudgetRequest request) {
-    User user = userRepository.findById(request.getUserId())
+  public BudgetResponse saveBudget(UUID userId, BudgetRequest request) {
+    User user = userRepository.findById(userId)
         .orElseThrow(() -> {
-          log.warn("saveBudget: 유효하지 않은 userId {}", request.getUserId());
+          log.warn("saveBudget: 유효하지 않은 userId {}", userId);
           return new CustomException(ErrorCode.USER_NOT_FOUND);
         });
 
@@ -94,12 +94,18 @@ public class BudgetService {
   }
 
   @Transactional
-  public void deleteBudget(UUID budgetId) {
+  public void deleteBudget(UUID userId, UUID budgetId) {
     Budget budget = budgetRepository.findById(budgetId)
         .orElseThrow(() -> {
           log.warn("deleteBudget: 유효하지 않은 budgetId {}", budgetId);
           return new CustomException(ErrorCode.BUDGET_NOT_FOUND);
         });
+
+    if (!budget.getUser().getId().equals(userId)) {
+      log.warn("deleteBudget: 본인 소유가 아닌 예산 삭제 시도 userId {} budgetId {}", userId, budgetId);
+      throw new CustomException(ErrorCode.ACCESS_DENIED);
+    }
+
     budgetRepository.delete(budget);
   }
 

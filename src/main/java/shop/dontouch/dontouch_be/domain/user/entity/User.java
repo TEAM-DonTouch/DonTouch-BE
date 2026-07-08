@@ -35,6 +35,12 @@ public class User extends BaseEntity {
   @Column(updatable = false, nullable = false)
   private UUID id;
 
+  @Column(nullable = false, unique = true, length = 30)
+  private String loginId;
+
+  @Column(nullable = false, length = 255)
+  private String password;
+
   @Column(nullable = false, unique = true, length = 255)
   private String email;
 
@@ -49,7 +55,7 @@ public class User extends BaseEntity {
   @Builder.Default
   private UserRole role = UserRole.GENERAL_USER;
 
-  @Column()
+  @Column
   private Integer age;
 
   @Enumerated(EnumType.STRING)

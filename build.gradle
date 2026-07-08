@@ -15,6 +15,14 @@ java {
 
 repositories {
 	mavenCentral()
+    maven {
+        name = 'chuseok22NexusReleases'
+        url = uri('https://nexus.chuseok22.com/repository/maven-releases/')
+        metadataSources {
+            mavenPom()
+            artifact()
+        }
+    }
 }
 
 dependencies {
@@ -41,8 +49,23 @@ dependencies {
     // Spring Actuator
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
 
-    //swagger
+    // swagger
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.9'
+
+    // Spring Security
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-security-oauth2-resource-server'
+
+    // JWT
+    implementation 'io.jsonwebtoken:jjwt-api:0.12.6'
+    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.6'
+    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.6'
+
+    // REDIS
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
+    // Chuseok22 Method Logging
+    implementation 'com.chuseok22:logging:0.0.9'
 }
 
 tasks.named('test') {

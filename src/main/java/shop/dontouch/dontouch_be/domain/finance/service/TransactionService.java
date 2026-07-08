@@ -30,10 +30,10 @@ public class TransactionService {
   private final UserRepository userRepository;
 
   @Transactional
-  public TransactionResponse createTransaction(TransactionRequest request) {
-    User user = userRepository.findById(request.getUserId())
+  public TransactionResponse createTransaction(UUID userId, TransactionRequest request) {
+    User user = userRepository.findById(userId)
         .orElseThrow(() -> {
-          log.warn("createTransaction: 유효하지 않은 userId {}", request.getUserId());
+          log.warn("createTransaction: 유효하지 않은 userId {}", userId);
           return new CustomException(ErrorCode.USER_NOT_FOUND);
         });
 
@@ -89,13 +89,13 @@ public class TransactionService {
         .toList();
   }
 
-  public List<TransactionResponse> getAllTransactionsByCategoryId(UUID categoryId) {
+  public List<TransactionResponse> getAllTransactionsByCategoryId(UUID userId, UUID categoryId) {
     if (!categoryRepository.existsById(categoryId)) {
       log.warn("getAllTransactionsByCategoryId: 유효하지 않은 categoryId {}", categoryId);
       throw new CustomException(ErrorCode.CATEGORY_NOT_FOUND);
     }
 
-    List<Transaction> transactions = transactionRepository.findAllByCategoryIdWithCategory(categoryId);
+    List<Transaction> transactions = transactionRepository.findAllByCategoryIdWithUserIdAndCategory(userId, categoryId);
 
     return transactions.stream()
         .map(TransactionResponse::from)
@@ -104,12 +104,18 @@ public class TransactionService {
 
 
   @Transactional
-  public TransactionResponse updateTransaction(UUID transactionId, TransactionUpdateRequest request) {
+  public TransactionResponse updateTransaction(UUID userId, UUID transactionId, TransactionUpdateRequest request) {
+
     Transaction transaction = transactionRepository.findById(transactionId)
         .orElseThrow(() -> {
           log.warn("updateTransaction: 유효하지 않은 transactionId {}", transactionId);
           return new CustomException(ErrorCode.TRANSACTION_NOT_FOUND);
         });
+
+    if (!transaction.getUser().getId().equals(userId)) {
+      log.warn("updateTransaction: 본인 소유가 아닌 거래 수정 시도 userId {} transactionId {}", userId, transactionId);
+      throw new CustomException(ErrorCode.ACCESS_DENIED);
+    }
 
     if (transaction.getUser().getStatus() == UserStatus.WITHDRAWN) {
       log.warn("updateTransaction: 탈퇴한 유저의 거래 수정 시도 userId {}, transactionId {}", transaction.getUser().getId(), transaction.getId());
@@ -129,12 +135,18 @@ public class TransactionService {
   }
 
   @Transactional
-  public void deleteTransaction(UUID transactionId) {
+  public void deleteTransaction(UUID userId, UUID transactionId) {
     Transaction transaction = transactionRepository.findById(transactionId)
         .orElseThrow(() -> {
           log.warn("deleteTransaction: 유효하지 않은 transactionId {}", transactionId);
           return new CustomException(ErrorCode.TRANSACTION_NOT_FOUND);
         });
+
+    if (!transaction.getUser().getId().equals(userId)) {
+      log.warn("deleteTransaction: 본인 소유가 아닌 거래 삭제 시도 userId {} transactionId {}", userId, transactionId);
+      throw new CustomException(ErrorCode.ACCESS_DENIED);
+    }
+
     transaction.delete();
   }
 

@@ -22,6 +22,7 @@ import shop.dontouch.dontouch_be.domain.user.constant.UserRegion;
 import shop.dontouch.dontouch_be.domain.user.constant.UserRole;
 import shop.dontouch.dontouch_be.domain.user.constant.UserStatus;
 import shop.dontouch.dontouch_be.global.common.BaseEntity;
+import shop.dontouch.dontouch_be.domain.user.constant.LoginPlatform;
 
 @Entity
 @Table(name = "users")
@@ -43,6 +44,14 @@ public class User extends BaseEntity {
 
   @Column(nullable = false, unique = true, length = 255)
   private String email;
+
+  @Enumerated(EnumType.STRING)
+  @Column(nullable = false, length = 20)
+  @Builder.Default
+  private LoginPlatform loginPlatform = LoginPlatform.LOCAL;
+
+  @Column(length = 255)
+  private String providerId;
 
   @Column(nullable = false, unique = true, length = 30)
   private String nickname;

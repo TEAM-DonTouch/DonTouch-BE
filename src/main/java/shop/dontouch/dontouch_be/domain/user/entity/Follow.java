@@ -1,4 +1,4 @@
-package shop.dontouch.dontouch_be.domain.community.entity;
+package shop.dontouch.dontouch_be.domain.user.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -8,36 +8,39 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.SQLRestriction;
-import shop.dontouch.dontouch_be.domain.user.entity.User;
 import shop.dontouch.dontouch_be.global.common.BaseEntity;
 
 @Entity
+@Table(
+    name = "follows",
+    uniqueConstraints = @UniqueConstraint(
+        name = "uk_follow_follower_following",
+        columnNames = {"follower_id", "following_id"}
+    )
+)
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Builder
-@SQLRestriction("deleted_at IS NULL")
-public class Comment extends BaseEntity {
+public class Follow extends BaseEntity {
   @Id
   @GeneratedValue(strategy = GenerationType.UUID)
   @Column(updatable = false, nullable = false)
   private UUID id;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "user_id", nullable = false)
-  private User user;
+  @JoinColumn(name = "follower_id", nullable = false)
+  private User follower;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "post_id", nullable = false)
-  private Post post;
-
-  @Column(nullable = false, length = 100)
-  private String content;
+  @JoinColumn(name = "following_id", nullable = false)
+  private User following;
 }

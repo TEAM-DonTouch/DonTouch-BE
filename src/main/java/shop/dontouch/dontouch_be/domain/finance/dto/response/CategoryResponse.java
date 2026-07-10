@@ -12,6 +12,7 @@ public class CategoryResponse {
 
   private UUID categoryId;
   private String categoryName;
+  private boolean isCustom;
   private LocalDateTime createdAt;
   private LocalDateTime updatedAt;
 
@@ -19,6 +20,7 @@ public class CategoryResponse {
     return CategoryResponse.builder()
         .categoryId(category.getId())
         .categoryName(category.getName())
+        .isCustom(category.isCustom())
         .createdAt(category.getCreatedAt())
         .updatedAt(category.getUpdatedAt())
         .build();

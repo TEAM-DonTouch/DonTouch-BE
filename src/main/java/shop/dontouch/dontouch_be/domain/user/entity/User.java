@@ -8,6 +8,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import java.util.Objects;
 import java.util.UUID;
 import lombok.AccessLevel;
@@ -25,7 +26,15 @@ import shop.dontouch.dontouch_be.global.common.BaseEntity;
 import shop.dontouch.dontouch_be.domain.user.constant.LoginPlatform;
 
 @Entity
-@Table(name = "users")
+@Table(
+  name = "users",
+  uniqueConstraints = {
+    @UniqueConstraint(
+      name = "uk_users_login_platform_provider_id",
+      columnNames = {"login_platform", "provider_id"}
+    )
+  }
+)
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)

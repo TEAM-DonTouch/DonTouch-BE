@@ -34,7 +34,6 @@ public enum ErrorCode {
   USER_ALREADY_WITHDRAWN(HttpStatus.CONFLICT, "이미 탈퇴한 사용자입니다."),
   USER_SUSPENDED(HttpStatus.FORBIDDEN, "정지된 계정입니다."),
   USER_ALREADY_SUSPENDED(HttpStatus.CONFLICT, "이미 정지된 사용자입니다."),
-  USER_DUPLICATE_email_or_nickname(HttpStatus.CONFLICT, "이미 사용 중인 이메일 또는 닉네임입니다."),
 
   //Auth
   USER_LOGIN_ID_DUPLICATE(HttpStatus.CONFLICT, "이미 사용 중인 아이디입니다."),

@@ -15,11 +15,7 @@ public interface CategoryRepository extends JpaRepository<Category, UUID> {
 
   boolean existsByNameAndUserId(String name, UUID userId);
 
-  boolean existsByNameAndUserIdAndIdNot(String name, UUID userId, UUID id);
-
   List<Category> findAllByUserIsNull();
-
-  List<Category> findAllByUserId(UUID userId);
 
   @Query("SELECT c FROM Category c LEFT JOIN FETCH c.user WHERE c.user IS NULL OR c.user.id = :userId")
   List<Category> findAllVisibleToUser(@Param("userId") UUID userId);

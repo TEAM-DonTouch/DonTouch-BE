@@ -63,6 +63,11 @@ public class CategoryService {
           return new CustomException(ErrorCode.CATEGORY_NOT_FOUND);
         });
 
+    if (category.isCustom()) {
+      log.warn("updateGlobalCategory: 전역 카테고리가 아닙니다. categoryId {}", categoryId);
+      throw new CustomException(ErrorCode.ACCESS_DENIED);
+    }
+
     if (categoryRepository.existsByNameAndUserIsNullAndIdNot(request.getCategoryName(), categoryId)) {
       log.warn("updateGlobalCategory: 이미 존재하는 이름입니다. {}", request.getCategoryName());
       throw new CustomException(ErrorCode.CATEGORY_NAME_DUPLICATE);
@@ -74,15 +79,15 @@ public class CategoryService {
   }
 
   @Transactional
-  public void deleteGlobalCategory(UUID categoryId) {
+  public void deleteCategory(UUID categoryId) {
     Category category = categoryRepository.findById(categoryId)
         .orElseThrow(() -> {
-          log.warn("deleteGlobalCategory: 유효하지 않은 category id  {}", categoryId);
+          log.warn("deleteCategory: 유효하지 않은 category id  {}", categoryId);
           return new CustomException(ErrorCode.CATEGORY_NOT_FOUND);
         });
 
     if (transactionRepository.existsByCategoryId(categoryId)) {
-      log.warn("deleteGlobalCategory: 거래에서 사용 중인 카테고리 삭제 시도 categoryId {}", categoryId);
+      log.warn("deleteCategory: 거래에서 사용 중인 카테고리 삭제 시도 categoryId {}", categoryId);
       throw new CustomException(ErrorCode.CATEGORY_IN_USE);
     }
 
@@ -138,12 +143,12 @@ public class CategoryService {
     category.delete();
   }
 
-  public List<CategoryResponse> getCustomCategoriesByUserId(UUID userId) {
+  public List<CategoryResponse> getCategoriesByUserId(UUID userId) {
     if (!userRepository.existsById(userId)) {
-      log.warn("getCustomCategoriesByUserId: 유효하지 않은 userId {}", userId);
+      log.warn("getCategoriesByUserId: 유효하지 않은 userId {}", userId);
       throw new CustomException(ErrorCode.USER_NOT_FOUND);
     }
-    return categoryRepository.findAllByUserId(userId).stream()
+    return categoryRepository.findAllVisibleToUser(userId).stream()
         .map(CategoryResponse::from)
         .toList();
   }

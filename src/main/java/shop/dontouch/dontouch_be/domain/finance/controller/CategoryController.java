@@ -82,9 +82,9 @@ public class CategoryController implements CategoryControllerDocs {
   @LogMonitoring
   @PreAuthorize("hasAuthority('ADMIN')")
   @GetMapping("/users/{user-id}")
-  public ResponseEntity<List<CategoryResponse>> getCustomCategoriesByUserId(
+  public ResponseEntity<List<CategoryResponse>> getCategoriesByUserId(
       @PathVariable(name = "user-id") UUID userId) {
-    return ResponseEntity.ok(categoryService.getCustomCategoriesByUserId(userId));
+    return ResponseEntity.ok(categoryService.getCategoriesByUserId(userId));
   }
 
   @LogMonitoring
@@ -108,7 +108,7 @@ public class CategoryController implements CategoryControllerDocs {
   @PreAuthorize("hasAuthority('ADMIN')")
   @DeleteMapping("/{category-id}")
   public ResponseEntity<Void> deleteCategory(@PathVariable(name = "category-id") UUID categoryId) {
-    categoryService.deleteGlobalCategory(categoryId);
+    categoryService.deleteCategory(categoryId);
     return ResponseEntity.noContent().build();
   }
 }

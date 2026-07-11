@@ -201,7 +201,7 @@ public interface CategoryControllerDocs {
   ResponseEntity<List<CategoryResponse>> getAllGlobalCategories();
 
   @Operation(
-      summary = "[ADMIN] 특정 유저의 커스텀 카테고리 조회",
+      summary = "[ADMIN] 특정 유저의 카테고리 조회 (전역+커스텀 병합)",
       description = """
           ### 요청 파라미터
           Header: `Authorization: Bearer {accessToken}` (ADMIN 권한 필요)
@@ -216,20 +216,21 @@ public interface CategoryControllerDocs {
           ```
 
           ### 응답 데이터
-          카테고리 목록(List<CategoryResponse>) — 해당 유저가 생성한 커스텀 카테고리만 반환됩니다.
+          카테고리 목록(List<CategoryResponse>) — 전역 카테고리와 해당 유저의 커스텀 카테고리를 병합하여 반환합니다. (해당 유저 입장에서 실제로 보이는 목록과 동일)
 
           - `categoryId` (UUID): 카테고리 ID
           - `categoryName` (String): 카테고리 이름
-          - `isCustom` (boolean): 커스텀 카테고리 여부 (항상 true)
+          - `isCustom` (boolean): 커스텀 카테고리 여부 (false면 전역 카테고리)
           - `createdAt` (LocalDateTime): 생성 일시
           - `updatedAt` (LocalDateTime): 수정 일시
 
           ### 사용 방법
           1. 조회할 유저 ID를 Path Variable로 전달합니다.
-          2. 해당 유저의 커스텀 카테고리 목록을 반환합니다.
+          2. 전역 카테고리 전체와 해당 유저가 생성한 커스텀 카테고리가 함께 반환됩니다.
 
           ### 유의 사항
           - CS 문의 대응 등 감사(audit) 목적의 조회입니다.
+          - 다른 유저의 커스텀 카테고리는 조회되지 않습니다.
           - 존재하지 않는 유저 ID로 요청 시 예외가 발생합니다.
 
           ### 예외 처리
@@ -237,7 +238,7 @@ public interface CategoryControllerDocs {
           - `USER_NOT_FOUND` (404 NOT_FOUND): 유효하지 않은 유저입니다.
           """
   )
-  ResponseEntity<List<CategoryResponse>> getCustomCategoriesByUserId(
+  ResponseEntity<List<CategoryResponse>> getCategoriesByUserId(
       @PathVariable(name = "user-id") UUID userId
   );
 
@@ -307,7 +308,7 @@ public interface CategoryControllerDocs {
   );
 
   @Operation(
-      summary = "[ADMIN] 카테고리 수정",
+      summary = "[ADMIN] 전역 카테고리 수정",
       description = """
           ### 요청 파라미터
           Header: `Authorization: Bearer {accessToken}` (ADMIN 권한 필요)
@@ -341,11 +342,12 @@ public interface CategoryControllerDocs {
 
           ### 유의 사항
           - `categoryName`은 공백일 수 없습니다.
+          - 전역 카테고리만 수정할 수 있습니다. 유저의 커스텀 카테고리 ID를 전달하면 예외가 발생합니다.
           - 이미 존재하는 카테고리 이름으로 수정 시 예외가 발생합니다.
           - 존재하지 않는 카테고리 ID로 요청 시 예외가 발생합니다.
 
           ### 예외 처리
-          - `ACCESS_DENIED` (403 FORBIDDEN): ADMIN 권한이 필요합니다.
+          - `ACCESS_DENIED` (403 FORBIDDEN): ADMIN 권한이 필요하거나, 대상이 전역 카테고리가 아닙니다.
           - `CATEGORY_NOT_FOUND` (404 NOT_FOUND): 카테고리를 찾을 수 없습니다.
           - `CATEGORY_NAME_DUPLICATE` (409 CONFLICT): 이미 존재하는 카테고리입니다.
           - `INVALID_INPUT_VALUE` (400 BAD_REQUEST): 유효하지 않은 입력값입니다.
@@ -357,7 +359,7 @@ public interface CategoryControllerDocs {
   );
 
   @Operation(
-      summary = "[ADMIN] 카테고리 삭제",
+      summary = "[ADMIN] 카테고리 삭제 (전역+커스텀 무관)",
       description = """
           ### 요청 파라미터
           Header: `Authorization: Bearer {accessToken}` (ADMIN 권한 필요)
@@ -376,9 +378,11 @@ public interface CategoryControllerDocs {
 
           ### 사용 방법
           1. 삭제할 카테고리 ID를 Path Variable로 전달합니다.
-          2. 요청 성공 시 응답 본문 없이 204 상태 코드가 반환됩니다.
+          2. 대상이 전역 카테고리든 특정 유저의 커스텀 카테고리든 스코프와 무관하게 삭제됩니다.
+          3. 요청 성공 시 응답 본문 없이 204 상태 코드가 반환됩니다.
 
           ### 유의 사항
+          - ADMIN은 전역 카테고리뿐 아니라 유저가 생성한 커스텀 카테고리도 삭제할 수 있습니다.
           - 실제 DB Row 삭제가 아닌 Soft Delete 방식입니다.
           - 삭제 시 `deletedAt` 값이 저장됩니다.
           - `@SQLRestriction("deleted_at IS NULL")` 조건으로 인해 삭제된 데이터는 이후 조회되지 않습니다.

@@ -36,10 +36,12 @@ public class KakaoOAuthClient {
     @Value("${oauth.kakao.redirect-uri}") String kakaoRedirectUri
   ) {
     this.kakaoAuthClient = restClientBuilder
+      .clone()
       .baseUrl(KAKAO_AUTH_BASE_URL)
       .build();
 
     this.kakaoApiClient = restClientBuilder
+      .clone()
       .baseUrl(KAKAO_API_BASE_URL)
       .build();
 

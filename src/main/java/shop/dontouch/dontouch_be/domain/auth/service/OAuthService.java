@@ -11,11 +11,14 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import shop.dontouch.dontouch_be.domain.auth.dto.request.AppleOAuthLoginRequest;
+import shop.dontouch.dontouch_be.domain.auth.dto.request.AppleOAuthSignupRequest;
 import shop.dontouch.dontouch_be.domain.auth.dto.request.GoogleOAuthLoginRequest;
 import shop.dontouch.dontouch_be.domain.auth.dto.request.GoogleOAuthSignupRequest;
 import shop.dontouch.dontouch_be.domain.auth.dto.request.KakaoOAuthLoginRequest;
 import shop.dontouch.dontouch_be.domain.auth.dto.request.KakaoOAuthSignupRequest;
 import shop.dontouch.dontouch_be.domain.auth.dto.response.AuthResponse;
+import shop.dontouch.dontouch_be.domain.auth.oauth.AppleOAuthClient;
 import shop.dontouch.dontouch_be.domain.auth.oauth.GoogleOAuthClient;
 import shop.dontouch.dontouch_be.domain.auth.oauth.KakaoOAuthClient;
 import shop.dontouch.dontouch_be.domain.auth.oauth.SocialUserInfo;
@@ -45,6 +48,7 @@ public class OAuthService {
 
   private final GoogleOAuthClient googleOAuthClient;
   private final KakaoOAuthClient kakaoOAuthClient;
+  private final AppleOAuthClient appleOAuthClient;
 
   @Transactional
   public AuthResponse googleLogin(GoogleOAuthLoginRequest request) {
@@ -102,6 +106,36 @@ public class OAuthService {
     return issueTokens(user);
   }
 
+  @Transactional
+  public AuthResponse appleLogin(AppleOAuthLoginRequest request) {
+    SocialUserInfo socialUserInfo = appleOAuthClient.getUserInfo(request);
+
+    validateSocialUserInfo(socialUserInfo);
+
+    User user = getExistingSocialUser(LoginPlatform.APPLE, socialUserInfo);
+
+    validateUserStatus(user);
+
+    return issueTokens(user);
+  }
+
+  @Transactional
+  public AuthResponse appleSignup(AppleOAuthSignupRequest request) {
+    SocialUserInfo socialUserInfo = appleOAuthClient.getUserInfo(request);
+
+    validateSocialUserInfo(socialUserInfo);
+
+    User user = createSocialUser(
+      LoginPlatform.APPLE,
+      socialUserInfo,
+      request.getNickname()
+    );
+
+    validateUserStatus(user);
+
+    return issueTokens(user);
+  }
+
   private User getExistingSocialUser(
     LoginPlatform loginPlatform,
     SocialUserInfo socialUserInfo
@@ -127,12 +161,12 @@ public class OAuthService {
       });
 
     if (userRepository.existsByEmail(socialUserInfo.email())) {
-      log.warn("social signup: 이미 가입된 이메일 email={}", socialUserInfo.email());
+      log.warn("social signup: 이미 가입된 이메일 loginPlatform={}", loginPlatform);
       throw new CustomException(ErrorCode.USER_EMAIL_DUPLICATE);
     }
 
     if (userRepository.existsByNickname(nickname)) {
-      log.warn("social signup: 중복 nickname={}", nickname);
+      log.warn("social signup: 중복 닉네임 loginPlatform={}", loginPlatform);
       throw new CustomException(ErrorCode.USER_NICKNAME_DUPLICATE);
     }
 

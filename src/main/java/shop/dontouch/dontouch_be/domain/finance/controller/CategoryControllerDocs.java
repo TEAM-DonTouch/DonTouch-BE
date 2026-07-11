@@ -48,7 +48,6 @@ public interface CategoryControllerDocs {
           - 다른 유저의 커스텀 카테고리 이름과는 겹쳐도 무방합니다.
 
           ### 예외 처리
-          - `USER_NOT_FOUND` (404 NOT_FOUND): 유효하지 않은 유저입니다.
           - `CATEGORY_NAME_DUPLICATE` (409 CONFLICT): 이미 존재하는 카테고리입니다.
           - `INVALID_INPUT_VALUE` (400 BAD_REQUEST): 유효하지 않은 입력값입니다.
           """

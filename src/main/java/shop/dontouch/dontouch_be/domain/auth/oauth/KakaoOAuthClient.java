@@ -78,8 +78,8 @@ public class KakaoOAuthClient {
       String profileImageUrl = extractProfileImageUrl(userResponse);
 
       if (isBlank(email)) {
-        log.warn("kakao oauth: 이메일 정보 없음");
-        throw new CustomException(ErrorCode.SOCIAL_LOGIN_FAILED);
+        log.warn("kakao oauth: 이메일 정보 없음, 대체 이메일 사용");
+        email = createFallbackEmail(providerId);
       }
 
       return new SocialUserInfo(
@@ -222,5 +222,9 @@ public class KakaoOAuthClient {
     @JsonProperty("profile_image_url")
     String profileImageUrl
   ) {
+  }
+
+  private String createFallbackEmail(String providerId) {
+    return "kakao_" + providerId + "@kakao.local";
   }
 }

@@ -17,4 +17,6 @@ public interface TransactionRepository extends JpaRepository<Transaction, UUID> 
 
   @Query("SELECT t FROM Transaction t JOIN FETCH t.category WHERE t.user.id = :userId AND t.category.id = :categoryId")
   List<Transaction> findAllByCategoryIdWithUserIdAndCategory(@Param("userId") UUID userId, @Param("categoryId") UUID categoryId);
+
+  boolean existsByCategoryId(UUID categoryId);
 }

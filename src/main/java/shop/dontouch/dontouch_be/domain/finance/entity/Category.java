@@ -6,6 +6,8 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -29,14 +31,18 @@ public class Category extends BaseEntity {
   @Column(updatable = false, nullable = false)
   private UUID id;
 
-//  @ManyToOne(fetch = FetchType.LAZY)
-//  @JoinColumn(name = "user_id", nullable = false)
-//  private User user;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "user_id")
+  private User user;
 
   @Column(nullable = false, length = 10)
   private String name;
 
   public void updateName(String name) {
     this.name = name;
+  }
+
+  public boolean isCustom() {       // null 이면 전역 카테고리, 아니면 유저의 커스텀 카테고리
+    return this.getUser() != null;
   }
 }

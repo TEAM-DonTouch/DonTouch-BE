@@ -13,6 +13,7 @@ import shop.dontouch.dontouch_be.domain.auth.dto.request.AppleOAuthLoginRequest;
 import shop.dontouch.dontouch_be.domain.auth.dto.request.AppleOAuthSignupRequest;
 import shop.dontouch.dontouch_be.global.exception.CustomException;
 import shop.dontouch.dontouch_be.global.exception.ErrorCode;
+import org.springframework.web.client.RestOperations;
 
 @Slf4j
 @Component
@@ -25,12 +26,14 @@ public class AppleOAuthClient {
   private final String appleClientId;
 
   public AppleOAuthClient(
-    @Value("${oauth.apple.client-id}") String appleClientId
+    @Value("${oauth.apple.client-id}") String appleClientId,
+    RestOperations restOperations
   ) {
     this.appleClientId = appleClientId;
 
     NimbusJwtDecoder decoder = NimbusJwtDecoder
       .withJwkSetUri(APPLE_JWK_SET_URI)
+      .restOperations(restOperations)
       .build();
 
     decoder.setJwtValidator(JwtValidators.createDefaultWithIssuer(APPLE_ISSUER));

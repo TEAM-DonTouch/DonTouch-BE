@@ -1,10 +1,12 @@
 package shop.dontouch.dontouch_be.domain.finance.repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import shop.dontouch.dontouch_be.domain.finance.constant.TransactionType;
 import shop.dontouch.dontouch_be.domain.finance.entity.Transaction;
 
 public interface TransactionRepository extends JpaRepository<Transaction, UUID> {
@@ -19,4 +21,18 @@ public interface TransactionRepository extends JpaRepository<Transaction, UUID> 
   List<Transaction> findAllByCategoryIdWithUserIdAndCategory(@Param("userId") UUID userId, @Param("categoryId") UUID categoryId);
 
   boolean existsByCategoryId(UUID categoryId);
+
+  @Query("""
+         SELECT COALESCE(SUM(t.amount),0)
+                   FROM Transaction t
+                             WHERE t.user.id = :userId
+                                       AND t.type = :type
+                                                 AND t.transactionDate BETWEEN :start AND :end
+      """)
+  Long sumAmountByUserIdAndTypeAndDateRange(
+      @Param("userId") UUID userId,
+      @Param("type") TransactionType type,
+      @Param("start") LocalDateTime start,
+      @Param("end") LocalDateTime end
+  );
 }

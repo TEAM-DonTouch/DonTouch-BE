@@ -1,5 +1,9 @@
 package shop.dontouch.dontouch_be.domain.finance.service;
 
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.temporal.TemporalAdjusters;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -7,10 +11,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import shop.dontouch.dontouch_be.domain.finance.constant.BudgetPeriod;
+import shop.dontouch.dontouch_be.domain.finance.constant.TransactionType;
 import shop.dontouch.dontouch_be.domain.finance.dto.request.BudgetRequest;
 import shop.dontouch.dontouch_be.domain.finance.dto.response.BudgetResponse;
 import shop.dontouch.dontouch_be.domain.finance.entity.Budget;
 import shop.dontouch.dontouch_be.domain.finance.repository.BudgetRepository;
+import shop.dontouch.dontouch_be.domain.finance.repository.TransactionRepository;
 import shop.dontouch.dontouch_be.domain.user.constant.UserStatus;
 import shop.dontouch.dontouch_be.domain.user.entity.User;
 import shop.dontouch.dontouch_be.domain.user.repository.UserRepository;
@@ -25,6 +31,11 @@ public class BudgetService {
 
   private final BudgetRepository budgetRepository;
   private final UserRepository userRepository;
+  private final TransactionRepository transactionRepository;
+
+  private record PeriodRange(LocalDate start, LocalDate end) {
+
+  }
 
   @Transactional
   public BudgetResponse saveBudget(UUID userId, BudgetRequest request) {
@@ -69,12 +80,12 @@ public class BudgetService {
                 .build()
         ));
 
-    return BudgetResponse.from(budget);
+    return BudgetResponse.from(budget, calculateUsedAmount(budget));
   }
 
   public List<BudgetResponse> getAllBudgets() {
     return budgetRepository.findAll().stream()
-        .map(BudgetResponse::from)
+        .map(budget -> BudgetResponse.from(budget, calculateUsedAmount(budget)))
         .toList();
   }
 
@@ -90,7 +101,7 @@ public class BudgetService {
           log.warn("getBudgetByUserId: budget 없음 userId {}", userId);
           return new CustomException(ErrorCode.BUDGET_NOT_FOUND);
         });
-    return BudgetResponse.from(budget);
+    return BudgetResponse.from(budget, calculateUsedAmount(budget));
   }
 
   @Transactional
@@ -107,6 +118,34 @@ public class BudgetService {
     }
 
     budgetRepository.delete(budget);
+  }
+
+  private Long calculateUsedAmount(Budget budget) {
+    PeriodRange range = resolveCurrentPeriod(budget.getPeriod(), budget.getStartDate(), budget.getEndDate(), LocalDate.now());
+    return transactionRepository.sumAmountByUserIdAndTypeAndDateRange(
+        budget.getUser().getId(),
+        TransactionType.EXPENSE,
+        range.start().atStartOfDay(),
+        range.end().atTime(LocalTime.MAX)
+    );
+  }
+
+  private PeriodRange resolveCurrentPeriod(BudgetPeriod period, LocalDate startDate, LocalDate endDate, LocalDate today) {
+    return switch (period) {
+      case WEEKLY -> new PeriodRange(
+          today.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY)),
+          today.with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY))
+      );
+      case MONTHLY -> new PeriodRange(
+          today.with(TemporalAdjusters.firstDayOfMonth()),
+          today.with(TemporalAdjusters.lastDayOfMonth())
+      );
+      case YEARLY -> new PeriodRange(
+          today.with(TemporalAdjusters.firstDayOfYear()),
+          today.with(TemporalAdjusters.lastDayOfYear())
+      );
+      case CUSTOM -> new PeriodRange(startDate, endDate);
+    };
   }
 
 }

@@ -9,8 +9,6 @@ import org.springframework.security.oauth2.jwt.JwtException;
 import org.springframework.security.oauth2.jwt.JwtValidators;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.stereotype.Component;
-import shop.dontouch.dontouch_be.domain.auth.dto.request.GoogleOAuthLoginRequest;
-import shop.dontouch.dontouch_be.domain.auth.dto.request.GoogleOAuthSignupRequest;
 import shop.dontouch.dontouch_be.global.exception.CustomException;
 import shop.dontouch.dontouch_be.global.exception.ErrorCode;
 
@@ -37,14 +35,6 @@ public class GoogleOAuthClient {
     decoder.setJwtValidator(JwtValidators.createDefault());
 
     this.jwtDecoder = decoder;
-  }
-
-  public SocialUserInfo getUserInfo(GoogleOAuthLoginRequest request) {
-    return getUserInfoByIdToken(request.getIdToken());
-  }
-
-  public SocialUserInfo getUserInfo(GoogleOAuthSignupRequest request) {
-    return getUserInfoByIdToken(request.getIdToken());
   }
 
   private SocialUserInfo getUserInfoByIdToken(String idToken) {

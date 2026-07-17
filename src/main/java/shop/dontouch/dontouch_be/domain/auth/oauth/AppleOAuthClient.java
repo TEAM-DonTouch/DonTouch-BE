@@ -9,8 +9,6 @@ import org.springframework.security.oauth2.jwt.JwtException;
 import org.springframework.security.oauth2.jwt.JwtValidators;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.stereotype.Component;
-import shop.dontouch.dontouch_be.domain.auth.dto.request.AppleOAuthLoginRequest;
-import shop.dontouch.dontouch_be.domain.auth.dto.request.AppleOAuthSignupRequest;
 import shop.dontouch.dontouch_be.global.exception.CustomException;
 import shop.dontouch.dontouch_be.global.exception.ErrorCode;
 import org.springframework.web.client.RestOperations;
@@ -39,14 +37,6 @@ public class AppleOAuthClient {
     decoder.setJwtValidator(JwtValidators.createDefaultWithIssuer(APPLE_ISSUER));
 
     this.jwtDecoder = decoder;
-  }
-
-  public SocialUserInfo getUserInfo(AppleOAuthLoginRequest request) {
-    return getUserInfoByIdentityToken(request.getIdentityToken());
-  }
-
-  public SocialUserInfo getUserInfo(AppleOAuthSignupRequest request) {
-    return getUserInfoByIdentityToken(request.getIdentityToken());
   }
 
   private SocialUserInfo getUserInfoByIdentityToken(String identityToken) {

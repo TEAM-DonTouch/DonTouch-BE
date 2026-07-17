@@ -11,6 +11,7 @@ import shop.dontouch.dontouch_be.domain.auth.dto.request.GoogleOAuthSignupReques
 import shop.dontouch.dontouch_be.domain.auth.dto.request.KakaoOAuthLoginRequest;
 import shop.dontouch.dontouch_be.domain.auth.dto.request.KakaoOAuthSignupRequest;
 import shop.dontouch.dontouch_be.domain.auth.dto.response.AuthResponse;
+import shop.dontouch.dontouch_be.domain.auth.dto.response.OAuthLoginResponse;
 import shop.dontouch.dontouch_be.domain.auth.service.OAuthService;
 
 @RestController
@@ -21,7 +22,7 @@ public class OAuthController implements OAuthControllerDocs {
   private final OAuthService oAuthService;
 
   @PostMapping("/google/login")
-  public ResponseEntity<AuthResponse> googleLogin(
+  public ResponseEntity<OAuthLoginResponse> googleLogin(
     @Valid @RequestBody GoogleOAuthLoginRequest request
   ) {
     return ResponseEntity.ok(oAuthService.googleLogin(request));
@@ -35,7 +36,7 @@ public class OAuthController implements OAuthControllerDocs {
   }
 
   @PostMapping("/kakao/login")
-  public ResponseEntity<AuthResponse> kakaoLogin(
+  public ResponseEntity<OAuthLoginResponse> kakaoLogin(
     @Valid @RequestBody KakaoOAuthLoginRequest request
   ) {
     return ResponseEntity.ok(oAuthService.kakaoLogin(request));
@@ -49,7 +50,7 @@ public class OAuthController implements OAuthControllerDocs {
   }
 
   @PostMapping("/apple/login")
-  public ResponseEntity<AuthResponse> appleLogin(
+  public ResponseEntity<OAuthLoginResponse> appleLogin(
     @Valid @RequestBody AppleOAuthLoginRequest request
   ) {
     return ResponseEntity.ok(oAuthService.appleLogin(request));

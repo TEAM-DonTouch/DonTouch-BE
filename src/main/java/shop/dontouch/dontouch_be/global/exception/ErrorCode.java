@@ -20,6 +20,7 @@ public enum ErrorCode {
   // Category
   CATEGORY_NAME_DUPLICATE(HttpStatus.CONFLICT, "이미 존재하는 카테고리입니다."),
   CATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND, "카테고리를 찾을 수 없습니다."),
+  CATEGORY_IN_USE(HttpStatus.CONFLICT, "이미 거래에서 사용 중인 카테고리는 삭제할 수 없습니다."),
 
   // BUDGET
   BUDGET_NOT_FOUND(HttpStatus.NOT_FOUND, "예산을 찾을 수 없습니다."),
@@ -34,7 +35,6 @@ public enum ErrorCode {
   USER_ALREADY_WITHDRAWN(HttpStatus.CONFLICT, "이미 탈퇴한 사용자입니다."),
   USER_SUSPENDED(HttpStatus.FORBIDDEN, "정지된 계정입니다."),
   USER_ALREADY_SUSPENDED(HttpStatus.CONFLICT, "이미 정지된 사용자입니다."),
-  USER_DUPLICATE(HttpStatus.CONFLICT, "이미 사용 중인 이메일 또는 닉네임입니다."),
 
   //Auth
   USER_LOGIN_ID_DUPLICATE(HttpStatus.CONFLICT, "이미 사용 중인 아이디입니다."),
@@ -42,6 +42,10 @@ public enum ErrorCode {
   TOKEN_EXPIRED(HttpStatus.UNAUTHORIZED, "토큰이 만료되었습니다."),
   TOKEN_INVALID(HttpStatus.UNAUTHORIZED, "유효하지 않은 토큰입니다."),
   REFRESH_TOKEN_NOT_FOUND(HttpStatus.UNAUTHORIZED, "리프레시 토큰을 찾을 수 없습니다."),
+  SOCIAL_SIGNUP_REQUIRED(HttpStatus.NOT_FOUND, "소셜 회원가입이 필요합니다."),
+  SOCIAL_LOGIN_FAILED(HttpStatus.UNAUTHORIZED, "소셜 로그인에 실패했습니다."),
+  USER_DUPLICATE(HttpStatus.CONFLICT, "이미 존재하는 사용자입니다."),
+  SOCIAL_SIGNUP_TOKEN_INVALID(HttpStatus.UNAUTHORIZED, "소셜 회원가입 토큰이 유효하지 않습니다.");
 
   // Post
   POST_NOT_FOUND(HttpStatus.NOT_FOUND, "게시글을 찾을 수 없습니다."),

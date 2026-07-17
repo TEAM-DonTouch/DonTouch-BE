@@ -16,6 +16,7 @@ import shop.dontouch.dontouch_be.domain.auth.dto.request.RefreshTokenRequest;
 import shop.dontouch.dontouch_be.domain.auth.dto.request.SignupRequest;
 import shop.dontouch.dontouch_be.domain.auth.dto.response.AuthResponse;
 import shop.dontouch.dontouch_be.domain.auth.repository.RefreshTokenRedisRepository;
+import shop.dontouch.dontouch_be.domain.user.constant.LoginPlatform;
 import shop.dontouch.dontouch_be.domain.user.constant.UserGender;
 import shop.dontouch.dontouch_be.domain.user.constant.UserJobType;
 import shop.dontouch.dontouch_be.domain.user.constant.UserRegion;
@@ -95,6 +96,11 @@ public class AuthService {
           log.warn("login: 존재하지 않는 loginId");
           return new CustomException(ErrorCode.LOGIN_FAILED);
         });
+
+    if (user.getLoginPlatform() != LoginPlatform.LOCAL) {
+      log.warn("login: 소셜 로그인 계정은 일반 로그인 불가");
+      throw new CustomException(ErrorCode.LOGIN_FAILED);
+    }
 
     if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
       log.warn("login: 비밀번호 불일치");

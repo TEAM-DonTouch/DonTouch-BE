@@ -4,6 +4,7 @@ package shop.dontouch.dontouch_be.domain.user.repository;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
+import shop.dontouch.dontouch_be.domain.user.constant.LoginPlatform;
 import shop.dontouch.dontouch_be.domain.user.entity.User;
 
 public interface UserRepository extends JpaRepository<User, UUID> {
@@ -11,9 +12,16 @@ public interface UserRepository extends JpaRepository<User, UUID> {
 
   Optional<User> findByLoginId(String loginId);
 
+  Optional<User> findByLoginPlatformAndProviderId(
+    LoginPlatform loginPlatform,
+    String providerId
+  );
+
   boolean existsByLoginId(String loginId);
 
   boolean existsByNickname(String nickname);
+
   boolean existsByNicknameAndIdNot(String nickname, UUID id);
+
   boolean existsByEmail(String email);
 }

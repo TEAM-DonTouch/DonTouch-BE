@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -22,7 +21,6 @@ import shop.dontouch.dontouch_be.global.common.dto.PageResponse;
 import shop.dontouch.dontouch_be.global.exception.CustomException;
 import shop.dontouch.dontouch_be.global.exception.ErrorCode;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -37,31 +35,36 @@ public class PostService {
   @Transactional
   public PostResponse createPost(UUID userId, PostRequest request) {
     User user = userRepository.findById(userId)
-        .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+      .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
 
     Post post = Post.builder()
-        .user(user)
-        .title(request.getTitle())
-        .content(request.getContent())
-        .build();
+      .user(user)
+      .title(request.getTitle())
+      .content(request.getContent())
+      .build();
 
     Post savedPost = postRepository.save(post);
+
     return PostResponse.of(savedPost, false);
   }
 
   public PageResponse<PostResponse> getPosts(
-      UUID userId, String sort, int page, int size
+    UUID userId,
+    String sort,
+    int page,
+    int size
   ) {
     Pageable pageable = PageRequest.of(page, size, resolveSort(sort));
-    Page<Post> posts = postRepository.findAll(pageable);
+    Page<Post> posts = postRepository.findAllWithUser(pageable);
 
     List<UUID> postIds = posts.map(Post::getId).toList();
-    Set<UUID> likedPostIds = Set.copyOf(
-        postLikeRepository.findLikedPostIdsByUserIdAndPostIdIn(userId, postIds)
-    );
+
+    Set<UUID> likedPostIds = postIds.isEmpty()
+      ? Set.of()
+      : Set.copyOf(postLikeRepository.findLikedPostIdsByUserIdAndPostIdIn(userId, postIds));
 
     Page<PostResponse> responses = posts.map(
-        post -> PostResponse.of(post, likedPostIds.contains(post.getId()))
+      post -> PostResponse.of(post, likedPostIds.contains(post.getId()))
     );
 
     return PageResponse.from(responses);
@@ -69,19 +72,24 @@ public class PostService {
 
   @Transactional
   public PostResponse getPost(UUID userId, UUID postId) {
-    Post post = postRepository.findById(postId)
-        .orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND));
+    int updated = postRepository.increaseViewCount(postId);
 
-    post.increaseViewCount();
+    if (updated == 0) {
+      throw new CustomException(ErrorCode.POST_NOT_FOUND);
+    }
+
+    Post post = postRepository.findByIdWithUser(postId)
+      .orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND));
 
     boolean isLiked = postLikeRepository.existsByUserIdAndPostId(userId, postId);
+
     return PostResponse.of(post, isLiked);
   }
 
   @Transactional
   public PostResponse updatePost(UUID userId, UUID postId, PostRequest request) {
-    Post post = postRepository.findById(postId)
-        .orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND));
+    Post post = postRepository.findByIdWithUser(postId)
+      .orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND));
 
     if (!post.getUser().getId().equals(userId)) {
       throw new CustomException(ErrorCode.POST_ACCESS_DENIED);
@@ -90,13 +98,14 @@ public class PostService {
     post.updatePost(request.getTitle(), request.getContent());
 
     boolean isLiked = postLikeRepository.existsByUserIdAndPostId(userId, postId);
+
     return PostResponse.of(post, isLiked);
   }
 
   @Transactional
   public void deletePost(UUID userId, UUID postId) {
-    Post post = postRepository.findById(postId)
-        .orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND));
+    Post post = postRepository.findByIdWithUser(postId)
+      .orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND));
 
     if (!post.getUser().getId().equals(userId)) {
       throw new CustomException(ErrorCode.POST_ACCESS_DENIED);
@@ -108,8 +117,9 @@ public class PostService {
   private Sort resolveSort(String sort) {
     if (SORT_POPULAR.equalsIgnoreCase(sort)) {
       return Sort.by(Sort.Direction.DESC, "likeCount")
-          .and(Sort.by(Sort.Direction.DESC, "createdAt"));
+        .and(Sort.by(Sort.Direction.DESC, "createdAt"));
     }
+
     return Sort.by(Sort.Direction.DESC, "createdAt");
   }
 }

@@ -9,6 +9,7 @@ import org.springframework.security.oauth2.jwt.JwtException;
 import org.springframework.security.oauth2.jwt.JwtValidators;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.stereotype.Component;
+import shop.dontouch.dontouch_be.domain.auth.dto.request.AppleOAuthLoginRequest;
 import shop.dontouch.dontouch_be.global.exception.CustomException;
 import shop.dontouch.dontouch_be.global.exception.ErrorCode;
 import org.springframework.web.client.RestOperations;
@@ -68,6 +69,10 @@ public class AppleOAuthClient {
       log.warn("apple oauth: identityToken 검증 실패", e);
       throw new CustomException(ErrorCode.SOCIAL_LOGIN_FAILED);
     }
+  }
+
+  public SocialUserInfo getUserInfo(AppleOAuthLoginRequest request) {
+    return getUserInfoByIdentityToken(request.getIdentityToken());
   }
 
   private void validateAudience(Jwt jwt) {

@@ -44,7 +44,8 @@ public enum ErrorCode {
   REFRESH_TOKEN_NOT_FOUND(HttpStatus.UNAUTHORIZED, "리프레시 토큰을 찾을 수 없습니다."),
   SOCIAL_SIGNUP_REQUIRED(HttpStatus.NOT_FOUND, "소셜 회원가입이 필요합니다."),
   SOCIAL_LOGIN_FAILED(HttpStatus.UNAUTHORIZED, "소셜 로그인에 실패했습니다."),
-  USER_DUPLICATE(HttpStatus.CONFLICT, "이미 존재하는 사용자입니다.");
+  USER_DUPLICATE(HttpStatus.CONFLICT, "이미 존재하는 사용자입니다."),
+  SOCIAL_SIGNUP_TOKEN_INVALID(HttpStatus.UNAUTHORIZED, "소셜 회원가입 토큰이 유효하지 않습니다.");
 
   private final HttpStatus httpStatus;
   private final String message;

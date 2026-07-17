@@ -2,14 +2,16 @@ package shop.dontouch.dontouch_be.domain.community.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
-import java.util.List;
 import java.util.UUID;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import shop.dontouch.dontouch_be.domain.community.dto.request.CommentRequest;
 import shop.dontouch.dontouch_be.domain.community.dto.response.CommentResponse;
+import shop.dontouch.dontouch_be.global.common.dto.PageResponse;
+import org.springframework.data.domain.Pageable;
 import shop.dontouch.dontouch_be.global.security.CustomUserDetails;
 
 public interface CommentControllerDocs {
@@ -18,18 +20,17 @@ public interface CommentControllerDocs {
       summary = "댓글 작성",
       description = """
           ### 요청 파라미터
-          Header: `Authorization: Bearer {accessToken}`
-
           Path Variable
-
-          - `post-id` (UUID, required): 댓글을 작성할 게시글 ID
-
-          Request Body(JSON)
-
-          - `content` (String, required): 댓글 내용 (최대 100자, 공백 불가)
-
+        
+          - `post-id` (UUID, required): 조회할 게시글 ID
+        
+          Query Parameter
+        
+          - `page` (int, default: 0): 페이지 번호
+          - `size` (int, default: 20): 페이지 크기
+        
           ### 응답 데이터
-          `CommentResponse`
+          `PageResponse<CommentResponse>` - 댓글 목록 페이지 응답
 
           ### 유의 사항
           - 댓글 작성 시 게시글의 `commentCount`가 1 증가합니다.
@@ -60,8 +61,9 @@ public interface CommentControllerDocs {
           - `POST_NOT_FOUND` (404 NOT_FOUND): 게시글을 찾을 수 없습니다.
           """
   )
-  ResponseEntity<List<CommentResponse>> getComments(
-      @PathVariable(name = "post-id") UUID postId
+  ResponseEntity<PageResponse<CommentResponse>> getComments(
+    @PathVariable(name = "post-id") UUID postId,
+    @PageableDefault(size = 20, sort = "createdAt") Pageable pageable
   );
 
   @Operation(

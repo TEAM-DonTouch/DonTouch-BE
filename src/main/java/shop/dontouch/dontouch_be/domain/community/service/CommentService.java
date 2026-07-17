@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import shop.dontouch.dontouch_be.domain.community.dto.request.CommentRequest;
@@ -14,6 +15,8 @@ import shop.dontouch.dontouch_be.domain.community.repository.CommentRepository;
 import shop.dontouch.dontouch_be.domain.community.repository.PostRepository;
 import shop.dontouch.dontouch_be.domain.user.entity.User;
 import shop.dontouch.dontouch_be.domain.user.repository.UserRepository;
+import shop.dontouch.dontouch_be.global.common.dto.PageResponse;
+import org.springframework.data.domain.Pageable;
 import shop.dontouch.dontouch_be.global.exception.CustomException;
 import shop.dontouch.dontouch_be.global.exception.ErrorCode;
 
@@ -41,19 +44,21 @@ public class CommentService {
         .build();
 
     Comment savedComment = commentRepository.save(comment);
-    post.increaseCommentCount();
+    postRepository.increaseCommentCount(postId);
 
     return CommentResponse.from(savedComment);
   }
 
-  public List<CommentResponse> getComments(UUID postId) {
+  public PageResponse<CommentResponse> getComments(UUID postId, Pageable pageable) {
     if (!postRepository.existsById(postId)) {
       throw new CustomException(ErrorCode.POST_NOT_FOUND);
     }
 
-    return commentRepository.findAllByPostIdOrderByCreatedAtAsc(postId).stream()
-        .map(CommentResponse::from)
-        .toList();
+    Page<CommentResponse> comments = commentRepository
+      .findAllByPostIdOrderByCreatedAtAsc(postId, pageable)
+      .map(CommentResponse::from);
+
+    return PageResponse.from(comments);
   }
 
   @Transactional
@@ -70,6 +75,6 @@ public class CommentService {
     }
 
     comment.delete();
-    comment.getPost().decreaseCommentCount();
+    postRepository.decreaseCommentCount(comment.getPost().getId());
   }
 }

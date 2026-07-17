@@ -48,11 +48,10 @@ public class PostController implements PostControllerDocs {
       @AuthenticationPrincipal CustomUserDetails currentUser,
       @RequestParam(name = "sort", defaultValue = "latest") String sort,
       @RequestParam(name = "page", defaultValue = "0") int page,
-      @RequestParam(name = "size", defaultValue = "10") int size,
-      @RequestParam(name = "following", defaultValue = "false") boolean following
+      @RequestParam(name = "size", defaultValue = "10") int size
   ) {
     PageResponse<PostResponse> responses =
-        postService.getPosts(currentUser.getUserId(), sort, page, size, following);
+        postService.getPosts(currentUser.getUserId(), sort, page, size);
     return ResponseEntity.ok(responses);
   }
 

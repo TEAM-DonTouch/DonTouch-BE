@@ -9,5 +9,4 @@ import shop.dontouch.dontouch_be.domain.community.entity.Post;
 
 public interface PostRepository extends JpaRepository<Post, UUID> {
 
-  Page<Post> findAllByUserIdIn(List<UUID> userIds, Pageable pageable);
 }

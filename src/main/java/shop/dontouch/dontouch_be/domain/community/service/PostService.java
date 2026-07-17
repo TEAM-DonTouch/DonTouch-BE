@@ -17,7 +17,6 @@ import shop.dontouch.dontouch_be.domain.community.entity.Post;
 import shop.dontouch.dontouch_be.domain.community.repository.PostLikeRepository;
 import shop.dontouch.dontouch_be.domain.community.repository.PostRepository;
 import shop.dontouch.dontouch_be.domain.user.entity.User;
-import shop.dontouch.dontouch_be.domain.user.repository.FollowRepository;
 import shop.dontouch.dontouch_be.domain.user.repository.UserRepository;
 import shop.dontouch.dontouch_be.global.common.dto.PageResponse;
 import shop.dontouch.dontouch_be.global.exception.CustomException;
@@ -34,7 +33,6 @@ public class PostService {
   private final PostRepository postRepository;
   private final PostLikeRepository postLikeRepository;
   private final UserRepository userRepository;
-  private final FollowRepository followRepository;
 
   @Transactional
   public PostResponse createPost(UUID userId, PostRequest request) {
@@ -52,10 +50,10 @@ public class PostService {
   }
 
   public PageResponse<PostResponse> getPosts(
-      UUID userId, String sort, int page, int size, boolean following
+      UUID userId, String sort, int page, int size
   ) {
     Pageable pageable = PageRequest.of(page, size, resolveSort(sort));
-    Page<Post> posts = following ? findFollowingPosts(userId, pageable) : postRepository.findAll(pageable);
+    Page<Post> posts = postRepository.findAll(pageable);
 
     List<UUID> postIds = posts.map(Post::getId).toList();
     Set<UUID> likedPostIds = Set.copyOf(
@@ -105,14 +103,6 @@ public class PostService {
     }
 
     post.delete();
-  }
-
-  private Page<Post> findFollowingPosts(UUID userId, Pageable pageable) {
-    List<UUID> followingIds = followRepository.findFollowingIdsByFollowerId(userId);
-    if (followingIds.isEmpty()) {
-      return Page.empty(pageable);
-    }
-    return postRepository.findAllByUserIdIn(followingIds, pageable);
   }
 
   private Sort resolveSort(String sort) {

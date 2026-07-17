@@ -55,7 +55,6 @@ public interface PostControllerDocs {
           - `sort` (String, optional, 기본값 `latest`): `latest`(최신순) 또는 `popular`(인기순, likeCount desc)
           - `page` (int, optional, 기본값 0)
           - `size` (int, optional, 기본값 10)
-          - `following` (boolean, optional, 기본값 false): true면 내가 팔로우한 유저의 게시글만 조회 (팔로잉 탭)
 
           ### 응답 데이터
           `PageResponse<PostResponse>` — `content`(게시글 목록), `page`, `size`, `totalElements`, `totalPages`, `hasNext`
@@ -70,8 +69,7 @@ public interface PostControllerDocs {
       @AuthenticationPrincipal CustomUserDetails currentUser,
       @RequestParam(name = "sort", defaultValue = "latest") String sort,
       @RequestParam(name = "page", defaultValue = "0") int page,
-      @RequestParam(name = "size", defaultValue = "10") int size,
-      @RequestParam(name = "following", defaultValue = "false") boolean following
+      @RequestParam(name = "size", defaultValue = "10") int size
   );
 
   @Operation(

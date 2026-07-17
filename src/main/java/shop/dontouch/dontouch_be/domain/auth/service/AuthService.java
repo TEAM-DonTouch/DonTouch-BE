@@ -24,6 +24,7 @@ import shop.dontouch.dontouch_be.domain.user.constant.UserStatus;
 import shop.dontouch.dontouch_be.domain.user.dto.response.UserResponse;
 import shop.dontouch.dontouch_be.domain.user.entity.User;
 import shop.dontouch.dontouch_be.domain.user.repository.UserRepository;
+import shop.dontouch.dontouch_be.domain.user.service.UserSettingsService;
 import shop.dontouch.dontouch_be.global.exception.CustomException;
 import shop.dontouch.dontouch_be.global.exception.ErrorCode;
 import shop.dontouch.dontouch_be.global.security.JwtProvider;
@@ -38,6 +39,7 @@ public class AuthService {
   private final JwtProvider jwtProvider;
   private final PasswordEncoder passwordEncoder;
   private final RefreshTokenRedisRepository refreshTokenRedisRepository;
+  private final UserSettingsService userSettingsService;
 
   @Transactional
   public AuthResponse signup(SignupRequest request) {
@@ -45,27 +47,30 @@ public class AuthService {
       log.warn("signup: 중복 loginId");
       throw new CustomException(ErrorCode.USER_LOGIN_ID_DUPLICATE);
     }
+
     if (userRepository.existsByEmail(request.getEmail())) {
       log.warn("signup: 중복 email");
       throw new CustomException(ErrorCode.USER_EMAIL_DUPLICATE);
     }
+
     if (userRepository.existsByNickname(request.getNickname())) {
       log.warn("signup: 중복 nickname");
       throw new CustomException(ErrorCode.USER_NICKNAME_DUPLICATE);
     }
 
     User user = User.builder()
-        .email(request.getEmail())
-        .loginId(request.getLoginId())
-        .password(passwordEncoder.encode(request.getPassword()))
-        .nickname(request.getNickname())
-        .age(request.getAge())
-        .gender(request.getGender() != null ? request.getGender() : UserGender.NOT_SELECTED)
-        .jobType(request.getJobType() != null ? request.getJobType() : UserJobType.OTHER)
-        .region(request.getRegion() != null ? request.getRegion() : UserRegion.SEOUL)
-        .build();
+      .email(request.getEmail())
+      .loginId(request.getLoginId())
+      .password(passwordEncoder.encode(request.getPassword()))
+      .nickname(request.getNickname())
+      .age(request.getAge())
+      .gender(request.getGender() != null ? request.getGender() : UserGender.NOT_SELECTED)
+      .jobType(request.getJobType() != null ? request.getJobType() : UserJobType.OTHER)
+      .region(request.getRegion() != null ? request.getRegion() : UserRegion.SEOUL)
+      .build();
 
     User savedUser;
+
     try {
       savedUser = userRepository.saveAndFlush(user);
     } catch (DataIntegrityViolationException e) {
@@ -73,21 +78,23 @@ public class AuthService {
       throw new CustomException(ErrorCode.USER_DUPLICATE);
     }
 
+    userSettingsService.createDefaultSettings(savedUser);
+
     String accessToken = jwtProvider.createAccessToken(savedUser);
     String refreshToken = jwtProvider.createRefreshToken();
     String refreshTokenKey = hashRefreshToken(refreshToken);
 
     refreshTokenRedisRepository.save(
-        refreshTokenKey,
-        savedUser.getId().toString(),
-        jwtProvider.getRefreshTokenExpiration()
+      refreshTokenKey,
+      savedUser.getId().toString(),
+      jwtProvider.getRefreshTokenExpiration()
     );
 
     return AuthResponse.builder()
-        .accessToken(accessToken)
-        .refreshToken(refreshToken)
-        .user(UserResponse.from(savedUser))
-        .build();
+      .accessToken(accessToken)
+      .refreshToken(refreshToken)
+      .user(UserResponse.from(savedUser))
+      .build();
   }
 
   public AuthResponse login(LoginRequest request) {

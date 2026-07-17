@@ -8,4 +8,6 @@ import shop.dontouch.dontouch_be.domain.user.entity.UserSettings;
 public interface UserSettingsRepository extends JpaRepository<UserSettings, UUID> {
 
   Optional<UserSettings> findByUserId(UUID userId);
+
+  boolean existsByUserId(UUID userId);
 }

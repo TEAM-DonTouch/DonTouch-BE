@@ -1,5 +1,6 @@
 package shop.dontouch.dontouch_be.domain.community.controller;
 
+import com.chuseok22.logging.annotation.LogMonitoring;
 import jakarta.validation.Valid;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +29,7 @@ public class CommentController implements CommentControllerDocs {
 
   private final CommentService commentService;
 
+  @LogMonitoring
   @PostMapping
   public ResponseEntity<CommentResponse> createComment(
     @AuthenticationPrincipal CustomUserDetails currentUser,
@@ -39,6 +41,7 @@ public class CommentController implements CommentControllerDocs {
     );
   }
 
+  @LogMonitoring
   @GetMapping
   public ResponseEntity<PageResponse<CommentResponse>> getComments(
     @PathVariable(name = "post-id") UUID postId,
@@ -48,6 +51,7 @@ public class CommentController implements CommentControllerDocs {
     return ResponseEntity.ok(commentService.getComments(postId, pageable));
   }
 
+  @LogMonitoring
   @DeleteMapping("/{comment-id}")
   public ResponseEntity<Void> deleteComment(
     @AuthenticationPrincipal CustomUserDetails currentUser,

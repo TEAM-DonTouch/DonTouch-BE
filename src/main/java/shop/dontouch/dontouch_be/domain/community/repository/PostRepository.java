@@ -21,15 +21,15 @@ public interface PostRepository extends JpaRepository<Post, UUID> {
   @Query("SELECT p FROM Post p WHERE p.id = :postId")
   Optional<Post> findByIdWithUser(@Param("postId") UUID postId);
 
-  @Modifying
+  @Modifying(clearAutomatically = true, flushAutomatically = true)
   @Query("UPDATE Post p SET p.viewCount = p.viewCount + 1 WHERE p.id = :postId")
   int increaseViewCount(@Param("postId") UUID postId);
 
-  @Modifying
+  @Modifying(clearAutomatically = true, flushAutomatically = true)
   @Query("UPDATE Post p SET p.likeCount = p.likeCount + 1 WHERE p.id = :postId")
   void increaseLikeCount(@Param("postId") UUID postId);
 
-  @Modifying
+  @Modifying(clearAutomatically = true, flushAutomatically = true)
   @Query("""
       UPDATE Post p
       SET p.likeCount = CASE
@@ -40,11 +40,11 @@ public interface PostRepository extends JpaRepository<Post, UUID> {
       """)
   void decreaseLikeCount(@Param("postId") UUID postId);
 
-  @Modifying
+  @Modifying(clearAutomatically = true, flushAutomatically = true)
   @Query("UPDATE Post p SET p.commentCount = p.commentCount + 1 WHERE p.id = :postId")
   void increaseCommentCount(@Param("postId") UUID postId);
 
-  @Modifying
+  @Modifying(clearAutomatically = true, flushAutomatically = true)
   @Query("""
       UPDATE Post p
       SET p.commentCount = CASE

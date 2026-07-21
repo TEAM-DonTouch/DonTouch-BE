@@ -3,6 +3,7 @@ package shop.dontouch.dontouch_be.domain.community.service;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import shop.dontouch.dontouch_be.domain.community.dto.response.PostLikeResponse;
@@ -15,6 +16,7 @@ import shop.dontouch.dontouch_be.domain.user.repository.UserRepository;
 import shop.dontouch.dontouch_be.global.exception.CustomException;
 import shop.dontouch.dontouch_be.global.exception.ErrorCode;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -38,8 +40,6 @@ public class PostLikeService {
 
     if (existingLike.isPresent()) {
       postLikeRepository.delete(existingLike.get());
-      postLikeRepository.flush();
-
       postRepository.decreaseLikeCount(postId);
       isLiked = false;
     } else {
@@ -49,14 +49,15 @@ public class PostLikeService {
         .build();
 
       postLikeRepository.save(postLike);
-      postLikeRepository.flush();
-
       postRepository.increaseLikeCount(postId);
       isLiked = true;
     }
 
     Post updatedPost = postRepository.findById(postId)
-      .orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND));
+      .orElseThrow(() -> {
+        log.warn("toggleLike: 존재하지 않는 postId={}", postId);
+        return new CustomException(ErrorCode.POST_NOT_FOUND);
+      });
 
     return PostLikeResponse.builder()
       .likeCount(updatedPost.getLikeCount())

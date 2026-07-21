@@ -20,17 +20,18 @@ public interface CommentControllerDocs {
       summary = "댓글 작성",
       description = """
           ### 요청 파라미터
+          Header: `Authorization: Bearer {accessToken}` (필수)
+
           Path Variable
-        
-          - `post-id` (UUID, required): 조회할 게시글 ID
-        
-          Query Parameter
-        
-          - `page` (int, default: 0): 페이지 번호
-          - `size` (int, default: 20): 페이지 크기
-        
+
+          - `post-id` (UUID, required): 댓글을 작성할 게시글 ID
+
+          Request Body(JSON)
+
+          - `content` (String, required): 댓글 내용
+
           ### 응답 데이터
-          `PageResponse<CommentResponse>` - 댓글 목록 페이지 응답
+          `CommentResponse` - 작성된 댓글 정보
 
           ### 유의 사항
           - 댓글 작성 시 게시글의 `commentCount`가 1 증가합니다.
@@ -54,8 +55,13 @@ public interface CommentControllerDocs {
 
           - `post-id` (UUID, required): 조회할 게시글 ID
 
+          Query Parameter
+
+          - `page` (int, default: 0): 페이지 번호
+          - `size` (int, default: 20): 페이지 크기
+
           ### 응답 데이터
-          `List<CommentResponse>` (createdAt 오름차순, 페이징 없음)
+          `PageResponse<CommentResponse>` - 댓글 목록 페이지 응답 (createdAt 오름차순)
 
           ### 예외 처리
           - `POST_NOT_FOUND` (404 NOT_FOUND): 게시글을 찾을 수 없습니다.

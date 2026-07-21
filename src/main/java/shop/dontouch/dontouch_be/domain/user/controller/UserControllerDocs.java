@@ -153,6 +153,7 @@ public interface UserControllerDocs {
 
           ### 예외 처리
           - `TOKEN_INVALID` (401 UNAUTHORIZED): 유효하지 않은 토큰입니다.
+          - `USER_SETTINGS_CONFLICT` (409 CONFLICT): 설정이 동시에 생성되어 요청을 처리하지 못했습니다. 다시 시도해주세요.
           """
   )
   ResponseEntity<UserSettingsResponse> getMySettings(
@@ -186,6 +187,7 @@ public interface UserControllerDocs {
 
           ### 예외 처리
           - `TOKEN_INVALID` (401 UNAUTHORIZED): 유효하지 않은 토큰입니다.
+          - `USER_SETTINGS_CONFLICT` (409 CONFLICT): 설정이 동시에 생성되어 요청을 처리하지 못했습니다. 다시 시도해주세요.
           """
   )
   ResponseEntity<UserSettingsResponse> updateMySettings(

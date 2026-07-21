@@ -36,6 +36,7 @@ public enum ErrorCode {
   USER_SUSPENDED(HttpStatus.FORBIDDEN, "정지된 계정입니다."),
   USER_ALREADY_SUSPENDED(HttpStatus.CONFLICT, "이미 정지된 사용자입니다."),
   USER_SETTINGS_NOT_FOUND(HttpStatus.NOT_FOUND, "사용자 설정을 찾을 수 없습니다."),
+  USER_SETTINGS_CONFLICT(HttpStatus.CONFLICT, "설정이 동시에 생성되어 요청을 처리하지 못했습니다. 다시 시도해주세요."),
 
   //Auth
   USER_LOGIN_ID_DUPLICATE(HttpStatus.CONFLICT, "이미 사용 중인 아이디입니다."),

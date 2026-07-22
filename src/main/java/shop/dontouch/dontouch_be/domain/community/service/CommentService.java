@@ -55,8 +55,8 @@ public class CommentService {
     }
 
     Page<CommentResponse> comments = commentRepository
-      .findAllByPostIdOrderByCreatedAtAsc(postId, pageable)
-      .map(CommentResponse::from);
+        .findAllByPostIdOrderByCreatedAtAsc(postId, pageable)
+        .map(CommentResponse::from);
 
     return PageResponse.from(comments);
   }
@@ -74,7 +74,11 @@ public class CommentService {
       throw new CustomException(ErrorCode.COMMENT_ACCESS_DENIED);
     }
 
-    comment.delete();
-    postRepository.decreaseCommentCount(comment.getPost().getId());
+    int deletedCount = commentRepository.softDelete(commentId);
+    if (deletedCount == 0) {
+      log.warn("deleteComment: 동시 요청으로 이미 삭제된 댓글, commentId={}", commentId);
+      throw new CustomException(ErrorCode.COMMENT_NOT_FOUND);
+    }
+    postRepository.decreaseCommentCount(postId);
   }
 }

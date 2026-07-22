@@ -2,6 +2,7 @@ package shop.dontouch.dontouch_be.domain.community.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Max;
 import java.util.UUID;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -54,7 +55,7 @@ public interface PostControllerDocs {
 
           - `sort` (String, optional, 기본값 `latest`): `latest`(최신순) 또는 `popular`(인기순, likeCount desc)
           - `page` (int, optional, 기본값 0)
-          - `size` (int, optional, 기본값 10)
+          - `size` (int, optional, 기본값 10, 최대 50)
 
           ### 응답 데이터
           `PageResponse<PostResponse>` — `content`(게시글 목록), `page`, `size`, `totalElements`, `totalPages`, `hasNext`
@@ -63,13 +64,16 @@ public interface PostControllerDocs {
 
           ### 유의 사항
           - 삭제된 게시글은 조회되지 않습니다.
+
+          ### 예외 처리
+          - `INVALID_INPUT_VALUE` (400 BAD_REQUEST): `size`가 50을 초과하는 등 요청 파라미터가 유효하지 않습니다.
           """
   )
   ResponseEntity<PageResponse<PostResponse>> getPosts(
       @AuthenticationPrincipal CustomUserDetails currentUser,
       @RequestParam(name = "sort", defaultValue = "latest") String sort,
       @RequestParam(name = "page", defaultValue = "0") int page,
-      @RequestParam(name = "size", defaultValue = "10") int size
+      @RequestParam(name = "size", defaultValue = "10") @Max(50) int size
   );
 
   @Operation(

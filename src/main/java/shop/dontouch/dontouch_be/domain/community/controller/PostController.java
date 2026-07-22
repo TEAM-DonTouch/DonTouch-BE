@@ -2,11 +2,13 @@ package shop.dontouch.dontouch_be.domain.community.controller;
 
 import com.chuseok22.logging.annotation.LogMonitoring;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Max;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -27,6 +29,7 @@ import shop.dontouch.dontouch_be.global.security.CustomUserDetails;
 @RestController
 @RequestMapping("/api/posts")
 @RequiredArgsConstructor
+@Validated
 public class PostController implements PostControllerDocs {
 
   private final PostService postService;
@@ -48,7 +51,7 @@ public class PostController implements PostControllerDocs {
       @AuthenticationPrincipal CustomUserDetails currentUser,
       @RequestParam(name = "sort", defaultValue = "latest") String sort,
       @RequestParam(name = "page", defaultValue = "0") int page,
-      @RequestParam(name = "size", defaultValue = "10") int size
+      @RequestParam(name = "size", defaultValue = "10") @Max(50) int size
   ) {
     PageResponse<PostResponse> responses =
         postService.getPosts(currentUser.getUserId(), sort, page, size);

@@ -24,6 +24,7 @@ public class UserSettingsService {
   private final UserSettingsRepository userSettingsRepository;
   private final UserRepository userRepository;
 
+  @Transactional
   public UserSettingsResponse getSettings(UUID userId) {
     return UserSettingsResponse.from(getOrCreateSettings(userId));
   }

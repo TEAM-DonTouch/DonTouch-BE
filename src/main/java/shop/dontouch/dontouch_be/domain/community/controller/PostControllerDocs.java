@@ -55,7 +55,7 @@ public interface PostControllerDocs {
           - `viewCount` (int): 조회수 - 항상 0
           - `likeCount` (int): 좋아요 수 - 항상 0
           - `commentCount` (int): 댓글 수 - 항상 0
-          - `isLiked` (boolean): 요청자의 좋아요 여부 - 항상 false
+          - `liked` (boolean): 요청자의 좋아요 여부 - 항상 false
           - `createdAt` (LocalDateTime): 작성 일시
           - `updatedAt` (LocalDateTime): 수정 일시 (작성 직후에는 `createdAt`과 동일)
 
@@ -126,7 +126,7 @@ public interface PostControllerDocs {
                 "viewCount": 12,
                 "likeCount": 3,
                 "commentCount": 1,
-                "isLiked": true,
+                "liked": true,
                 "createdAt": "2026-07-28T10:00:00",
                 "updatedAt": "2026-07-28T10:00:00"
               }
@@ -148,7 +148,7 @@ public interface PostControllerDocs {
           ### 유의 사항
           - 삭제된 게시글은 목록에 포함되지 않습니다.
           - `size`가 50을 초과하거나 `page`가 음수이면 `INVALID_INPUT_VALUE` (400)를 반환합니다.
-          - `isLiked`는 요청한 사용자 기준으로 계산됩니다.
+          - `liked`는 요청한 사용자 기준으로 계산됩니다.
           - 이 API는 조회수를 증가시키지 않습니다. 조회수는 상세 조회에서만 증가합니다.
 
           ### 예외 처리
@@ -186,7 +186,7 @@ public interface PostControllerDocs {
           `200 OK` + `PostResponse` (게시글 작성 API와 동일한 구조)
 
           - `viewCount`는 이번 조회가 반영된 값으로 반환됩니다.
-          - `isLiked`는 요청한 사용자 기준으로 계산됩니다.
+          - `liked`는 요청한 사용자 기준으로 계산됩니다.
 
           ### 사용 방법
           1. Swagger UI 상단 `Authorize` 버튼에 `Bearer {accessToken}`을 입력합니다.
@@ -334,7 +334,7 @@ public interface PostControllerDocs {
           `200 OK` + `PostLikeResponse`
 
           - `likeCount` (int): 토글이 반영된 게시글의 총 좋아요 수
-          - `isLiked` (boolean): 토글이 반영된 요청자의 좋아요 여부
+          - `liked` (boolean): 토글이 반영된 요청자의 좋아요 여부
             - `true`: 이번 요청으로 좋아요가 등록됨
             - `false`: 이번 요청으로 좋아요가 취소됨
 
@@ -342,14 +342,14 @@ public interface PostControllerDocs {
           ```json
           {
             "likeCount": 4,
-            "isLiked": true
+            "liked": true
           }
           ```
 
           ### 사용 방법
           1. Swagger UI 상단 `Authorize` 버튼에 `Bearer {accessToken}`을 입력합니다.
           2. 좋아요 버튼을 누를 때마다 동일한 요청을 보냅니다.
-          3. 응답의 `isLiked`와 `likeCount`로 화면 상태를 바로 갱신하면 됩니다. 별도 재조회가 필요 없습니다.
+          3. 응답의 `liked`와 `likeCount`로 화면 상태를 바로 갱신하면 됩니다. 별도 재조회가 필요 없습니다.
 
           ### 유의 사항
           - 좋아요가 없으면 등록하고, 이미 좋아요한 상태면 취소합니다.

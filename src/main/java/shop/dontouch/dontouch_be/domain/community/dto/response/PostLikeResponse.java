@@ -12,5 +12,5 @@ import lombok.NoArgsConstructor;
 public class PostLikeResponse {
 
   private int likeCount;
-  private Boolean isLiked;
+  private boolean liked;
 }

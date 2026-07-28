@@ -1,6 +1,7 @@
 package shop.dontouch.dontouch_be.domain.finance.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.validation.Valid;
 import java.util.List;
 import java.util.UUID;
@@ -34,7 +35,7 @@ public interface CategoryControllerDocs {
           ### 응답 데이터
           - `categoryId` (UUID): 생성된 카테고리 ID
           - `categoryName` (String): 카테고리 이름
-          - `isCustom` (boolean): 커스텀 카테고리 여부 (항상 true)
+          - `custom` (boolean): 커스텀 카테고리 여부 (항상 true)
           - `createdAt` (LocalDateTime): 생성 일시
           - `updatedAt` (LocalDateTime): 수정 일시
 
@@ -53,7 +54,7 @@ public interface CategoryControllerDocs {
           """
   )
   ResponseEntity<CategoryResponse> createMyCategory(
-      @AuthenticationPrincipal CustomUserDetails currentUser,
+      @Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails currentUser,
       @Valid @RequestBody CategoryRequest request
   );
 
@@ -70,7 +71,7 @@ public interface CategoryControllerDocs {
 
           - `categoryId` (UUID): 카테고리 ID
           - `categoryName` (String): 카테고리 이름
-          - `isCustom` (boolean): 커스텀 카테고리 여부 (false면 전역 카테고리)
+          - `custom` (boolean): 커스텀 카테고리 여부 (false면 전역 카테고리)
           - `createdAt` (LocalDateTime): 생성 일시
           - `updatedAt` (LocalDateTime): 수정 일시
 
@@ -83,11 +84,11 @@ public interface CategoryControllerDocs {
           - 삭제된 카테고리는 조회되지 않습니다.
 
           ### 예외 처리
-          - `INTERNAL_SERVER_ERROR` (500 INTERNAL_SERVER_ERROR): 서버에 문제가 발생했습니다.
+          - `TOKEN_INVALID` (401 UNAUTHORIZED): 유효하지 않은 토큰입니다.
           """
   )
   ResponseEntity<List<CategoryResponse>> getMyCategories(
-      @AuthenticationPrincipal CustomUserDetails currentUser
+      @Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails currentUser
   );
 
   @Operation(
@@ -119,7 +120,7 @@ public interface CategoryControllerDocs {
           """
   )
   ResponseEntity<Void> deleteMyCategory(
-      @AuthenticationPrincipal CustomUserDetails currentUser,
+      @Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails currentUser,
       @PathVariable(name = "category-id") UUID categoryId
   );
 
@@ -145,7 +146,7 @@ public interface CategoryControllerDocs {
           ### 응답 데이터
           - `categoryId` (UUID): 생성된 카테고리 ID
           - `categoryName` (String): 카테고리 이름
-          - `isCustom` (boolean): 커스텀 카테고리 여부 (항상 false)
+          - `custom` (boolean): 커스텀 카테고리 여부 (항상 false)
           - `createdAt` (LocalDateTime): 생성 일시
           - `updatedAt` (LocalDateTime): 수정 일시
 
@@ -181,7 +182,7 @@ public interface CategoryControllerDocs {
 
           - `categoryId` (UUID): 카테고리 ID
           - `categoryName` (String): 카테고리 이름
-          - `isCustom` (boolean): 커스텀 카테고리 여부 (항상 false)
+          - `custom` (boolean): 커스텀 카테고리 여부 (항상 false)
           - `createdAt` (LocalDateTime): 생성 일시
           - `updatedAt` (LocalDateTime): 수정 일시
 
@@ -194,7 +195,7 @@ public interface CategoryControllerDocs {
           - `deleted_at IS NULL` 조건이 적용된 데이터만 조회됩니다.
 
           ### 예외 처리
-          - `INTERNAL_SERVER_ERROR` (500 INTERNAL_SERVER_ERROR): 서버에 문제가 발생했습니다.
+          - `TOKEN_INVALID` (401 UNAUTHORIZED): 유효하지 않은 토큰입니다.
           """
   )
   ResponseEntity<List<CategoryResponse>> getAllGlobalCategories();
@@ -219,7 +220,7 @@ public interface CategoryControllerDocs {
 
           - `categoryId` (UUID): 카테고리 ID
           - `categoryName` (String): 카테고리 이름
-          - `isCustom` (boolean): 커스텀 카테고리 여부 (false면 전역 카테고리)
+          - `custom` (boolean): 커스텀 카테고리 여부 (false면 전역 카테고리)
           - `createdAt` (LocalDateTime): 생성 일시
           - `updatedAt` (LocalDateTime): 수정 일시
 
@@ -252,7 +253,7 @@ public interface CategoryControllerDocs {
 
           - `categoryId` (UUID): 카테고리 ID
           - `categoryName` (String): 카테고리 이름
-          - `isCustom` (boolean): 커스텀 카테고리 여부
+          - `custom` (boolean): 커스텀 카테고리 여부
           - `createdAt` (LocalDateTime): 생성 일시
           - `updatedAt` (LocalDateTime): 수정 일시
 
@@ -286,7 +287,7 @@ public interface CategoryControllerDocs {
           ### 응답 데이터
           - `categoryId` (UUID): 카테고리 ID
           - `categoryName` (String): 카테고리 이름
-          - `isCustom` (boolean): 커스텀 카테고리 여부
+          - `custom` (boolean): 커스텀 카테고리 여부
           - `createdAt` (LocalDateTime): 생성 일시
           - `updatedAt` (LocalDateTime): 수정 일시
 
@@ -330,7 +331,7 @@ public interface CategoryControllerDocs {
           ### 응답 데이터
           - `categoryId` (UUID): 카테고리 ID
           - `categoryName` (String): 변경된 카테고리 이름
-          - `isCustom` (boolean): 커스텀 카테고리 여부 (항상 false)
+          - `custom` (boolean): 커스텀 카테고리 여부 (항상 false)
           - `createdAt` (LocalDateTime): 생성 일시
           - `updatedAt` (LocalDateTime): 수정 일시
 

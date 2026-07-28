@@ -72,7 +72,7 @@ public class PostLikeService {
 
     return PostLikeResponse.builder()
       .likeCount(updatedPost.getLikeCount())
-      .isLiked(isLiked)
+      .liked(isLiked)
       .build();
   }
 }

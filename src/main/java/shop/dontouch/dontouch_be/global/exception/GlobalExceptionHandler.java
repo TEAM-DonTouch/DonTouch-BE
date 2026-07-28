@@ -2,6 +2,7 @@ package shop.dontouch.dontouch_be.global.exception;
 
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -136,6 +137,24 @@ public class GlobalExceptionHandler {
         .build();
 
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+  }
+
+  /**
+   * DB 제약 조건 위반(unique, FK, not null 등) 처리
+   *
+   */
+  @ExceptionHandler(DataIntegrityViolationException.class)
+  public ResponseEntity<ErrorResponse> handleDataIntegrityViolationException(
+      DataIntegrityViolationException e
+  ) {
+    log.error("처리되지 않은 DB 제약 조건 위반", e);
+
+    ErrorResponse response = ErrorResponse.builder()
+        .errorCode(ErrorCode.DATA_INTEGRITY_VIOLATION)
+        .errorMessage(ErrorCode.DATA_INTEGRITY_VIOLATION.getMessage())
+        .build();
+
+    return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
   }
 
   @ExceptionHandler(AccessDeniedException.class)

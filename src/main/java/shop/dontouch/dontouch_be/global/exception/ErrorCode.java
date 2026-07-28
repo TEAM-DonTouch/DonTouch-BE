@@ -13,6 +13,7 @@ public enum ErrorCode {
   INVALID_INPUT_VALUE(HttpStatus.BAD_REQUEST, "유효하지 않은 입력값입니다."),
   INVALID_REQUEST(HttpStatus.BAD_REQUEST, "유효하지 않은 요청입니다."),
   ACCESS_DENIED(HttpStatus.FORBIDDEN, "접근이 거부되었습니다."),
+  DATA_INTEGRITY_VIOLATION(HttpStatus.CONFLICT, "요청을 처리할 수 없는 데이터 상태입니다. 잠시 후 다시 시도해주세요."),
 
   // Transaction
   TRANSACTION_NOT_FOUND(HttpStatus.NOT_FOUND, "거래를 찾을 수 없습니다."),
@@ -52,6 +53,7 @@ public enum ErrorCode {
   // Post
   POST_NOT_FOUND(HttpStatus.NOT_FOUND, "게시글을 찾을 수 없습니다."),
   POST_ACCESS_DENIED(HttpStatus.FORBIDDEN, "본인이 작성한 게시글만 수정/삭제할 수 있습니다."),
+  POST_LIKE_CONFLICT(HttpStatus.CONFLICT, "좋아요 요청이 동시에 처리되어 반영하지 못했습니다. 다시 시도해주세요."),
 
   // Comment
   COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "댓글을 찾을 수 없습니다."),

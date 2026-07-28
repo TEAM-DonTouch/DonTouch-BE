@@ -13,7 +13,7 @@ import shop.dontouch.dontouch_be.domain.community.entity.Comment;
 public interface CommentRepository extends JpaRepository<Comment, UUID> {
 
   @EntityGraph(attributePaths = "user")
-  Page<Comment> findAllByPostIdOrderByCreatedAtAsc(UUID postId, Pageable pageable);
+  Page<Comment> findAllByPostId(UUID postId, Pageable pageable);
 
   @Modifying(clearAutomatically = true, flushAutomatically = true)
   @Query("UPDATE Comment c SET c.deletedAt = CURRENT_TIMESTAMP WHERE c.id = :commentId AND c.deletedAt IS NULL")

@@ -3,6 +3,7 @@ package shop.dontouch.dontouch_be.domain.community.controller;
 import com.chuseok22.logging.annotation.LogMonitoring;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import shop.dontouch.dontouch_be.domain.community.dto.request.PostRequest;
+import shop.dontouch.dontouch_be.domain.community.dto.request.PostUpdateRequest;
 import shop.dontouch.dontouch_be.domain.community.dto.response.PostLikeResponse;
 import shop.dontouch.dontouch_be.domain.community.dto.response.PostResponse;
 import shop.dontouch.dontouch_be.domain.community.service.PostLikeService;
@@ -50,8 +52,11 @@ public class PostController implements PostControllerDocs {
   public ResponseEntity<PageResponse<PostResponse>> getPosts(
       @AuthenticationPrincipal CustomUserDetails currentUser,
       @RequestParam(name = "sort", defaultValue = "latest") String sort,
-      @RequestParam(name = "page", defaultValue = "0") int page,
-      @RequestParam(name = "size", defaultValue = "10") @Max(50) int size
+      @RequestParam(name = "page", defaultValue = "0")
+      @Min(value = 0, message = "페이지 번호는 0 이상이어야 합니다.") int page,
+      @RequestParam(name = "size", defaultValue = "10")
+      @Min(value = 1, message = "페이지 크기는 1 이상이어야 합니다.")
+      @Max(value = 50, message = "페이지 크기는 50 이하여야 합니다.") int size
   ) {
     PageResponse<PostResponse> responses =
         postService.getPosts(currentUser.getUserId(), sort, page, size);
@@ -73,7 +78,7 @@ public class PostController implements PostControllerDocs {
   public ResponseEntity<PostResponse> updatePost(
       @AuthenticationPrincipal CustomUserDetails currentUser,
       @PathVariable(name = "post-id") UUID postId,
-      @Valid @RequestBody PostRequest request
+      @Valid @RequestBody PostUpdateRequest request
   ) {
     PostResponse response = postService.updatePost(currentUser.getUserId(), postId, request);
     return ResponseEntity.ok(response);

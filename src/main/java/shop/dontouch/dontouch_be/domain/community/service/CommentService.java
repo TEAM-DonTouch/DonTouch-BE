@@ -1,10 +1,11 @@
 package shop.dontouch.dontouch_be.domain.community.service;
 
-import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import shop.dontouch.dontouch_be.domain.community.dto.request.CommentRequest;
@@ -26,6 +27,8 @@ import shop.dontouch.dontouch_be.global.exception.ErrorCode;
 @Transactional(readOnly = true)
 public class CommentService {
 
+  private static final String SORT_LATEST = "latest";
+
   private final CommentRepository commentRepository;
   private final PostRepository postRepository;
   private final UserRepository userRepository;
@@ -33,9 +36,15 @@ public class CommentService {
   @Transactional
   public CommentResponse createComment(UUID userId, UUID postId, CommentRequest request) {
     Post post = postRepository.findById(postId)
-        .orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND));
+        .orElseThrow(() -> {
+          log.warn("createComment: 존재하지 않는 postId={}", postId);
+          return new CustomException(ErrorCode.POST_NOT_FOUND);
+        });
     User user = userRepository.findById(userId)
-        .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+        .orElseThrow(() -> {
+          log.warn("createComment: 존재하지 않는 userId={}", userId);
+          return new CustomException(ErrorCode.USER_NOT_FOUND);
+        });
 
     Comment comment = Comment.builder()
         .user(user)
@@ -49,13 +58,16 @@ public class CommentService {
     return CommentResponse.from(savedComment);
   }
 
-  public PageResponse<CommentResponse> getComments(UUID postId, Pageable pageable) {
+  public PageResponse<CommentResponse> getComments(UUID postId, String sort, int page, int size) {
     if (!postRepository.existsById(postId)) {
+      log.warn("getComments: 존재하지 않는 postId={}", postId);
       throw new CustomException(ErrorCode.POST_NOT_FOUND);
     }
 
+    Pageable pageable = PageRequest.of(page, size, resolveSort(sort));
+
     Page<CommentResponse> comments = commentRepository
-        .findAllByPostIdOrderByCreatedAtAsc(postId, pageable)
+        .findAllByPostId(postId, pageable)
         .map(CommentResponse::from);
 
     return PageResponse.from(comments);
@@ -80,5 +92,13 @@ public class CommentService {
       throw new CustomException(ErrorCode.COMMENT_NOT_FOUND);
     }
     postRepository.decreaseCommentCount(postId);
+  }
+
+  private Sort resolveSort(String sort) {
+    if (SORT_LATEST.equalsIgnoreCase(sort)) {
+      return Sort.by(Sort.Direction.DESC, "createdAt");
+    }
+
+    return Sort.by(Sort.Direction.ASC, "createdAt");
   }
 }

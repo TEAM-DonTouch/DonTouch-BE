@@ -1,5 +1,6 @@
 package shop.dontouch.dontouch_be.domain.auth.controller;
 
+import com.chuseok22.logging.annotation.LogMonitoring;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -21,6 +22,7 @@ public class AuthController implements AuthControllerDocs {
 
   private final AuthService authService;
 
+  @LogMonitoring(logParameters = false)
   @PostMapping("/signup")
   public ResponseEntity<AuthResponse> signup(
       @Valid @RequestBody SignupRequest request
@@ -29,6 +31,7 @@ public class AuthController implements AuthControllerDocs {
         .body(authService.signup(request));
   }
 
+  @LogMonitoring(logParameters = false)
   @PostMapping("/login")
   public ResponseEntity<AuthResponse> login(
       @Valid @RequestBody LoginRequest request
@@ -36,6 +39,7 @@ public class AuthController implements AuthControllerDocs {
     return ResponseEntity.ok(authService.login(request));
   }
 
+  @LogMonitoring(logParameters = false)
   @PostMapping("/refresh")
   public ResponseEntity<AuthResponse> refresh(
       @Valid @RequestBody RefreshTokenRequest request
@@ -43,6 +47,7 @@ public class AuthController implements AuthControllerDocs {
     return ResponseEntity.ok(authService.refresh(request));
   }
 
+  @LogMonitoring(logParameters = false)
   @PostMapping("/logout")
   public ResponseEntity<Void> logout(
       @Valid @RequestBody RefreshTokenRequest request

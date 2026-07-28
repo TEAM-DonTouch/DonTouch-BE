@@ -250,6 +250,7 @@ public interface UserControllerDocs {
           - `USER_LOGIN_ID_DUPLICATE` (409 CONFLICT): 이미 사용 중인 아이디입니다.
           - `USER_EMAIL_DUPLICATE` (409 CONFLICT): 이미 사용 중인 이메일입니다.
           - `USER_NICKNAME_DUPLICATE` (409 CONFLICT): 이미 사용 중인 닉네임입니다.
+          - `USER_DUPLICATE` (409 CONFLICT): 동시 요청으로 중복 검사를 통과한 뒤 DB 유니크 제약에 걸렸습니다.
           - `INVALID_INPUT_VALUE` (400 BAD_REQUEST): 유효하지 않은 입력값입니다.
           """
   )
@@ -348,11 +349,14 @@ public interface UserControllerDocs {
 
           ### 유의 사항
           - 존재하지 않는 유저 ID로 요청 시 예외가 발생합니다.
+          - 이미 해당 상태인 유저에게 같은 상태를 다시 요청하면 409를 반환합니다.
 
           ### 예외 처리
+          - `INVALID_INPUT_VALUE` (400 BAD_REQUEST): 유효하지 않은 입력값입니다.
           - `ACCESS_DENIED` (403 FORBIDDEN): ADMIN 권한이 필요합니다.
           - `USER_NOT_FOUND` (404 NOT_FOUND): 사용자를 찾을 수 없습니다.
-          - `INVALID_INPUT_VALUE` (400 BAD_REQUEST): 유효하지 않은 입력값입니다.
+          - `USER_ALREADY_SUSPENDED` (409 CONFLICT): 이미 정지된 사용자입니다.
+          - `USER_ALREADY_WITHDRAWN` (409 CONFLICT): 이미 탈퇴한 사용자입니다.
           """
   )
   ResponseEntity<UserResponse> updateUserStatus(

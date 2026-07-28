@@ -1,8 +1,8 @@
 package shop.dontouch.dontouch_be.domain.finance.service;
 
+import java.time.Clock;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.time.temporal.TemporalAdjusters;
 import java.util.List;
 import java.util.UUID;
@@ -32,6 +32,7 @@ public class BudgetService {
   private final BudgetRepository budgetRepository;
   private final UserRepository userRepository;
   private final TransactionRepository transactionRepository;
+  private final Clock clock;
 
   private record PeriodRange(LocalDate start, LocalDate end) {
 
@@ -84,7 +85,7 @@ public class BudgetService {
   }
 
   public List<BudgetResponse> getAllBudgets() {
-    return budgetRepository.findAll().stream()
+    return budgetRepository.findAllWithUser().stream()
         .map(budget -> BudgetResponse.from(budget, calculateUsedAmount(budget)))
         .toList();
   }
@@ -121,12 +122,12 @@ public class BudgetService {
   }
 
   private Long calculateUsedAmount(Budget budget) {
-    PeriodRange range = resolveCurrentPeriod(budget.getPeriod(), budget.getStartDate(), budget.getEndDate(), LocalDate.now());
+    PeriodRange range = resolveCurrentPeriod(budget.getPeriod(), budget.getStartDate(), budget.getEndDate(), LocalDate.now(clock));
     return transactionRepository.sumAmountByUserIdAndTypeAndDateRange(
         budget.getUser().getId(),
         TransactionType.EXPENSE,
         range.start().atStartOfDay(),
-        range.end().atTime(LocalTime.MAX)
+        range.end().plusDays(1).atStartOfDay()
     );
   }
 
@@ -144,8 +145,16 @@ public class BudgetService {
           today.with(TemporalAdjusters.firstDayOfYear()),
           today.with(TemporalAdjusters.lastDayOfYear())
       );
-      case CUSTOM -> new PeriodRange(startDate, endDate);
+      case CUSTOM -> resolveCustomPeriod(startDate, endDate);
     };
+  }
+
+  private PeriodRange resolveCustomPeriod(LocalDate startDate, LocalDate endDate) {
+    if (startDate == null || endDate == null) {
+      log.warn("resolveCustomPeriod: CUSTOM 예산에 기간이 없음 startDate {} endDate {}", startDate, endDate);
+      throw new CustomException(ErrorCode.BUDGET_PERIOD_DATE_REQUIRED);
+    }
+    return new PeriodRange(startDate, endDate);
   }
 
 }

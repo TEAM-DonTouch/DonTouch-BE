@@ -23,16 +23,17 @@ public interface TransactionRepository extends JpaRepository<Transaction, UUID> 
   boolean existsByCategoryId(UUID categoryId);
 
   @Query("""
-         SELECT COALESCE(SUM(t.amount),0)
-                   FROM Transaction t
-                             WHERE t.user.id = :userId
-                                       AND t.type = :type
-                                                 AND t.transactionDate BETWEEN :start AND :end
+      SELECT COALESCE(SUM(t.amount), 0)
+      FROM Transaction t
+      WHERE t.user.id = :userId
+        AND t.type = :type
+        AND t.transactionDate >= :start
+        AND t.transactionDate < :endExclusive
       """)
   Long sumAmountByUserIdAndTypeAndDateRange(
       @Param("userId") UUID userId,
       @Param("type") TransactionType type,
       @Param("start") LocalDateTime start,
-      @Param("end") LocalDateTime end
+      @Param("endExclusive") LocalDateTime endExclusive
   );
 }

@@ -69,7 +69,9 @@ public class BudgetService {
                 .build()
         ));
 
-    return BudgetResponse.from(budget);
+    Budget savedBudget = budgetRepository.saveAndFlush(budget);
+
+    return BudgetResponse.from(savedBudget);
   }
 
   public List<BudgetResponse> getAllBudgets() {

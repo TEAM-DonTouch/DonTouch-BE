@@ -38,7 +38,9 @@ public class UserSettingsService {
         request.getBiometricLoginEnabled()
     );
 
-    return UserSettingsResponse.from(userSettings);
+    UserSettings updatedSettings = userSettingsRepository.saveAndFlush(userSettings);
+
+    return UserSettingsResponse.from(updatedSettings);
   }
 
   @Transactional
@@ -54,8 +56,7 @@ public class UserSettingsService {
     userSettingsRepository.save(userSettings);
   }
 
-  @Transactional
-  public UserSettings getOrCreateSettings(UUID userId) {
+  private UserSettings getOrCreateSettings(UUID userId) {
     return userSettingsRepository.findByUserId(userId)
         .orElseGet(() -> createSettings(userId));
   }

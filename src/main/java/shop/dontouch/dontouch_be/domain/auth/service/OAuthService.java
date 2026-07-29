@@ -34,6 +34,7 @@ import shop.dontouch.dontouch_be.domain.user.constant.UserStatus;
 import shop.dontouch.dontouch_be.domain.user.dto.response.UserResponse;
 import shop.dontouch.dontouch_be.domain.user.entity.User;
 import shop.dontouch.dontouch_be.domain.user.repository.UserRepository;
+import shop.dontouch.dontouch_be.domain.user.service.UserSettingsService;
 import shop.dontouch.dontouch_be.global.exception.CustomException;
 import shop.dontouch.dontouch_be.global.exception.ErrorCode;
 import shop.dontouch.dontouch_be.global.security.JwtProvider;
@@ -49,6 +50,7 @@ public class OAuthService {
   private final JwtProvider jwtProvider;
   private final RefreshTokenRedisRepository refreshTokenRedisRepository;
   private final SocialSignupTokenRedisRepository socialSignupTokenRedisRepository;
+  private final UserSettingsService userSettingsService;
 
   private final GoogleOAuthClient googleOAuthClient;
   private final KakaoOAuthClient kakaoOAuthClient;
@@ -207,12 +209,18 @@ public class OAuthService {
       .region(UserRegion.SEOUL)
       .build();
 
+    User savedUser;
+
     try {
-      return userRepository.saveAndFlush(user);
+      savedUser = userRepository.saveAndFlush(user);
     } catch (DataIntegrityViolationException e) {
       log.warn("social signup: DB 제약조건 위반", e);
       throw new CustomException(ErrorCode.USER_DUPLICATE);
     }
+
+    userSettingsService.createDefaultSettings(savedUser);
+
+    return savedUser;
   }
 
   private void validateSocialUserInfo(SocialUserInfo socialUserInfo) {

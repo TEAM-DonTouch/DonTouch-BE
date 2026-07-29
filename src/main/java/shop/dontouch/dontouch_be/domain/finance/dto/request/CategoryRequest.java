@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class CategoryRequest {
 
-  @NotBlank
+  @NotBlank(message = "카테고리 이름은 필수입니다.")
   @Size(max = 10, message = "카테고리 이름은 최대 10자까지 입력 가능합니다.")
   private String categoryName;
 

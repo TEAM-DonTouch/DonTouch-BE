@@ -75,7 +75,9 @@ public class CategoryService {
 
     category.updateName(request.getCategoryName());
 
-    return CategoryResponse.from(category);
+    Category updatedCategory = categoryRepository.saveAndFlush(category);
+
+    return CategoryResponse.from(updatedCategory);
   }
 
   @Transactional

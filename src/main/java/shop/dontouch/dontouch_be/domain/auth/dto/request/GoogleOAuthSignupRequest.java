@@ -13,6 +13,6 @@ public class GoogleOAuthSignupRequest {
   private String signupToken;
 
   @NotBlank(message = "닉네임은 필수입니다.")
-  @Size(max = 30)
+  @Size(max = 30, message = "닉네임은 30자를 초과할 수 없습니다.")
   private String nickname;
 }

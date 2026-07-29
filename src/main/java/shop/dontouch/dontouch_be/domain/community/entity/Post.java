@@ -8,13 +8,13 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
 import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLRestriction;
 import shop.dontouch.dontouch_be.domain.user.entity.User;
 import shop.dontouch.dontouch_be.global.common.BaseEntity;
 
@@ -23,6 +23,7 @@ import shop.dontouch.dontouch_be.global.common.BaseEntity;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Builder
+@SQLRestriction("deleted_at IS NULL")
 public class Post extends BaseEntity {
   @Id
   @GeneratedValue(strategy = GenerationType.UUID)
@@ -40,11 +41,23 @@ public class Post extends BaseEntity {
   private String content;
 
   @Column(nullable = false)
-  private int viewCount;
+  @Builder.Default
+  private int viewCount = 0;
 
   @Column(nullable = false)
-  private int likeCount;
+  @Builder.Default
+  private int likeCount = 0;
 
   @Column(nullable = false)
-  private boolean postStatus;
+  @Builder.Default
+  private int commentCount = 0;
+
+  public void updatePost(String title, String content) {
+    if (title != null) {
+      this.title = title;
+    }
+    if (content != null) {
+      this.content = content;
+    }
+  }
 }

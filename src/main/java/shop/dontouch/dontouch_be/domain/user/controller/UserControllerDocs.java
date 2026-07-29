@@ -11,9 +11,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import shop.dontouch.dontouch_be.domain.user.dto.request.UserCreateRequest;
 import shop.dontouch.dontouch_be.domain.user.dto.request.UserRoleUpdateRequest;
+import shop.dontouch.dontouch_be.domain.user.dto.request.UserSettingsUpdateRequest;
 import shop.dontouch.dontouch_be.domain.user.dto.request.UserStatusUpdateRequest;
 import shop.dontouch.dontouch_be.domain.user.dto.request.UserUpdateRequest;
 import shop.dontouch.dontouch_be.domain.user.dto.response.UserResponse;
+import shop.dontouch.dontouch_be.domain.user.dto.response.UserSettingsResponse;
 import shop.dontouch.dontouch_be.global.security.CustomUserDetails;
 
 public interface UserControllerDocs {
@@ -135,6 +137,64 @@ public interface UserControllerDocs {
       @Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails currentUser
   );
 
+  @Operation(
+      summary = "내 알림/보안 설정 조회",
+      description = """
+          ### 요청 파라미터
+          Header: `Authorization: Bearer {accessToken}` (필수)
+
+          ### 응답 데이터
+          - `pushNotificationEnabled` (boolean): 푸시 알림 수신 여부
+          - `biometricLoginEnabled` (boolean): 생체 인증 로그인 사용 여부
+          - `updatedAt` (LocalDateTime)
+
+          ### 유의 사항
+          - 설정이 아직 없는 경우 기본값(`pushNotificationEnabled=true`, `biometricLoginEnabled=false`)으로 자동 생성 후 반환합니다.
+
+          ### 예외 처리
+          - `TOKEN_INVALID` (401 UNAUTHORIZED): 유효하지 않은 토큰입니다.
+          - `USER_SETTINGS_CONFLICT` (409 CONFLICT): 설정이 동시에 생성되어 요청을 처리하지 못했습니다. 다시 시도해주세요.
+          """
+  )
+  ResponseEntity<UserSettingsResponse> getMySettings(
+      @Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails currentUser
+  );
+
+  @Operation(
+      summary = "내 알림/보안 설정 수정",
+      description = """
+          ### 요청 파라미터
+          Header: `Authorization: Bearer {accessToken}` (필수)
+
+          Request Body(JSON) — 변경할 필드만 포함
+
+          - `pushNotificationEnabled` (boolean, optional)
+          - `biometricLoginEnabled` (boolean, optional)
+
+          요청 예시
+          ```json
+          {
+            "biometricLoginEnabled": true
+          }
+          ```
+
+          ### 응답 데이터
+          변경된 설정 정보 (UserSettingsResponse)
+
+          ### 유의 사항
+          - 전달하지 않은 필드는 기존 값이 유지됩니다.
+          - 설정이 아직 없는 경우 기본값으로 생성한 뒤 전달된 필드를 적용합니다.
+
+          ### 예외 처리
+          - `TOKEN_INVALID` (401 UNAUTHORIZED): 유효하지 않은 토큰입니다.
+          - `USER_SETTINGS_CONFLICT` (409 CONFLICT): 설정이 동시에 생성되어 요청을 처리하지 못했습니다. 다시 시도해주세요.
+          """
+  )
+  ResponseEntity<UserSettingsResponse> updateMySettings(
+      @Parameter(hidden = true) @AuthenticationPrincipal CustomUserDetails currentUser,
+      @Valid @RequestBody UserSettingsUpdateRequest request
+  );
+
   // ==================== ADMIN 전용 ====================
 
   @Operation(
@@ -190,6 +250,7 @@ public interface UserControllerDocs {
           - `USER_LOGIN_ID_DUPLICATE` (409 CONFLICT): 이미 사용 중인 아이디입니다.
           - `USER_EMAIL_DUPLICATE` (409 CONFLICT): 이미 사용 중인 이메일입니다.
           - `USER_NICKNAME_DUPLICATE` (409 CONFLICT): 이미 사용 중인 닉네임입니다.
+          - `USER_DUPLICATE` (409 CONFLICT): 동시 요청으로 중복 검사를 통과한 뒤 DB 유니크 제약에 걸렸습니다.
           - `INVALID_INPUT_VALUE` (400 BAD_REQUEST): 유효하지 않은 입력값입니다.
           """
   )
@@ -288,11 +349,14 @@ public interface UserControllerDocs {
 
           ### 유의 사항
           - 존재하지 않는 유저 ID로 요청 시 예외가 발생합니다.
+          - 이미 해당 상태인 유저에게 같은 상태를 다시 요청하면 409를 반환합니다.
 
           ### 예외 처리
+          - `INVALID_INPUT_VALUE` (400 BAD_REQUEST): 유효하지 않은 입력값입니다.
           - `ACCESS_DENIED` (403 FORBIDDEN): ADMIN 권한이 필요합니다.
           - `USER_NOT_FOUND` (404 NOT_FOUND): 사용자를 찾을 수 없습니다.
-          - `INVALID_INPUT_VALUE` (400 BAD_REQUEST): 유효하지 않은 입력값입니다.
+          - `USER_ALREADY_SUSPENDED` (409 CONFLICT): 이미 정지된 사용자입니다.
+          - `USER_ALREADY_WITHDRAWN` (409 CONFLICT): 이미 탈퇴한 사용자입니다.
           """
   )
   ResponseEntity<UserResponse> updateUserStatus(

@@ -28,6 +28,9 @@ import shop.dontouch.dontouch_be.domain.user.service.UserSettingsService;
 import shop.dontouch.dontouch_be.global.exception.CustomException;
 import shop.dontouch.dontouch_be.global.exception.ErrorCode;
 import shop.dontouch.dontouch_be.global.security.JwtProvider;
+import java.sql.SQLException;
+import org.hibernate.exception.ConstraintViolationException;
+import org.springframework.dao.DataIntegrityViolationException;
 
 @Slf4j
 @Service
@@ -74,8 +77,11 @@ public class AuthService {
     try {
       savedUser = userRepository.saveAndFlush(user);
     } catch (DataIntegrityViolationException e) {
-      log.warn("signup: DB 제약조건 위반");
-      throw new CustomException(ErrorCode.USER_DUPLICATE);
+      if (isUniqueConstraintViolation(e)) {
+        log.warn("signup: DB 유니크 제약조건 위반");
+        throw new CustomException(ErrorCode.USER_DUPLICATE);
+      }
+      throw e;
     }
 
     userSettingsService.createDefaultSettings(savedUser);
@@ -203,5 +209,24 @@ public class AuthService {
     } catch (NoSuchAlgorithmException e) {
       throw new IllegalStateException("SHA-256 algorithm not available", e);
     }
+  }
+
+  private boolean isUniqueConstraintViolation(
+    DataIntegrityViolationException exception
+  ) {
+    Throwable cause = exception;
+
+    while (cause != null) {
+      if (cause instanceof ConstraintViolationException constraintViolationException) {
+        SQLException sqlException = constraintViolationException.getSQLException();
+
+        return sqlException != null
+               && "23505".equals(sqlException.getSQLState());
+      }
+
+      cause = cause.getCause();
+    }
+
+    return false;
   }
 }

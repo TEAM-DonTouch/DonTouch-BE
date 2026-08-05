@@ -38,6 +38,8 @@ import shop.dontouch.dontouch_be.domain.user.service.UserSettingsService;
 import shop.dontouch.dontouch_be.global.exception.CustomException;
 import shop.dontouch.dontouch_be.global.exception.ErrorCode;
 import shop.dontouch.dontouch_be.global.security.JwtProvider;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 @Slf4j
 @Service
@@ -93,10 +95,12 @@ public class OAuthService {
       request.getNickname()
     );
 
-    socialSignupTokenRedisRepository.delete(request.getSignupToken());
-
     validateUserStatus(user);
-    return issueTokens(user);
+
+    AuthResponse response = issueTokens(user);
+    deleteSignupTokenAfterCommit(request.getSignupToken());
+
+    return response;
   }
 
   @Transactional
@@ -112,10 +116,12 @@ public class OAuthService {
       request.getNickname()
     );
 
-    socialSignupTokenRedisRepository.delete(request.getSignupToken());
-
     validateUserStatus(user);
-    return issueTokens(user);
+
+    AuthResponse response = issueTokens(user);
+    deleteSignupTokenAfterCommit(request.getSignupToken());
+
+    return response;
   }
 
   @Transactional
@@ -131,10 +137,12 @@ public class OAuthService {
       request.getNickname()
     );
 
-    socialSignupTokenRedisRepository.delete(request.getSignupToken());
-
     validateUserStatus(user);
-    return issueTokens(user);
+
+    AuthResponse response = issueTokens(user);
+    deleteSignupTokenAfterCommit(request.getSignupToken());
+
+    return response;
   }
 
   private OAuthLoginResponse loginOrCreateSignupToken(
@@ -221,6 +229,23 @@ public class OAuthService {
     userSettingsService.createDefaultSettings(savedUser);
 
     return savedUser;
+  }
+
+  private void deleteSignupTokenAfterCommit(String signupToken) {
+    TransactionSynchronizationManager.registerSynchronization(
+      new TransactionSynchronization() {
+
+        @Override
+        public void afterCommit() {
+          try {
+            socialSignupTokenRedisRepository.delete(signupToken);
+          } catch (RuntimeException e) {
+            log.warn("social signup: DB 커밋 후 signupToken 삭제 실패", e);
+          }
+        }
+
+      }
+    );
   }
 
   private void validateSocialUserInfo(SocialUserInfo socialUserInfo) {

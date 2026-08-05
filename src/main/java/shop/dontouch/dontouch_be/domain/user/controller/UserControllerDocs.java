@@ -314,8 +314,8 @@ public interface UserControllerDocs {
   ResponseEntity<UserResponse> getUser(@PathVariable(name = "user-id") UUID userId);
 
   @Operation(
-      summary = "[ADMIN] 유저 상태 변경",
-      description = """
+    summary = "[ADMIN] 유저 상태 변경",
+    description = """
           ### 요청 파라미터
           Header: `Authorization: Bearer {accessToken}` (ADMIN 권한 필요)
 
@@ -334,7 +334,7 @@ public interface UserControllerDocs {
           요청 예시
           ```json
           {
-            "userStatus": "INACTIVE"
+            "userStatus": "SUSPENDED"
           }
           ```
 
@@ -349,7 +349,9 @@ public interface UserControllerDocs {
 
           ### 유의 사항
           - 존재하지 않는 유저 ID로 요청 시 예외가 발생합니다.
-          - 이미 해당 상태인 유저에게 같은 상태를 다시 요청하면 409를 반환합니다.
+          - 이미 `SUSPENDED` 상태인 사용자에게 `SUSPENDED`를 다시 요청하면 409를 반환합니다.
+          - 이미 `WITHDRAWN` 상태인 사용자에게 `WITHDRAWN`을 다시 요청하면 409를 반환합니다.
+          - `ACTIVE` 또는 `DORMANT` 상태를 동일하게 다시 요청하는 경우에는 정상 응답합니다.
 
           ### 예외 처리
           - `INVALID_INPUT_VALUE` (400 BAD_REQUEST): 유효하지 않은 입력값입니다.
@@ -360,8 +362,8 @@ public interface UserControllerDocs {
           """
   )
   ResponseEntity<UserResponse> updateUserStatus(
-      @PathVariable(name = "user-id") UUID userId,
-      @Valid @RequestBody UserStatusUpdateRequest request
+    @PathVariable(name = "user-id") UUID userId,
+    @Valid @RequestBody UserStatusUpdateRequest request
   );
 
   @Operation(

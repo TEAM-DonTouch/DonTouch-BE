@@ -133,7 +133,10 @@ public class TransactionService {
       validateCategoryOwnership(category, userId);
     }
     transaction.update(category, request.getAmount(), request.getMemo(), request.getType(), request.getTransactionDate());
-    return TransactionResponse.from(transaction);
+
+    Transaction updatedTransaction = transactionRepository.saveAndFlush(transaction);
+
+    return TransactionResponse.from(updatedTransaction);
   }
 
   @Transactional

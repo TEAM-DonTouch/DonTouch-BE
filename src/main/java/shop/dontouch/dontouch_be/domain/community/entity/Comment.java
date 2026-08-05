@@ -8,13 +8,13 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
 import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLRestriction;
 import shop.dontouch.dontouch_be.domain.user.entity.User;
 import shop.dontouch.dontouch_be.global.common.BaseEntity;
 
@@ -23,6 +23,7 @@ import shop.dontouch.dontouch_be.global.common.BaseEntity;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Builder
+@SQLRestriction("deleted_at IS NULL")
 public class Comment extends BaseEntity {
   @Id
   @GeneratedValue(strategy = GenerationType.UUID)
@@ -39,7 +40,4 @@ public class Comment extends BaseEntity {
 
   @Column(nullable = false, length = 100)
   private String content;
-
-  @Column(nullable = false)
-  private boolean commentStatus;
 }

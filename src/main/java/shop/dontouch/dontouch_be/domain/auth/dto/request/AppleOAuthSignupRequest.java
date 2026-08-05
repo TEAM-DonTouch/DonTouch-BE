@@ -9,10 +9,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class AppleOAuthSignupRequest {
 
-  @NotBlank(message = "애플 identityToken은 필수입니다.")
-  private String identityToken;
+  @NotBlank(message = "소셜 회원가입 토큰은 필수입니다.")
+  private String signupToken;
 
   @NotBlank(message = "닉네임은 필수입니다.")
-  @Size(max = 30)
+  @Size(max = 30, message = "닉네임은 30자를 초과할 수 없습니다.")
   private String nickname;
 }

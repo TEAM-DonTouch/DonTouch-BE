@@ -6,17 +6,11 @@ Tracks ongoing and planned work. Updated at the end of each task cycle.
 
 ## 문제상황
 
-
-
 ---
 
 ## 목표
 
-
-
 ## 참고사항
-
-
 
 ---
 

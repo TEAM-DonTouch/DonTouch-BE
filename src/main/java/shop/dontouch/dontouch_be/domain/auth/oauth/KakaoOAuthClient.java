@@ -12,7 +12,6 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
 import shop.dontouch.dontouch_be.domain.auth.dto.request.KakaoOAuthLoginRequest;
-import shop.dontouch.dontouch_be.domain.auth.dto.request.KakaoOAuthSignupRequest;
 import shop.dontouch.dontouch_be.global.exception.CustomException;
 import shop.dontouch.dontouch_be.global.exception.ErrorCode;
 
@@ -50,14 +49,6 @@ public class KakaoOAuthClient {
     this.kakaoRedirectUri = kakaoRedirectUri;
   }
 
-  public SocialUserInfo getUserInfo(KakaoOAuthLoginRequest request) {
-    return getUserInfoByCode(request.getCode());
-  }
-
-  public SocialUserInfo getUserInfo(KakaoOAuthSignupRequest request) {
-    return getUserInfoByCode(request.getCode());
-  }
-
   private SocialUserInfo getUserInfoByCode(String code) {
     if (isBlank(code)) {
       throw new CustomException(ErrorCode.SOCIAL_LOGIN_FAILED);
@@ -92,6 +83,10 @@ public class KakaoOAuthClient {
       log.warn("kakao oauth: 카카오 API 호출 실패", e);
       throw new CustomException(ErrorCode.SOCIAL_LOGIN_FAILED);
     }
+  }
+
+  public SocialUserInfo getUserInfo(KakaoOAuthLoginRequest request) {
+    return getUserInfoByCode(request.getCode());
   }
 
   private KakaoTokenResponse requestToken(String code) {

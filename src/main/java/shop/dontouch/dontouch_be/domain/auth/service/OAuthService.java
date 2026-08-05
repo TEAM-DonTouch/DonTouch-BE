@@ -18,11 +18,14 @@ import shop.dontouch.dontouch_be.domain.auth.dto.request.GoogleOAuthSignupReques
 import shop.dontouch.dontouch_be.domain.auth.dto.request.KakaoOAuthLoginRequest;
 import shop.dontouch.dontouch_be.domain.auth.dto.request.KakaoOAuthSignupRequest;
 import shop.dontouch.dontouch_be.domain.auth.dto.response.AuthResponse;
+import shop.dontouch.dontouch_be.domain.auth.dto.response.OAuthLoginResponse;
 import shop.dontouch.dontouch_be.domain.auth.oauth.AppleOAuthClient;
 import shop.dontouch.dontouch_be.domain.auth.oauth.GoogleOAuthClient;
 import shop.dontouch.dontouch_be.domain.auth.oauth.KakaoOAuthClient;
+import shop.dontouch.dontouch_be.domain.auth.oauth.SocialSignupInfo;
 import shop.dontouch.dontouch_be.domain.auth.oauth.SocialUserInfo;
 import shop.dontouch.dontouch_be.domain.auth.repository.RefreshTokenRedisRepository;
+import shop.dontouch.dontouch_be.domain.auth.repository.SocialSignupTokenRedisRepository;
 import shop.dontouch.dontouch_be.domain.user.constant.LoginPlatform;
 import shop.dontouch.dontouch_be.domain.user.constant.UserGender;
 import shop.dontouch.dontouch_be.domain.user.constant.UserJobType;
@@ -31,6 +34,7 @@ import shop.dontouch.dontouch_be.domain.user.constant.UserStatus;
 import shop.dontouch.dontouch_be.domain.user.dto.response.UserResponse;
 import shop.dontouch.dontouch_be.domain.user.entity.User;
 import shop.dontouch.dontouch_be.domain.user.repository.UserRepository;
+import shop.dontouch.dontouch_be.domain.user.service.UserSettingsService;
 import shop.dontouch.dontouch_be.global.exception.CustomException;
 import shop.dontouch.dontouch_be.global.exception.ErrorCode;
 import shop.dontouch.dontouch_be.global.security.JwtProvider;
@@ -45,107 +49,129 @@ public class OAuthService {
   private final PasswordEncoder passwordEncoder;
   private final JwtProvider jwtProvider;
   private final RefreshTokenRedisRepository refreshTokenRedisRepository;
+  private final SocialSignupTokenRedisRepository socialSignupTokenRedisRepository;
+  private final UserSettingsService userSettingsService;
 
   private final GoogleOAuthClient googleOAuthClient;
   private final KakaoOAuthClient kakaoOAuthClient;
   private final AppleOAuthClient appleOAuthClient;
 
   @Transactional
-  public AuthResponse googleLogin(GoogleOAuthLoginRequest request) {
+  public OAuthLoginResponse googleLogin(GoogleOAuthLoginRequest request) {
     SocialUserInfo socialUserInfo = googleOAuthClient.getUserInfo(request);
     validateSocialUserInfo(socialUserInfo);
 
-    User user = getExistingSocialUser(LoginPlatform.GOOGLE, socialUserInfo);
+    return loginOrCreateSignupToken(LoginPlatform.GOOGLE, socialUserInfo);
+  }
 
-    validateUserStatus(user);
+  @Transactional
+  public OAuthLoginResponse kakaoLogin(KakaoOAuthLoginRequest request) {
+    SocialUserInfo socialUserInfo = kakaoOAuthClient.getUserInfo(request);
+    validateSocialUserInfo(socialUserInfo);
 
-    return issueTokens(user);
+    return loginOrCreateSignupToken(LoginPlatform.KAKAO, socialUserInfo);
+  }
+
+  @Transactional
+  public OAuthLoginResponse appleLogin(AppleOAuthLoginRequest request) {
+    SocialUserInfo socialUserInfo = appleOAuthClient.getUserInfo(request);
+    validateSocialUserInfo(socialUserInfo);
+
+    return loginOrCreateSignupToken(LoginPlatform.APPLE, socialUserInfo);
   }
 
   @Transactional
   public AuthResponse googleSignup(GoogleOAuthSignupRequest request) {
-    SocialUserInfo socialUserInfo = googleOAuthClient.getUserInfo(request);
-    validateSocialUserInfo(socialUserInfo);
+    SocialSignupInfo signupInfo = getValidSignupInfo(
+      request.getSignupToken(),
+      LoginPlatform.GOOGLE
+    );
 
     User user = createSocialUser(
       LoginPlatform.GOOGLE,
-      socialUserInfo,
+      signupInfo.toSocialUserInfo(),
       request.getNickname()
     );
 
-    validateUserStatus(user);
-
-    return issueTokens(user);
-  }
-
-  @Transactional
-  public AuthResponse kakaoLogin(KakaoOAuthLoginRequest request) {
-    SocialUserInfo socialUserInfo = kakaoOAuthClient.getUserInfo(request);
-    validateSocialUserInfo(socialUserInfo);
-
-    User user = getExistingSocialUser(LoginPlatform.KAKAO, socialUserInfo);
+    socialSignupTokenRedisRepository.delete(request.getSignupToken());
 
     validateUserStatus(user);
-
     return issueTokens(user);
   }
 
   @Transactional
   public AuthResponse kakaoSignup(KakaoOAuthSignupRequest request) {
-    SocialUserInfo socialUserInfo = kakaoOAuthClient.getUserInfo(request);
-    validateSocialUserInfo(socialUserInfo);
+    SocialSignupInfo signupInfo = getValidSignupInfo(
+      request.getSignupToken(),
+      LoginPlatform.KAKAO
+    );
 
     User user = createSocialUser(
       LoginPlatform.KAKAO,
-      socialUserInfo,
+      signupInfo.toSocialUserInfo(),
       request.getNickname()
     );
 
-    validateUserStatus(user);
-
-    return issueTokens(user);
-  }
-
-  @Transactional
-  public AuthResponse appleLogin(AppleOAuthLoginRequest request) {
-    SocialUserInfo socialUserInfo = appleOAuthClient.getUserInfo(request);
-
-    validateSocialUserInfo(socialUserInfo);
-
-    User user = getExistingSocialUser(LoginPlatform.APPLE, socialUserInfo);
+    socialSignupTokenRedisRepository.delete(request.getSignupToken());
 
     validateUserStatus(user);
-
     return issueTokens(user);
   }
 
   @Transactional
   public AuthResponse appleSignup(AppleOAuthSignupRequest request) {
-    SocialUserInfo socialUserInfo = appleOAuthClient.getUserInfo(request);
-
-    validateSocialUserInfo(socialUserInfo);
+    SocialSignupInfo signupInfo = getValidSignupInfo(
+      request.getSignupToken(),
+      LoginPlatform.APPLE
+    );
 
     User user = createSocialUser(
       LoginPlatform.APPLE,
-      socialUserInfo,
+      signupInfo.toSocialUserInfo(),
       request.getNickname()
     );
 
-    validateUserStatus(user);
+    socialSignupTokenRedisRepository.delete(request.getSignupToken());
 
+    validateUserStatus(user);
     return issueTokens(user);
   }
 
-  private User getExistingSocialUser(
+  private OAuthLoginResponse loginOrCreateSignupToken(
     LoginPlatform loginPlatform,
     SocialUserInfo socialUserInfo
   ) {
     return userRepository
       .findByLoginPlatformAndProviderId(loginPlatform, socialUserInfo.providerId())
-      .orElseThrow(() -> {
-        log.warn("social login: 가입되지 않은 소셜 계정 loginPlatform={}", loginPlatform);
-        return new CustomException(ErrorCode.SOCIAL_SIGNUP_REQUIRED);
+      .map(user -> {
+        validateUserStatus(user);
+        return OAuthLoginResponse.success(issueTokens(user));
+      })
+      .orElseGet(() -> {
+        String signupToken = UUID.randomUUID().toString();
+
+        socialSignupTokenRedisRepository.save(
+          signupToken,
+          SocialSignupInfo.from(loginPlatform, socialUserInfo)
+        );
+
+        return OAuthLoginResponse.signupRequired(loginPlatform, signupToken);
       });
+  }
+
+  private SocialSignupInfo getValidSignupInfo(
+    String signupToken,
+    LoginPlatform expectedLoginPlatform
+  ) {
+    SocialSignupInfo signupInfo = socialSignupTokenRedisRepository
+      .findByToken(signupToken)
+      .orElseThrow(() -> new CustomException(ErrorCode.SOCIAL_SIGNUP_TOKEN_INVALID));
+
+    if (signupInfo.loginPlatform() != expectedLoginPlatform) {
+      throw new CustomException(ErrorCode.SOCIAL_SIGNUP_TOKEN_INVALID);
+    }
+
+    return signupInfo;
   }
 
   private User createSocialUser(
@@ -183,12 +209,18 @@ public class OAuthService {
       .region(UserRegion.SEOUL)
       .build();
 
+    User savedUser;
+
     try {
-      return userRepository.saveAndFlush(user);
+      savedUser = userRepository.saveAndFlush(user);
     } catch (DataIntegrityViolationException e) {
       log.warn("social signup: DB 제약조건 위반", e);
       throw new CustomException(ErrorCode.USER_DUPLICATE);
     }
+
+    userSettingsService.createDefaultSettings(savedUser);
+
+    return savedUser;
   }
 
   private void validateSocialUserInfo(SocialUserInfo socialUserInfo) {

@@ -32,6 +32,7 @@ public class UserService {
 
   private final UserRepository userRepository;
   private final PasswordEncoder passwordEncoder;
+  private final UserSettingsService userSettingsService;
 
   @Transactional
   public UserResponse createUser(UserCreateRequest request) {
@@ -65,6 +66,7 @@ public class UserService {
 
     try {
       User savedEntity = userRepository.saveAndFlush(entity);
+      userSettingsService.createDefaultSettings(savedEntity);
       return UserResponse.from(savedEntity);
     } catch (DataIntegrityViolationException e) {
       if (isUniqueConstraintViolation(e)) {

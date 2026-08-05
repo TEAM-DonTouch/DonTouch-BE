@@ -15,23 +15,23 @@ import shop.dontouch.dontouch_be.domain.finance.constant.TransactionType;
 public class TransactionRequest {
 
   @Schema(description = "카테고리 ID", example = "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa")
-  @NotNull
+  @NotNull(message = "카테고리는 필수입니다.")
   private UUID categoryId;
 
   @Schema(description = "거래 유형 (INCOME / EXPENSE)", example = "INCOME")
-  @NotNull
+  @NotNull(message = "거래 유형은 필수입니다.")
   private TransactionType type; // INCOME,EXPENSE
 
   @Schema(description = "거래 금액", example = "50000")
-  @NotNull
+  @NotNull(message = "거래 금액은 필수입니다.")
   @Min(value = 1, message = "금액은 1 이상이어야 합니다.")
   private Long amount;
 
   @Schema(description = "메모")
-  @Size(max = 30)
+  @Size(max = 30, message = "메모는 30자를 초과할 수 없습니다.")
   private String memo;
 
   @Schema(description = "거래 일시")
-  @NotNull
+  @NotNull(message = "거래 일시는 필수입니다.")
   private LocalDateTime transactionDate;
 }

@@ -1,13 +1,13 @@
 package shop.dontouch.dontouch_be.domain.auth.repository;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.Duration;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Repository;
 import shop.dontouch.dontouch_be.domain.auth.oauth.SocialSignupInfo;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.json.JsonMapper;
 
 @Repository
 @RequiredArgsConstructor
@@ -17,14 +17,14 @@ public class SocialSignupTokenRedisRepository {
   private static final Duration EXPIRATION = Duration.ofMinutes(10);
 
   private final StringRedisTemplate stringRedisTemplate;
-  private final ObjectMapper objectMapper;
+  private final JsonMapper jsonMapper;
 
   public void save(String signupToken, SocialSignupInfo signupInfo) {
     try {
-      String value = objectMapper.writeValueAsString(signupInfo);
+      String value = jsonMapper.writeValueAsString(signupInfo);
       stringRedisTemplate.opsForValue()
         .set(KEY_PREFIX + signupToken, value, EXPIRATION);
-    } catch (JsonProcessingException e) {
+    } catch (JacksonException e) {
       throw new IllegalStateException("소셜 회원가입 정보 직렬화 실패", e);
     }
   }
@@ -37,8 +37,8 @@ public class SocialSignupTokenRedisRepository {
     }
 
     try {
-      return Optional.of(objectMapper.readValue(value, SocialSignupInfo.class));
-    } catch (JsonProcessingException e) {
+      return Optional.of(jsonMapper.readValue(value, SocialSignupInfo.class));
+    } catch (JacksonException e) {
       throw new IllegalStateException("소셜 회원가입 정보 역직렬화 실패", e);
     }
   }

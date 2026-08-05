@@ -67,8 +67,15 @@ public class CategoryController implements CategoryControllerDocs {
 
   @LogMonitoring
   @GetMapping("/{category-id}")
-  public ResponseEntity<CategoryResponse> getCategoryByCategoryId(@PathVariable(name = "category-id") UUID categoryId) {
-    CategoryResponse response = categoryService.getCategoryByCategoryId(categoryId);
+  public ResponseEntity<CategoryResponse> getCategoryByCategoryId(
+    @AuthenticationPrincipal CustomUserDetails currentUser,
+    @PathVariable(name = "category-id") UUID categoryId
+  ) {
+    CategoryResponse response = categoryService.getCategoryByCategoryId(
+      categoryId,
+      currentUser == null ? null : currentUser.getUser()
+    );
+
     return ResponseEntity.ok(response);
   }
 

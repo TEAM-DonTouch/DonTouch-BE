@@ -15,6 +15,9 @@ import shop.dontouch.dontouch_be.domain.user.entity.User;
 import shop.dontouch.dontouch_be.domain.user.repository.UserRepository;
 import shop.dontouch.dontouch_be.global.exception.CustomException;
 import shop.dontouch.dontouch_be.global.exception.ErrorCode;
+import java.sql.SQLException;
+import org.springframework.dao.DataIntegrityViolationException;
+import shop.dontouch.dontouch_be.domain.user.constant.UserRole;
 
 @Service
 @Slf4j
@@ -28,24 +31,54 @@ public class CategoryService {
 
   @Transactional
   public CategoryResponse createGlobalCategory(CategoryRequest request) {
-    if (categoryRepository.existsByNameAndUserIsNull(request.getCategoryName())) {
-      log.warn("createGlobalCategory: 이미 존재하는 이름입니다. {}", request.getCategoryName());
-      throw new CustomException(ErrorCode.CATEGORY_NAME_DUPLICATE);
+    String name = request.getCategoryName();
+
+    if (categoryRepository.existsByNameAndUserIsNull(name)) {
+      log.warn("createGlobalCategory: 이미 존재하는 이름입니다. {}", name);
+
+      throw new CustomException(
+        ErrorCode.CATEGORY_NAME_DUPLICATE
+      );
     }
-    Category category = categoryRepository.save(
-        Category.builder()
-            .name(request.getCategoryName())
-            .build()
-    );
-    return CategoryResponse.from(category);
+
+    Category category = Category.builder()
+      .name(name)
+      .build();
+
+    Category savedCategory = saveAndFlushCategory(category, "createGlobalCategory");
+
+    return CategoryResponse.from(savedCategory);
   }
 
-  public CategoryResponse getCategoryByCategoryId(UUID categoryId) {
+  public CategoryResponse getCategoryByCategoryId(
+    UUID categoryId,
+    User currentUser
+  ) {
     Category category = categoryRepository.findById(categoryId)
-        .orElseThrow(() -> {
-          log.warn("getCategory: 유효하지 않은 category id {}", categoryId);
-          return new CustomException(ErrorCode.CATEGORY_NOT_FOUND);
-        });
+      .orElseThrow(() -> {
+        log.warn(
+          "getCategoryByCategoryId: 유효하지 않은 category id {}",
+          categoryId
+        );
+
+        return new CustomException(ErrorCode.CATEGORY_NOT_FOUND);
+      });
+
+    if (category.isCustom()) {
+      boolean isOwner = currentUser != null && category.getUser().getId().equals(currentUser.getId());
+      boolean isAdmin = currentUser != null && currentUser.getRole() == UserRole.ADMIN;
+
+      if (!isOwner && !isAdmin) {
+        log.warn(
+          "getCategoryByCategoryId: 커스텀 카테고리 접근 거부 userId={} categoryId={}",
+          currentUser == null ? null : currentUser.getId(),
+          categoryId
+        );
+
+        throw new CustomException(ErrorCode.ACCESS_DENIED);
+      }
+    }
+
     return CategoryResponse.from(category);
   }
 
@@ -74,8 +107,7 @@ public class CategoryService {
     }
 
     category.updateName(request.getCategoryName());
-
-    Category updatedCategory = categoryRepository.saveAndFlush(category);
+    Category updatedCategory = saveAndFlushCategory(category, "updateGlobalCategory");
 
     return CategoryResponse.from(updatedCategory);
   }
@@ -108,14 +140,14 @@ public class CategoryService {
       throw new CustomException(ErrorCode.CATEGORY_NAME_DUPLICATE);
     }
 
-    Category category = categoryRepository.save(
-        Category.builder()
-            .user(user)
-            .name(name)
-            .build()
-    );
+    Category category = Category.builder()
+      .user(user)
+      .name(name)
+      .build();
 
-    return CategoryResponse.from(category);
+    Category savedCategory = saveAndFlushCategory(category, "createCustomCategory");
+
+    return CategoryResponse.from(savedCategory);
   }
 
   public List<CategoryResponse> getCategoriesForUser(UUID userId) {
@@ -159,5 +191,35 @@ public class CategoryService {
     return categoryRepository.findAll().stream()
         .map(CategoryResponse::from)
         .toList();
+  }
+
+  private Category saveAndFlushCategory(
+    Category category,
+    String operation
+  ) {
+    try {
+      return categoryRepository.saveAndFlush(category);
+    } catch (DataIntegrityViolationException e) {
+      if (isUniqueConstraintViolation(e)) {
+        log.warn("{}: 카테고리 이름 DB 중복 name={}", operation, category.getName());
+        throw new CustomException(ErrorCode.CATEGORY_NAME_DUPLICATE);
+      }
+
+      throw e;
+    }
+  }
+
+  private boolean isUniqueConstraintViolation(Throwable throwable) {
+    Throwable cause = throwable;
+
+    while (cause != null) {
+      if (cause instanceof SQLException sqlException && "23505".equals(sqlException.getSQLState())) {
+        return true;
+      }
+
+      cause = cause.getCause();
+    }
+
+    return false;
   }
 }

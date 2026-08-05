@@ -275,8 +275,11 @@ public interface CategoryControllerDocs {
       summary = "카테고리 단건 조회",
       description = """
           ### 요청 파라미터
-          Path Variable
+          Header: `Authorization: Bearer {accessToken}`
+          - 전역 카테고리 조회 시 선택
+          - 커스텀 카테고리 조회 시 필수
 
+          Path Variable
           - `category-id` (UUID, required): 조회할 카테고리 ID
 
           요청 예시
@@ -293,18 +296,26 @@ public interface CategoryControllerDocs {
 
           ### 사용 방법
           1. 조회할 카테고리 ID를 Path Variable로 전달합니다.
-          2. 해당 카테고리 정보를 반환합니다.
+          2. 전역 카테고리는 로그인하지 않아도 조회할 수 있습니다.
+          3. 커스텀 카테고리는 소유자 또는 ADMIN만 조회할 수 있습니다.
 
           ### 유의 사항
-          - 존재하지 않는 카테고리 ID로 요청 시 예외가 발생합니다.
-          - 삭제된 카테고리는 조회되지 않습니다.
+          - 다른 사용자의 커스텀 카테고리는 조회할 수 없습니다.
+          - 존재하지 않거나 삭제된 카테고리는 조회되지 않습니다.
 
           ### 예외 처리
+          - `TOKEN_INVALID` (401 UNAUTHORIZED): 유효하지 않은 토큰입니다.
+          - `ACCESS_DENIED` (403 FORBIDDEN): 커스텀 카테고리 조회 권한이 없습니다.
           - `CATEGORY_NOT_FOUND` (404 NOT_FOUND): 카테고리를 찾을 수 없습니다.
           """
   )
   ResponseEntity<CategoryResponse> getCategoryByCategoryId(
-      @PathVariable(name = "category-id") UUID categoryId
+      @Parameter(hidden = true)
+      @AuthenticationPrincipal
+      CustomUserDetails currentUser,
+
+      @PathVariable(name = "category-id")
+      UUID categoryId
   );
 
   @Operation(

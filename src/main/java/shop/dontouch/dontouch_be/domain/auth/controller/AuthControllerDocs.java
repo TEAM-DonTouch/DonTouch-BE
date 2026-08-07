@@ -77,6 +77,7 @@ public interface AuthControllerDocs {
           - `USER_LOGIN_ID_DUPLICATE` (409 CONFLICT): 이미 사용 중인 아이디입니다.
           - `USER_EMAIL_DUPLICATE` (409 CONFLICT): 이미 사용 중인 이메일입니다.
           - `USER_NICKNAME_DUPLICATE` (409 CONFLICT): 이미 사용 중인 닉네임입니다.
+          - `USER_DUPLICATE` (409 CONFLICT): 중복 검사 이후 사용자 저장 중 DB 유니크 제약 위반이 발생했습니다.
           - `INVALID_INPUT_VALUE` (400 BAD_REQUEST): 유효하지 않은 입력값입니다.
           """
   )

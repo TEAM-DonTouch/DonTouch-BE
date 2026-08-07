@@ -11,10 +11,10 @@ import shop.dontouch.dontouch_be.domain.finance.constant.BudgetPeriod;
 @NoArgsConstructor
 public class BudgetRequest {
 
-  @NotNull
+  @NotNull(message = "예산 기간은 필수입니다.")
   private BudgetPeriod period;
 
-  @NotNull
+  @NotNull(message = "예산 금액은 필수입니다.")
   @Min(value = 1, message = "금액은 1 이상이어야 합니다.")
   private Long amount;
 

@@ -47,6 +47,7 @@ public class TransactionService {
           log.warn("createTransaction: 유효하지 않은 categoryId {}", request.getCategoryId());
           return new CustomException(ErrorCode.CATEGORY_NOT_FOUND);
         });
+    validateCategoryOwnership(category, userId);
 
     Transaction transaction = transactionRepository.save(
         Transaction.builder()
@@ -129,9 +130,13 @@ public class TransactionService {
             log.warn("updateTransaction: 유효하지 않은 categoryId {}", request.getCategoryId());
             return new CustomException(ErrorCode.CATEGORY_NOT_FOUND);
           });
+      validateCategoryOwnership(category, userId);
     }
     transaction.update(category, request.getAmount(), request.getMemo(), request.getType(), request.getTransactionDate());
-    return TransactionResponse.from(transaction);
+
+    Transaction updatedTransaction = transactionRepository.saveAndFlush(transaction);
+
+    return TransactionResponse.from(updatedTransaction);
   }
 
   @Transactional
@@ -148,6 +153,13 @@ public class TransactionService {
     }
 
     transaction.delete();
+  }
+
+  private void validateCategoryOwnership(Category category, UUID userId) {
+    if (category.getUser() != null && !category.getUser().getId().equals(userId)) {
+      log.warn("validateCategoryOwnership: 본인 소유가 아닌 카테고리 사용 시도 userId {} categoryId {}", userId, category.getId());
+      throw new CustomException(ErrorCode.ACCESS_DENIED);
+    }
   }
 
 }

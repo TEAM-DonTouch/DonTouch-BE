@@ -4,35 +4,34 @@ package shop.dontouch.dontouch_be.domain.finance.dto.response;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.UUID;
-import lombok.Builder;
-import lombok.Getter;
 import shop.dontouch.dontouch_be.domain.finance.constant.BudgetPeriod;
 import shop.dontouch.dontouch_be.domain.finance.entity.Budget;
 
-@Getter
-@Builder
-public class BudgetResponse {
+public record BudgetResponse(
+    UUID budgetId,
+    UUID userId,
+    BudgetPeriod period,
+    Long amount,
+    LocalDate startDate,
+    LocalDate endDate,
+    LocalDateTime createdAt,
+    LocalDateTime updatedAt,
+    Long usedAmount,
+    Long remainingAmount
+) {
 
-  private UUID budgetId;
-  private UUID userId;
-  private BudgetPeriod period;
-  private Long amount;
-  private LocalDate startDate;
-  private LocalDate endDate;
-  private LocalDateTime createdAt;
-  private LocalDateTime updatedAt;
-
-  public static BudgetResponse from(Budget budget) {
-    return BudgetResponse.builder()
-        .budgetId(budget.getId())
-        .userId(budget.getUser().getId())
-        .period(budget.getPeriod())
-        .amount(budget.getAmount())
-        .startDate(budget.getStartDate())
-        .endDate(budget.getEndDate())
-        .createdAt(budget.getCreatedAt())
-        .updatedAt(budget.getUpdatedAt())
-        .build();
+  public static BudgetResponse from(Budget budget, Long usedAmount) {
+    return new BudgetResponse(
+        budget.getId(),
+        budget.getUser().getId(),
+        budget.getPeriod(),
+        budget.getAmount(),
+        budget.getStartDate(),
+        budget.getEndDate(),
+        budget.getCreatedAt(),
+        budget.getUpdatedAt(),
+        usedAmount,
+        budget.getAmount() - usedAmount
+    );
   }
-
 }

@@ -16,6 +16,7 @@ import shop.dontouch.dontouch_be.domain.auth.dto.request.RefreshTokenRequest;
 import shop.dontouch.dontouch_be.domain.auth.dto.request.SignupRequest;
 import shop.dontouch.dontouch_be.domain.auth.dto.response.AuthResponse;
 import shop.dontouch.dontouch_be.domain.auth.repository.RefreshTokenRedisRepository;
+import shop.dontouch.dontouch_be.domain.user.constant.LoginPlatform;
 import shop.dontouch.dontouch_be.domain.user.constant.UserGender;
 import shop.dontouch.dontouch_be.domain.user.constant.UserJobType;
 import shop.dontouch.dontouch_be.domain.user.constant.UserRegion;
@@ -23,9 +24,13 @@ import shop.dontouch.dontouch_be.domain.user.constant.UserStatus;
 import shop.dontouch.dontouch_be.domain.user.dto.response.UserResponse;
 import shop.dontouch.dontouch_be.domain.user.entity.User;
 import shop.dontouch.dontouch_be.domain.user.repository.UserRepository;
+import shop.dontouch.dontouch_be.domain.user.service.UserSettingsService;
 import shop.dontouch.dontouch_be.global.exception.CustomException;
 import shop.dontouch.dontouch_be.global.exception.ErrorCode;
 import shop.dontouch.dontouch_be.global.security.JwtProvider;
+import java.sql.SQLException;
+import org.hibernate.exception.ConstraintViolationException;
+import org.springframework.dao.DataIntegrityViolationException;
 
 @Slf4j
 @Service
@@ -37,6 +42,7 @@ public class AuthService {
   private final JwtProvider jwtProvider;
   private final PasswordEncoder passwordEncoder;
   private final RefreshTokenRedisRepository refreshTokenRedisRepository;
+  private final UserSettingsService userSettingsService;
 
   @Transactional
   public AuthResponse signup(SignupRequest request) {
@@ -44,49 +50,57 @@ public class AuthService {
       log.warn("signup: 중복 loginId");
       throw new CustomException(ErrorCode.USER_LOGIN_ID_DUPLICATE);
     }
+
     if (userRepository.existsByEmail(request.getEmail())) {
       log.warn("signup: 중복 email");
       throw new CustomException(ErrorCode.USER_EMAIL_DUPLICATE);
     }
+
     if (userRepository.existsByNickname(request.getNickname())) {
       log.warn("signup: 중복 nickname");
       throw new CustomException(ErrorCode.USER_NICKNAME_DUPLICATE);
     }
 
     User user = User.builder()
-        .email(request.getEmail())
-        .loginId(request.getLoginId())
-        .password(passwordEncoder.encode(request.getPassword()))
-        .nickname(request.getNickname())
-        .age(request.getAge())
-        .gender(request.getGender() != null ? request.getGender() : UserGender.NOT_SELECTED)
-        .jobType(request.getJobType() != null ? request.getJobType() : UserJobType.OTHER)
-        .region(request.getRegion() != null ? request.getRegion() : UserRegion.SEOUL)
-        .build();
+      .email(request.getEmail())
+      .loginId(request.getLoginId())
+      .password(passwordEncoder.encode(request.getPassword()))
+      .nickname(request.getNickname())
+      .age(request.getAge())
+      .gender(request.getGender() != null ? request.getGender() : UserGender.NOT_SELECTED)
+      .jobType(request.getJobType() != null ? request.getJobType() : UserJobType.OTHER)
+      .region(request.getRegion() != null ? request.getRegion() : UserRegion.SEOUL)
+      .build();
 
     User savedUser;
+
     try {
       savedUser = userRepository.saveAndFlush(user);
     } catch (DataIntegrityViolationException e) {
-      log.warn("signup: DB 제약조건 위반");
-      throw new CustomException(ErrorCode.USER_DUPLICATE);
+      if (isUniqueConstraintViolation(e)) {
+        log.warn("signup: DB 유니크 제약조건 위반");
+        throw new CustomException(ErrorCode.USER_DUPLICATE);
+      }
+      throw e;
     }
+
+    userSettingsService.createDefaultSettings(savedUser);
 
     String accessToken = jwtProvider.createAccessToken(savedUser);
     String refreshToken = jwtProvider.createRefreshToken();
     String refreshTokenKey = hashRefreshToken(refreshToken);
 
     refreshTokenRedisRepository.save(
-        refreshTokenKey,
-        savedUser.getId().toString(),
-        jwtProvider.getRefreshTokenExpiration()
+      refreshTokenKey,
+      savedUser.getId().toString(),
+      jwtProvider.getRefreshTokenExpiration()
     );
 
     return AuthResponse.builder()
-        .accessToken(accessToken)
-        .refreshToken(refreshToken)
-        .user(UserResponse.from(savedUser))
-        .build();
+      .accessToken(accessToken)
+      .refreshToken(refreshToken)
+      .user(UserResponse.from(savedUser))
+      .build();
   }
 
   public AuthResponse login(LoginRequest request) {
@@ -95,6 +109,11 @@ public class AuthService {
           log.warn("login: 존재하지 않는 loginId");
           return new CustomException(ErrorCode.LOGIN_FAILED);
         });
+
+    if (user.getLoginPlatform() != LoginPlatform.LOCAL) {
+      log.warn("login: 소셜 로그인 계정은 일반 로그인 불가");
+      throw new CustomException(ErrorCode.LOGIN_FAILED);
+    }
 
     if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
       log.warn("login: 비밀번호 불일치");
@@ -190,5 +209,24 @@ public class AuthService {
     } catch (NoSuchAlgorithmException e) {
       throw new IllegalStateException("SHA-256 algorithm not available", e);
     }
+  }
+
+  private boolean isUniqueConstraintViolation(
+    DataIntegrityViolationException exception
+  ) {
+    Throwable cause = exception;
+
+    while (cause != null) {
+      if (cause instanceof ConstraintViolationException constraintViolationException) {
+        SQLException sqlException = constraintViolationException.getSQLException();
+
+        return sqlException != null
+               && "23505".equals(sqlException.getSQLState());
+      }
+
+      cause = cause.getCause();
+    }
+
+    return false;
   }
 }

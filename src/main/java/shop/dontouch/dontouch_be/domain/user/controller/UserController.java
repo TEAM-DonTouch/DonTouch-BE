@@ -19,10 +19,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import shop.dontouch.dontouch_be.domain.user.dto.request.UserCreateRequest;
 import shop.dontouch.dontouch_be.domain.user.dto.request.UserRoleUpdateRequest;
+import shop.dontouch.dontouch_be.domain.user.dto.request.UserSettingsUpdateRequest;
 import shop.dontouch.dontouch_be.domain.user.dto.request.UserStatusUpdateRequest;
 import shop.dontouch.dontouch_be.domain.user.dto.request.UserUpdateRequest;
 import shop.dontouch.dontouch_be.domain.user.dto.response.UserResponse;
+import shop.dontouch.dontouch_be.domain.user.dto.response.UserSettingsResponse;
 import shop.dontouch.dontouch_be.domain.user.service.UserService;
+import shop.dontouch.dontouch_be.domain.user.service.UserSettingsService;
 import shop.dontouch.dontouch_be.global.security.CustomUserDetails;
 
 @RestController
@@ -31,6 +34,7 @@ import shop.dontouch.dontouch_be.global.security.CustomUserDetails;
 public class UserController implements UserControllerDocs {
 
   private final UserService userService;
+  private final UserSettingsService userSettingsService;
 
 
 
@@ -58,6 +62,23 @@ public class UserController implements UserControllerDocs {
   ) {
     userService.deleteUser(currentUser.getUserId());
     return ResponseEntity.noContent().build();
+  }
+
+  @LogMonitoring
+  @GetMapping("/me/settings")
+  public ResponseEntity<UserSettingsResponse> getMySettings(
+      @AuthenticationPrincipal CustomUserDetails currentUser
+  ) {
+    return ResponseEntity.ok(userSettingsService.getSettings(currentUser.getUserId()));
+  }
+
+  @LogMonitoring
+  @PatchMapping("/me/settings")
+  public ResponseEntity<UserSettingsResponse> updateMySettings(
+      @AuthenticationPrincipal CustomUserDetails currentUser,
+      @Valid @RequestBody UserSettingsUpdateRequest request
+  ) {
+    return ResponseEntity.ok(userSettingsService.updateSettings(currentUser.getUserId(), request));
   }
 
   ///  ADMIN

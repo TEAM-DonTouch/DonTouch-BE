@@ -24,7 +24,7 @@ public class TransactionUpdateRequest {
   private Long amount;
 
   @Schema(description = "메모")
-  @Size(max = 30)
+  @Size(max = 30, message = "메모는 30자를 초과할 수 없습니다.")
   private String memo;
 
   @Schema(description = "거래 일시")

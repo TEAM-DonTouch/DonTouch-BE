@@ -25,6 +25,16 @@ import org.springframework.context.annotation.Configuration;
             ### 💻 **GitHub 저장소**
             - **[백엔드 소스코드](https://github.com/TEAM-DonTouch/DonTouch-BE)**
               백엔드 개발에 관심이 있다면 저장소를 방문해보세요.
+
+            ### ⚠️ 공통 응답 코드
+
+            아래 오류는 특정 엔드포인트가 아니라 **요청 자체가 잘못됐을 때** 발생하므로, 각 API 문서에는 따로 표기하지 않습니다.
+            모든 오류 응답의 본문 형식은 `{"errorCode": "...", "errorMessage": "..."}` 로 동일합니다.
+
+            - `RESOURCE_NOT_FOUND` (404 NOT_FOUND): 존재하지 않는 경로입니다. 요청 URL을 확인해주세요.
+            - `METHOD_NOT_ALLOWED` (405 METHOD_NOT_ALLOWED): 해당 경로가 지원하지 않는 HTTP 메서드입니다. 응답의 `Allow` 헤더에서 지원 메서드를 확인할 수 있습니다.
+            - `UNSUPPORTED_MEDIA_TYPE` (415 UNSUPPORTED_MEDIA_TYPE): 지원하지 않는 Content-Type입니다. 요청 본문이 있는 API는 `application/json`으로 보내주세요.
+            - `INTERNAL_SERVER_ERROR` (500 INTERNAL_SERVER_ERROR): 서버 내부 오류입니다. 재현 방법과 함께 백엔드에 알려주세요.
             """,
         version = "0.0.1v"
     )

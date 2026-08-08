@@ -14,6 +14,9 @@ public enum ErrorCode {
   INVALID_REQUEST(HttpStatus.BAD_REQUEST, "유효하지 않은 요청입니다."),
   ACCESS_DENIED(HttpStatus.FORBIDDEN, "접근이 거부되었습니다."),
   DATA_INTEGRITY_VIOLATION(HttpStatus.CONFLICT, "요청을 처리할 수 없는 데이터 상태입니다. 잠시 후 다시 시도해주세요."),
+  RESOURCE_NOT_FOUND(HttpStatus.NOT_FOUND, "요청하신 리소스를 찾을 수 없습니다."),
+  METHOD_NOT_ALLOWED(HttpStatus.METHOD_NOT_ALLOWED, "지원하지 않는 요청 방식입니다."),
+  UNSUPPORTED_MEDIA_TYPE(HttpStatus.UNSUPPORTED_MEDIA_TYPE, "지원하지 않는 Content-Type입니다."),
 
   // Transaction
   TRANSACTION_NOT_FOUND(HttpStatus.NOT_FOUND, "거래를 찾을 수 없습니다."),

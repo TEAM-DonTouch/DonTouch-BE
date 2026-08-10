@@ -3,8 +3,8 @@ package shop.dontouch.dontouch_be.global.exception;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
@@ -202,13 +202,11 @@ public class GlobalExceptionHandler {
         .errorMessage(ErrorCode.METHOD_NOT_ALLOWED.getMessage())
         .build();
 
-    // RFC 9110: 405 응답에는 허용되는 메서드를 Allow 헤더로 알려야 한다
-    HttpHeaders headers = new HttpHeaders();
-    if (e.getSupportedHttpMethods() != null) {
-      headers.setAllow(e.getSupportedHttpMethods());
-    }
-
-    return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).headers(headers).body(response);
+    // RFC 9110: 405 응답에는 허용되는 메서드를 Allow 헤더로 알려야 한다.
+    // 예외가 제공하는 헤더를 그대로 쓴다(지원 메서드를 알 수 없으면 빈 헤더를 돌려준다).
+    return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED)
+        .headers(e.getHeaders())
+        .body(response);
   }
 
   /**
@@ -225,7 +223,10 @@ public class GlobalExceptionHandler {
         .errorMessage(ErrorCode.UNSUPPORTED_MEDIA_TYPE.getMessage())
         .build();
 
-    return ResponseEntity.status(HttpStatus.UNSUPPORTED_MEDIA_TYPE).body(response);
+    // 예외가 지원 가능한 미디어 타입을 Accept(또는 Accept-Patch) 헤더로 알려주므로 함께 내려보낸다
+    return ResponseEntity.status(HttpStatus.UNSUPPORTED_MEDIA_TYPE)
+        .headers(e.getHeaders())
+        .body(response);
   }
 
   /**
@@ -236,9 +237,10 @@ public class GlobalExceptionHandler {
     // Spring MVC 표준 예외는 자신의 상태 코드를 알고 있다(ErrorResponse 구현).
     // 개별 핸들러를 빠뜨리더라도 4xx가 500으로 둔갑하지 않도록 그 값을 살려준다.
     if (e instanceof org.springframework.web.ErrorResponse springError) {
-      HttpStatus status = HttpStatus.resolve(springError.getStatusCode().value());
+      // HttpStatus enum 에 없는 비표준 4xx도 살릴 수 있도록 HttpStatusCode 를 그대로 쓴다
+      HttpStatusCode status = springError.getStatusCode();
 
-      if (status != null && status.is4xxClientError()) {
+      if (status.is4xxClientError()) {
         log.warn("처리되지 않은 요청 오류 {} -> {}", e.getClass().getSimpleName(), status.value());
 
         ErrorResponse response = ErrorResponse.builder()
@@ -246,7 +248,9 @@ public class GlobalExceptionHandler {
             .errorMessage(ErrorCode.INVALID_REQUEST.getMessage())
             .build();
 
-        return ResponseEntity.status(status).body(response);
+        return ResponseEntity.status(status)
+            .headers(springError.getHeaders())
+            .body(response);
       }
     }
 

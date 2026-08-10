@@ -4,14 +4,18 @@ import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.web.HttpMediaTypeNotSupportedException;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 @RestControllerAdvice
 @Slf4j
@@ -170,10 +174,86 @@ public class GlobalExceptionHandler {
   }
 
   /**
+   * 매핑되지 않은 경로 요청 처리 (예: URL 오타, 스캐너의 무작위 요청)
+   */
+  @ExceptionHandler(NoResourceFoundException.class)
+  public ResponseEntity<ErrorResponse> handleNoResourceFoundException(NoResourceFoundException e) {
+    log.warn("존재하지 않는 경로 요청: {}", e.getResourcePath());
+
+    ErrorResponse response = ErrorResponse.builder()
+        .errorCode(ErrorCode.RESOURCE_NOT_FOUND)
+        .errorMessage(ErrorCode.RESOURCE_NOT_FOUND.getMessage())
+        .build();
+
+    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+  }
+
+  /**
+   * 지원하지 않는 HTTP 메서드로 호출한 경우 (예: POST 전용 엔드포인트를 GET으로 호출)
+   */
+  @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+  public ResponseEntity<ErrorResponse> handleHttpRequestMethodNotSupportedException(
+      HttpRequestMethodNotSupportedException e
+  ) {
+    log.warn("지원하지 않는 HTTP 메서드: {}", e.getMessage());
+
+    ErrorResponse response = ErrorResponse.builder()
+        .errorCode(ErrorCode.METHOD_NOT_ALLOWED)
+        .errorMessage(ErrorCode.METHOD_NOT_ALLOWED.getMessage())
+        .build();
+
+    // RFC 9110: 405 응답에는 허용되는 메서드를 Allow 헤더로 알려야 한다.
+    // 예외가 제공하는 헤더를 그대로 쓴다(지원 메서드를 알 수 없으면 빈 헤더를 돌려준다).
+    return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED)
+        .headers(e.getHeaders())
+        .body(response);
+  }
+
+  /**
+   * 지원하지 않는 Content-Type 으로 요청한 경우
+   */
+  @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
+  public ResponseEntity<ErrorResponse> handleHttpMediaTypeNotSupportedException(
+      HttpMediaTypeNotSupportedException e
+  ) {
+    log.warn("지원하지 않는 Content-Type: {}", e.getMessage());
+
+    ErrorResponse response = ErrorResponse.builder()
+        .errorCode(ErrorCode.UNSUPPORTED_MEDIA_TYPE)
+        .errorMessage(ErrorCode.UNSUPPORTED_MEDIA_TYPE.getMessage())
+        .build();
+
+    // 예외가 지원 가능한 미디어 타입을 Accept(또는 Accept-Patch) 헤더로 알려주므로 함께 내려보낸다
+    return ResponseEntity.status(HttpStatus.UNSUPPORTED_MEDIA_TYPE)
+        .headers(e.getHeaders())
+        .body(response);
+  }
+
+  /**
    * 기타 예외를 처리하는 핸들러 메서드
    */
   @ExceptionHandler(Exception.class)
   public ResponseEntity<ErrorResponse> handleException(Exception e) {
+    // Spring MVC 표준 예외는 자신의 상태 코드를 알고 있다(ErrorResponse 구현).
+    // 개별 핸들러를 빠뜨리더라도 4xx가 500으로 둔갑하지 않도록 그 값을 살려준다.
+    if (e instanceof org.springframework.web.ErrorResponse springError) {
+      // HttpStatus enum 에 없는 비표준 4xx도 살릴 수 있도록 HttpStatusCode 를 그대로 쓴다
+      HttpStatusCode status = springError.getStatusCode();
+
+      if (status.is4xxClientError()) {
+        log.warn("처리되지 않은 요청 오류 {} -> {}", e.getClass().getSimpleName(), status.value());
+
+        ErrorResponse response = ErrorResponse.builder()
+            .errorCode(ErrorCode.INVALID_REQUEST)
+            .errorMessage(ErrorCode.INVALID_REQUEST.getMessage())
+            .build();
+
+        return ResponseEntity.status(status)
+            .headers(springError.getHeaders())
+            .body(response);
+      }
+    }
+
     log.error("Unhandled exception", e);
 
     ErrorResponse response = ErrorResponse.builder()
